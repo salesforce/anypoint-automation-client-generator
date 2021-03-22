@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: VPC API
+  description: Description of the VPC API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/cloudhub/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/cloudhub/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/vpcs:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Returns a list of vpcs.
+      description: Returns a list of VPCs for the given organization id
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListVpcs'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    SuccessListVpcs:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of vpcs
+                items:
+                  $ref: '#/components/schemas/vpc'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    vpc:
+      title: VPC Object Schema
+      type: object
+      properties:
+        associatedEnvironments:
+          default: []
+          title: The associatedEnvironments schema
+          type: array
+          items:
+            description: Environment Id.
+            title: The first anyOf schema
+            type: string
+        cidrBlock:
+          default: "10.0.0.0/20"
+          description: An explanation about the purpose of this instance.
+          title: The cidrBlock schema
+          type: string
+        firewallRules:
+          default: []
+          title: The firewallRules schema
+          type: array
+          items:
+            type: object
+            required:
+              - cidrBlock
+              - protocol
+              - fromPort
+              - toPort
+            properties:
+              cidrBlock:
+                default: ""
+                description: An explanation about the purpose of this instance.
+                title: The cidrBlock schema
+                type: string
+              fromPort:
+                default: 0
+                description: An explanation about the purpose of this instance.
+                title: The fromPort schema
+                type: integer
+              protocol:
+                default: ""
+                description: An explanation about the purpose of this instance.
+                title: The protocol schema
+                type: string
+              toPort:
+                default: 0
+                description: An explanation about the purpose of this instance.
+                title: The toPort schema
+                type: integer
+        id:
+          description: The vpc Id
+          title: The id schema
+          type: string
+        internalDns:
+          title: The internalDns schema
+          type: object
+          default:
+            dnsServers: []
+            specialDomains: []
+          required:
+            - dnsServers
+            - specialDomains
+          properties:
+            dnsServers:
+              default: []
+              title: The dnsServers schema
+              type: array
+              items:
+                type: string
+            specialDomains:
+              title: The specialDomains schema
+              type: array
+              default: []
+              items:
+                type: string
+        isDefault:
+          type: boolean
+          title: The isDefault schema
+        name:
+          type: string
+          title: The name schema
+        ownerId:
+          type: string
+          title: The ownerId schema
+        region:
+          type: string
+          title: The region schema
+        sharedWith:
+          title: The sharedWith schema
+          type: array
+          default: []
+          items:
+            type: string
+        vpcRoutes:
+          type: array
+          title: The vpcRoutes schema
+          default: []
+          items:
+            title: The first anyOf schema
+            type: object
+            required:
+              - Next Hop
+              - CIDR
+            properties:
+              CIDR:
+                default: ""
+                title: The CIDR schema
+                type: string
+              Next Hop:
+                default: ""
+                title: The Next Hop schema
+                type: string
+

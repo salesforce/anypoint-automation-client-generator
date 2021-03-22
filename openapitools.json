@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "5.1.0",
+    "generators": {
+      "golang": {
+        "generatorName": "go",
+        "output": "$GOPATH/src/github.com/mulesoft-consulting/cloudhub-client-go/#{name}",
+        "glob": "spec/*.{json,yaml,yml}",
+        "gitUserId": "mulesoft-consulting",
+        "gitRepoId": "cloudhub-client-go",
+        "additionalProperties": {
+          "isGoSubmodule": true,
+          "packageName": "#{name}",
+          "structPrefix": true,
+          "packageVersion": "1.0.0"
+        }
+      }
+    }
+  }
+}
