@@ -1,0 +1,42 @@
+name: Mule Pipeline
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push
+  push:
+    branches: [ dev ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  generate_code:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 15.x]
+    env:
+      CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
+      GIT_TOKEN: ${{ secret.GIT_TOKEN }}
+    
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          name: ${{ env.CLIENT_GO_REPO_NAME }}
+          ref: refs/heads/dev
+          token: ${GIT_TOKEN}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - run: npm install
+
+      - run: |
+          ls -al
+          pwd
+
+
