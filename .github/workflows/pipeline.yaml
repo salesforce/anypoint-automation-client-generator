@@ -16,11 +16,12 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ~/workspace
+        working-directory: ./workspace
     strategy:
       matrix:
         node-version: [14.x]
     env:
+      WORKING-DIRECTORY: ./workspace
       CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
 
@@ -32,6 +33,7 @@ jobs:
 
       - name: Prepare Bash env variables and workspace
         run: |
+          pwd
           > ~/.bashrc
           echo 'export GENERATOR_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
           echo 'export GO_CLIENT_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
