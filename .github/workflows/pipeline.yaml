@@ -13,13 +13,17 @@ jobs:
   generate_code:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ~/workspace
     strategy:
       matrix:
         node-version: [14.x]
     env:
       CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-    
+
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
@@ -41,7 +45,7 @@ jobs:
       - name: Copy Cloudhub-client-generator project
         run: |
           source ~/.bashrc
-          cp -r ./. $GENERATOR_FOLDER
+          cp -r ./. $GENERATOR_FOLDER/
           cd $GENERATOR_FOLDER
           npm install
       
@@ -64,11 +68,5 @@ jobs:
           source ~/.bashrc
           cp -r ./. $GO_CLIENT_FOLDER
 
-      - name: List copy 
-        run: |
-          source ~/.bashrc
-          cd $GO_CLIENT_FOLDER
-          pwd
-          ls -al
 
 
