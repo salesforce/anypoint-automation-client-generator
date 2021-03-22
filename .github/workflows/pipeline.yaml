@@ -16,12 +16,12 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./workspace
+        working-directory: "~"
     strategy:
       matrix:
         node-version: [14.x]
     env:
-      WORKING-DIRECTORY: ./workspace
+      WORKING-DIRECTORY: "~"
       CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
 
