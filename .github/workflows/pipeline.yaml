@@ -18,7 +18,7 @@ jobs:
         node-version: [14.x, 15.x]
     env:
       CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
-      GIT_TOKEN: ${{ secret.GIT_TOKEN }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
     
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
