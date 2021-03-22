@@ -31,16 +31,21 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      # - name: Prepare Bash env variables and workspace
+      #   run: |
+      #     pwd
+      #     > ~/.bashrc
+      #     echo 'export GENERATOR_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
+      #     echo 'export GO_CLIENT_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
+      #     echo 'export GOPATH="$GO_CLIENT_FOLDER"' >> ~/.bashrc
+      #     source ~/.bashrc
+      #     mkdir -p $GENERATOR_FOLDER
+      #     mkdir -p $GO_CLIENT_FOLDER
+      
+
       - name: Prepare Bash env variables and workspace
         run: |
           pwd
-          > ~/.bashrc
-          echo 'export GENERATOR_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
-          echo 'export GO_CLIENT_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
-          echo 'export GOPATH="$GO_CLIENT_FOLDER"' >> ~/.bashrc
-          source ~/.bashrc
-          mkdir -p $GENERATOR_FOLDER
-          mkdir -p $GO_CLIENT_FOLDER
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
