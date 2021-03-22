@@ -22,6 +22,10 @@ jobs:
       GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
 
     steps:
+      - name: Set Up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
       - uses: webfactory/ssh-agent@v0.5.1
         with:
           ssh-private-key: ${{ env.GIT_SSH_KEY }}
@@ -34,6 +38,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Copy Cloudhub-client-generator project
         run: |
+          git config --global user.email "pipeline@cloudhub-client-generator.com"
+          git config --global user.name "pipeline-cloudhub-clients-generator"
           export GENERATOR_FOLDER=`pwd`
           export GO_CLIENT_FOLDER=`pwd`/dist/cloudhub-client-generator
           export GOPATH="$GO_CLIENT_FOLDER"
@@ -41,7 +47,7 @@ jobs:
           git clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate
           cd $GO_CLIENT_FOLDER
-          git add
+          git add .
           git commit -am "Generates modules from pipeline."
           git push
 
