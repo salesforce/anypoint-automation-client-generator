@@ -18,6 +18,7 @@ jobs:
         node-version: [14.x]
     env:
       CLIENT_GO_REPO: git@github.com:mulesoft-consulting/cloudhub-client-go.git
+      CLIENT_GO_BRANCH: test
       GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
 
     steps:
@@ -36,10 +37,15 @@ jobs:
           export GENERATOR_FOLDER=`pwd`
           export GO_CLIENT_FOLDER=`pwd`/dist/cloudhub-client-generator
           export GOPATH="$GO_CLIENT_FOLDER"
-          npm install
-          git clone ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
-          ls -al $GO_CLIENT_FOLDER
-          
+          npm install 
+          git clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
+          npx openapi-generator-cli generate
+          cd $GO_CLIENT_FOLDER
+          git add
+          git commit -am "Generates modules from pipeline."
+          git push
+
+
 
 
 
