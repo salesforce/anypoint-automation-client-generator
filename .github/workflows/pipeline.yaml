@@ -21,22 +21,54 @@ jobs:
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
     
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
-        with:
-          repository: ${{ env.CLIENT_GO_REPO_NAME }}
-          ref: refs/heads/dev
-          token: ${{ env.GIT_TOKEN }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      
-      - run: npm install
 
-      - run: |
-          ls -al
+      - name: Prepare Bash env variables and workspace
+        run: |
+          > ~/.bashrc
+          echo 'export GENERATOR_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
+          echo 'export GO_CLIENT_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
+          echo 'export GOPATH="$GO_CLIENT_FOLDER"' >> ~/.bashrc
+          source ~/.bashrc
+          mkdir -p $GENERATOR_FOLDER
+          mkdir -p $GO_CLIENT_FOLDER
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Copy Cloudhub-client-generator project
+        run: |
+          source ~/.bashrc
+          cp -r ./. $GENERATOR_FOLDER
+          cd $GENERATOR_FOLDER
+          npm install
+      
+      - name: List copy
+        run: |
+          source ~/.bashrc
+          cd $GENERATOR_FOLDER
           pwd
+          ls -al
+
+      - name: Clone destination repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.CLIENT_GO_REPO_NAME }}
+          ref: refs/heads/dev
+          token: ${{ env.GIT_TOKEN }}
+
+      - name: Prepare destination repo
+        run: |
+          source ~/.bashrc
+          cp -r ./. $GO_CLIENT_FOLDER
+
+      - name: List copy 
+        run: |
+          source ~/.bashrc
+          cd $GO_CLIENT_FOLDER
+          pwd
+          ls -al
 
 
