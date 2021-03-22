@@ -13,67 +13,35 @@ jobs:
   generate_code:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: "~"
     strategy:
       matrix:
         node-version: [14.x]
     env:
-      WORKING-DIRECTORY: "~"
-      CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
-      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+      CLIENT_GO_REPO: git@github.com:mulesoft-consulting/cloudhub-client-go.git
+      GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
 
     steps:
+      - uses: webfactory/ssh-agent@v0.5.1
+        with:
+          ssh-private-key: ${{ env.GIT_SSH_KEY }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
 
-      # - name: Prepare Bash env variables and workspace
-      #   run: |
-      #     pwd
-      #     > ~/.bashrc
-      #     echo 'export GENERATOR_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
-      #     echo 'export GO_CLIENT_FOLDER="~/workspace/cloudhub-client-generator"' >> ~/.bashrc
-      #     echo 'export GOPATH="$GO_CLIENT_FOLDER"' >> ~/.bashrc
-      #     source ~/.bashrc
-      #     mkdir -p $GENERATOR_FOLDER
-      #     mkdir -p $GO_CLIENT_FOLDER
-      
-
-      - name: Prepare Bash env variables and workspace
-        run: |
-          pwd
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: Copy Cloudhub-client-generator project
         run: |
-          source ~/.bashrc
-          cp -r ./. $GENERATOR_FOLDER/
-          cd $GENERATOR_FOLDER
+          export GENERATOR_FOLDER=`pwd`
+          export GO_CLIENT_FOLDER=`pwd`/dist/cloudhub-client-generator
+          export GOPATH="$GO_CLIENT_FOLDER"
           npm install
-      
-      - name: List copy
-        run: |
-          source ~/.bashrc
-          cd $GENERATOR_FOLDER
-          pwd
-          ls -al
+          git clone ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
+          ls -al $GO_CLIENT_FOLDER
+          
 
-      - name: Clone destination repository
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ env.CLIENT_GO_REPO_NAME }}
-          ref: refs/heads/dev
-          token: ${{ env.GIT_TOKEN }}
 
-      - name: Prepare destination repo
-        run: |
-          source ~/.bashrc
-          cp -r ./. $GO_CLIENT_FOLDER
 
 
 
