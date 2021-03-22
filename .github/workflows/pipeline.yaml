@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 15.x]
+        node-version: [14.x]
     env:
       CLIENT_GO_REPO_NAME: mulesoft-consulting/cloudhub-client-go
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -27,7 +27,7 @@ jobs:
         with:
           name: ${{ env.CLIENT_GO_REPO_NAME }}
           ref: refs/heads/dev
-          token: ${GIT_TOKEN}
+          token: ${{ env.GIT_TOKEN }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
