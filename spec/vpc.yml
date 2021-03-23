@@ -161,32 +161,32 @@ components:
           properties:
             id:
               description: The vpc Id
-              title: The id schema
+              title: id schema
               type: string
               example: 'vpc-0b111d1a1ace2a12f'
         - $ref: "#/components/schemas/vpcCore"
     vpcCore:
-      title: VPC Object Schema
+      title: vpcCore schema
       type: object
       properties:
         isDefault:
           type: boolean
-          title: The isDefault schema
+          title: isDefault schema
           default: false
         name:
           type: string
-          title: The name schema
+          title: name schema
           example: "myAwesomeVPC"
         ownerId:
           type: string
-          title: The ownerId schema
+          title: ownerId schema
           example: "0000-1111-2222-3333-4444"
         region:
           type: string
           title: The region schema
           example: "us-east-1"
         sharedWith:
-          title: List of Organization Ids to share the vpc with 
+          title: sharedWith schema 
           type: array
           default: []
           example: ["0000000-1111-2222-3333-44444444444"]
@@ -195,16 +195,16 @@ components:
         associatedEnvironments:
           default: []
           example: ["eeeeb145-6f79-402d-85fc-8c90905d2490"]
-          title: The associatedEnvironments schema
+          title: associatedEnvironments schema
           type: array
           items:
             description: Environment Id.
-            title: The first anyOf schema
+            title: associatedEnvironment schema
             type: string
         cidrBlock:
           default: "10.0.0.0/20"
           description: An explanation about the purpose of this instance.
-          title: The cidrBlock schema
+          title: cidrBlock schema
           type: string
         firewallRules:
           default: []
@@ -217,7 +217,7 @@ components:
               protocol: "tcp"
               fromPort: 8091
               toPort: 8092
-          title: The firewallRules schema
+          title: firewallRules schema
           type: array
           items:
             type: object
@@ -230,25 +230,25 @@ components:
               cidrBlock:
                 default: ""
                 description: An explanation about the purpose of this instance.
-                title: The cidrBlock schema
+                title: cidrBlock schema
                 type: string
               fromPort:
                 default: 0
                 description: An explanation about the purpose of this instance.
-                title: The fromPort schema
+                title: fromPort schema
                 type: integer
               protocol:
                 default: ""
                 description: An explanation about the purpose of this instance.
-                title: The protocol schema
+                title: protocol schema
                 type: string
               toPort:
                 default: 0
                 description: An explanation about the purpose of this instance.
-                title: The toPort schema
+                title: toPort schema
                 type: integer
         internalDns:
-          title: The internalDns schema
+          title: internalDns schema
           type: object
           default:
             dnsServers: []
@@ -259,19 +259,19 @@ components:
           properties:
             dnsServers:
               default: []
-              title: The dnsServers schema
+              title: dnsServers schema
               type: array
               items:
                 type: string
             specialDomains:
-              title: The specialDomains schema
+              title: specialDomains schema
               type: array
               default: []
               items:
                 type: string
         vpcRoutes:
           type: array
-          title: The vpcRoutes schema
+          title: vpcRoutes schema
           default: []
           example:
             - Next Hop: "Local"
@@ -279,7 +279,7 @@ components:
             - Next Hop: "Internet Gateway"
               CIDR: "0.0.0.0/0"
           items:
-            title: The first anyOf schema
+            title: vpcRoute schema
             type: object
             required:
               - Next Hop
