@@ -28,7 +28,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
-          $ref: '#/components/responses/SuccessListVpcs'
+          $ref: '#/components/responses/SuccessListVPCs'
     post:
       summary: Creates a new VPC in the provided organization.
       description: Creates a new VPC for the probided organization
@@ -68,7 +68,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
-          $ref: '#/components/responses/SuccessGetVpc'
+          $ref: '#/components/responses/SuccessGetVPC'
     put:
       summary: Update the VPC configuration
       description: Changes the configuration of the VPC by overriding the values of the properties passed in the JSON. ownerId, region and cidrBlock cannot be overriden. Organizations that do not own the VPC can only update isDefault and associatedEnvironments.
@@ -84,8 +84,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
-        
-
+        '200':
+          $ref: '#/components/responses/SuccessPutVPC'
     delete:
       summary: Delete a VPC by its id.
       description: Delete a VPC by its given id for the given organization id. 
@@ -93,7 +93,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '204':    # status code
-          $ref: '#/components/responses/SuccessDeleteVpc'
+          $ref: '#/components/responses/SuccessDeleteVPC'
 
 
 
@@ -122,7 +122,7 @@ components:
                 type: string
                 title: the error message
                 example: vpcs limit has been reached (max=1, use=1) for the organization 
-    SuccessGetVpc:
+    SuccessGetVPC:
       description: Success response
       content:
         application/json:
@@ -134,9 +134,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/vpc'
-    SuccessDeleteVpc:
+    SuccessPutVPC:
       description: Success response
-    SuccessListVpcs:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/vpc'
+    SuccessDeleteVPC:
+      description: Success response
+    SuccessListVPCs:
       description: Success response
       content:
         application/json:
