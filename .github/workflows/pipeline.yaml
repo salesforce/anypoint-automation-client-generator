@@ -42,7 +42,7 @@ jobs:
           git config --global user.name "pipeline-cloudhub-clients-generator"
           export GENERATOR_FOLDER=`pwd`
           export GO_CLIENT_FOLDER=`pwd`/dist/cloudhub-client-generator
-          export GOPATH="$GO_CLIENT_FOLDER"
+          export CLOUDHUB_GENERATOR_GO_DEST="$GO_CLIENT_FOLDER"
           npm install 
           git clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate

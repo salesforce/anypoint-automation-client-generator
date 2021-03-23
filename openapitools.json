@@ -6,7 +6,7 @@
     "generators": {
       "golang": {
         "generatorName": "go",
-        "output": "$GOPATH/src/github.com/mulesoft-consulting/cloudhub-client-go/#{name}",
+        "output": "$CLOUDHUB_GENERATOR_GO_DEST/#{name}",
         "glob": "spec/*.{json,yaml,yml}",
         "gitUserId": "mulesoft-consulting",
         "gitRepoId": "cloudhub-client-go",
