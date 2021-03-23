@@ -8,7 +8,10 @@ $ npm install
 
 ## Execute generator
 
-Make sure to add `CLOUDHUB_GENERATOR_GO_DEST` environment variable that should point to the destination go folder
+Make sure to add `CLOUDHUB_GENERATOR_GO_DEST` environment variable that should point to the destination go folder. You can use the `dist` folder of the project which is ignored in git by executing the following inside the project's folder: 
+```bash
+$ export CLOUDHUB_GENERATOR_GO_DEST=`pwd`/dist
+```
 
 Use the following to get the manual 
 ```

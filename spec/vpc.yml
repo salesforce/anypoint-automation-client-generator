@@ -154,8 +154,10 @@ components:
 
   schemas:
     vpc:
+      title: vpc schema
       allOf:
         - type: object
+          title: vpcId schema
           required:
             - id
           properties:
