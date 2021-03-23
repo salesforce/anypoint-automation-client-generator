@@ -154,41 +154,41 @@ components:
 
   schemas:
     vpc:
-      title: vpc schema
+      title: vpc
       allOf:
         - type: object
-          title: vpcId schema
+          title: vpcId
           required:
             - id
           properties:
             id:
               description: The vpc Id
-              title: id schema
+              title: id
               type: string
               example: 'vpc-0b111d1a1ace2a12f'
         - $ref: "#/components/schemas/vpcCore"
     vpcCore:
-      title: vpcCore schema
+      title: vpcCore
       type: object
       properties:
         isDefault:
           type: boolean
-          title: isDefault schema
+          title: isDefault
           default: false
         name:
           type: string
-          title: name schema
+          title: name
           example: "myAwesomeVPC"
         ownerId:
           type: string
-          title: ownerId schema
+          title: ownerId
           example: "0000-1111-2222-3333-4444"
         region:
           type: string
-          title: The region schema
+          title: region
           example: "us-east-1"
         sharedWith:
-          title: sharedWith schema 
+          title: sharedWith 
           type: array
           default: []
           example: ["0000000-1111-2222-3333-44444444444"]
@@ -197,16 +197,16 @@ components:
         associatedEnvironments:
           default: []
           example: ["eeeeb145-6f79-402d-85fc-8c90905d2490"]
-          title: associatedEnvironments schema
+          title: associatedEnvironments
           type: array
           items:
             description: Environment Id.
-            title: associatedEnvironment schema
+            title: associatedEnvironment
             type: string
         cidrBlock:
           default: "10.0.0.0/20"
           description: An explanation about the purpose of this instance.
-          title: cidrBlock schema
+          title: cidrBlock
           type: string
         firewallRules:
           default: []
@@ -219,9 +219,10 @@ components:
               protocol: "tcp"
               fromPort: 8091
               toPort: 8092
-          title: firewallRules schema
+          title: firewallRules
           type: array
           items:
+            title: firewallRule
             type: object
             required:
               - cidrBlock
@@ -250,7 +251,7 @@ components:
                 title: toPort schema
                 type: integer
         internalDns:
-          title: internalDns schema
+          title: internalDns
           type: object
           default:
             dnsServers: []
@@ -261,19 +262,19 @@ components:
           properties:
             dnsServers:
               default: []
-              title: dnsServers schema
+              title: dnsServers
               type: array
               items:
                 type: string
             specialDomains:
-              title: specialDomains schema
+              title: specialDomains
               type: array
               default: []
               items:
                 type: string
         vpcRoutes:
           type: array
-          title: vpcRoutes schema
+          title: vpcRoutes
           default: []
           example:
             - Next Hop: "Local"
@@ -281,7 +282,7 @@ components:
             - Next Hop: "Internet Gateway"
               CIDR: "0.0.0.0/0"
           items:
-            title: vpcRoute schema
+            title: vpcRoute
             type: object
             required:
               - Next Hop
@@ -289,10 +290,10 @@ components:
             properties:
               CIDR:
                 default: ""
-                title: The CIDR schema
+                title: CIDR
                 type: string
               Next Hop:
                 default: ""
-                title: The Next Hop schema
+                title: NextHop
                 type: string
 
