@@ -7,6 +7,9 @@ $ npm install
 ```
 
 ## Execute generator
+
+Make sure to add `CLOUDHUB_GENERATOR_GO_DEST` environment variable that should point to the destination go folder
+
 Use the following to get the manual 
 ```
 $ npx openapi-generator-cli help 
