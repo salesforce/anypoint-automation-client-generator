@@ -20,6 +20,14 @@ Use the following command to generate using the configuration stored in `openapi
 $ npx openapi-generator-cli generate
 ```
 
+## How to write your spec ?
+
+Here's some rules to keep in mind when you write your spec: 
+  * Use OAS 3.0.0
+  * Define your objects schemas in `#/components/schema` and reference them in your path definitions.
+  * Use enheritance and polymorphism when you define your schemas to avoid redefining the same attributes multiple times. [ref](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/).
+  * For each attribute of your schemas make sure to provide a `title`. The `title` will be used to generate a structure name for that attribute, therefore use a short and consitent name. look in the existent specs for examples.
+  * 
 
 ## Reference
 * [open api generator](https://openapi-generator.tech/)
