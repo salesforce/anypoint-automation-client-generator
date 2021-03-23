@@ -1,4 +1,4 @@
-name: Mule Pipeline
+name: Cloudhub Client Generator Pipeline
 
 # Controls when the action will run. 
 on:
