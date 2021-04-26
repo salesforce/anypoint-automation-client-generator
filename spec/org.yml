@@ -1,0 +1,1222 @@
+openapi: 3.0.0
+info:
+  title: Organization API
+  description: Description of the Organization API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations:
+    post:
+      summary: Creates a new Business Group within an organization.
+      description: Creates a new Business Group within an organization. This action can only be performed with an access token generated from user/pwd.
+      requestBody:
+        description: Business Group Request Body Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BGPostReqBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPostBG'
+  
+  /organizations/{orgId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Returns the business Group instance with the given id.
+      description: Returns the Business Group with the given id 
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetBG'
+    put:
+      summary: Put a Business Group by its id.
+      description: Put a Business Group by its given id. 
+      requestBody:
+        description: Business Group Request Body Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BGPutReqBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessPutBG'
+    delete:
+      summary: Delete a Business Group by its id.
+      description: Delete a Business Group by its given id. 
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteBG'
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        text/html:
+          schema:
+            type: string
+            title: the error message
+            example: "Organization Name provided is empty"
+    SuccessGetBG:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/BGDetail'
+              - $ref: '#/components/schemas/masterBGDetail'
+    SuccessPostBG:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BGDetail'
+    SuccessDeleteBG:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            default: {}
+    SuccessPutBG:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BGDetail'
+    
+
+  schemas:
+    BGPostReqBody:
+      properties:
+        entitlements:
+          $ref: "#/components/schemas/BGCore/properties/entitlements"
+        name:
+          $ref: "#/components/schemas/BGCore/properties/name"
+        ownerId:
+          $ref: "#/components/schemas/BGCore/properties/ownerId"
+        parentOrganizationId:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: parentOrganizationId
+            type: string
+      required:
+      - name
+      - parentOrganizationId
+      - ownerId
+      - entitlements
+      title: BGPostReqBody
+      type: object
+
+    BGPutReqBody:
+      title: BGPutReqBody
+      allOf:
+        - $ref: "#/components/schemas/BGPostReqBody"
+        - properties:
+            sessionTimeout:
+              default: 0
+              description: An explanation about the purpose of this instance.
+              title: sessionTimeout
+              type: integer
+          required:
+            - sessionTimeout
+          title: BGPutSpecificProperties
+          type: object
+
+    BGCore:
+      properties:
+        clientId:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            example:
+            - 1ab4bb7db66448be902379d1fcfb1a43
+            title: clientId
+            type: string
+        createdAt:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            example:
+            - '2021-03-05T14:06:52.976Z'
+            title: createdAt
+            type: string
+        domain:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            example:
+            - ms-04
+            title: domain
+            type: string
+        entitlements:
+            additionalProperties: true
+            default: {}
+            description: An explanation about the purpose of this instance.
+            properties:
+                angGovernance:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        level:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            example:
+                            - -1
+                            title: level
+                            type: integer
+                    required:
+                    - level
+                    title: angGovernance
+                    type: object
+                anypointSecurityEdgePolicies:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: anypointSecurityEdgePolicies
+                    type: object
+                anypointSecurityTokenization:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: anypointSecurityTokenization
+                    type: object
+                apiCommunityManager:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: apiCommunityManager
+                    type: object
+                apiMonitoring:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        schedules:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: schedules
+                            type: integer
+                    required:
+                    - schedules
+                    title: apiMonitoring
+                    type: object
+                apiQuery:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                        productSKU:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: productSKU
+                            type: integer
+                    required:
+                    - enabled
+                    - productSKU
+                    title: apiQuery
+                    type: object
+                apiQueryC360:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: apiQueryC360
+                    type: object
+                apis:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: apis
+                    type: object
+                appViz:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: appViz
+                    type: boolean
+                armAlerts:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: armAlerts
+                    type: boolean
+                autoscaling:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: autoscaling
+                    type: boolean
+                cam:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: cam
+                    type: object
+                createEnvironments:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: createEnvironments
+                    type: boolean
+                createSubOrgs:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: createSubOrgs
+                    type: boolean
+                crowd:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        environments:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: environments
+                            type: boolean
+                        hideApiManagerDesigner:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: hideApiManagerDesigner
+                            type: boolean
+                        hideFormerApiPlatform:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: hideFormerApiPlatform
+                            type: boolean
+                    required:
+                    - hideApiManagerDesigner
+                    - hideFormerApiPlatform
+                    - environments
+                    title: crowd
+                    type: object
+                crowdSelfServiceMigration:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: crowdSelfServiceMigration
+                    type: object
+                designCenter:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        api:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: api
+                            type: boolean
+                        mozart:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: mozart
+                            type: boolean
+                    required:
+                    - api
+                    - mozart
+                    title: The designCenter schema
+                    type: object
+                exchange2:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: exchange2
+                    type: object
+                externalIdentity:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: externalIdentity
+                    type: boolean
+                gateways:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                    required:
+                    - assigned
+                    title: gateways
+                    type: object
+                globalDeployment:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: globalDeployment
+                    type: boolean
+                hybrid:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: The hybrid schema
+                    type: object
+                hybridAutoDiscoverProperties:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: hybridAutoDiscoverProperties
+                    type: boolean
+                hybridInsight:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: hybridInsight
+                    type: boolean
+                kpiDashboard:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: kpiDashboard
+                    type: object
+                loadBalancer:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: integer
+                    required:
+                    - assigned
+                    - reassigned
+                    title: loadBalancer
+                    type: object
+                messaging:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                    required:
+                    - assigned
+                    title: messaging
+                    type: object
+                monitoringCenter:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        productSKU:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: productSKU
+                            type: integer
+                    required:
+                    - productSKU
+                    title: monitoringCenter
+                    type: object
+                mqAdvancedFeatures:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: mqAdvancedFeatures
+                    type: object
+                mqMessages:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        addOn:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: addOn
+                            type: integer
+                        base:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: base
+                            type: integer
+                    required:
+                    - base
+                    - addOn
+                    title: mqMessages
+                    type: object
+                mqRequests:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        addOn:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: addOn
+                            type: integer
+                        base:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: base
+                            type: integer
+                    required:
+                    - base
+                    - addOn
+                    title: mqRequests
+                    type: object
+                objectStoreKeys:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        addOn:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: addOn
+                            type: integer
+                        base:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: base
+                            type: integer
+                    required:
+                    - base
+                    - addOn
+                    title: objectStoreKeys
+                    type: object
+                objectStoreRequestUnits:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        addOn:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: addOn
+                            type: integer
+                        base:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: base
+                            type: integer
+                    required:
+                    - base
+                    - addOn
+                    title: objectStoreRequestUnits
+                    type: object
+                partnersProduction:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                    required:
+                    - assigned
+                    title: partnersProduction
+                    type: object
+                partnersSandbox:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                    required:
+                    - assigned
+                    title: partnersSandbox
+                    type: object
+                pcf:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: pcf
+                    type: boolean
+                runtimeFabric:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: runtimeFabric
+                    type: boolean
+                runtimeFabricCloud:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: runtimeFabricCloud
+                    type: object
+                serviceMesh:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: serviceMesh
+                    type: object
+                staticIps:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: integer
+                    required:
+                    - assigned
+                    - reassigned
+                    title: staticIps
+                    type: object
+                tradingPartnersProduction:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                    required:
+                    - assigned
+                    title: tradingPartnersProduction
+                    type: object
+                tradingPartnersSandbox:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                    required:
+                    - assigned
+                    title: tradingPartnersSandbox
+                    type: object
+                vCoresDesign:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0.0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: number
+                    required:
+                    - assigned
+                    - reassigned
+                    title: vCoresDesign
+                    type: object
+                vCoresProduction:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0.0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: number
+                    required:
+                    - assigned
+                    - reassigned
+                    title: vCoresProduction
+                    type: object
+                vCoresSandbox:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0.0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: number
+                    required:
+                    - assigned
+                    - reassigned
+                    title: vCoresSandbox
+                    type: object
+                vpcs:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: integer
+                    required:
+                    - assigned
+                    - reassigned
+                    title: vpcs
+                    type: object
+                vpns:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: integer
+                    required:
+                    - assigned
+                    - reassigned
+                    title: vpns
+                    type: object
+                workerClouds:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        assigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: assigned
+                            type: integer
+                        reassigned:
+                            default: 0
+                            description: An explanation about the purpose of this instance.
+                            title: reassigned
+                            type: integer
+                    required:
+                    - assigned
+                    - reassigned
+                    title: workerClouds
+                    type: object
+                workerLoggingOverride:
+                    additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        enabled:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: enabled
+                            type: boolean
+                    required:
+                    - enabled
+                    title: workerLoggingOverride
+                    type: object
+            required:
+            - createEnvironments
+            - globalDeployment
+            - createSubOrgs
+            - hybrid
+            - hybridInsight
+            - hybridAutoDiscoverProperties
+            - vCoresProduction
+            - vCoresSandbox
+            - vCoresDesign
+            - staticIps
+            - vpcs
+            - vpns
+            - workerLoggingOverride
+            - mqMessages
+            - mqRequests
+            - objectStoreRequestUnits
+            - objectStoreKeys
+            - mqAdvancedFeatures
+            - gateways
+            - designCenter
+            - partnersProduction
+            - partnersSandbox
+            - tradingPartnersProduction
+            - tradingPartnersSandbox
+            - loadBalancer
+            - externalIdentity
+            - autoscaling
+            - armAlerts
+            - apis
+            - apiMonitoring
+            - apiCommunityManager
+            - monitoringCenter
+            - apiQuery
+            - apiQueryC360
+            - angGovernance
+            - crowd
+            - cam
+            - exchange2
+            - crowdSelfServiceMigration
+            - kpiDashboard
+            - pcf
+            - appViz
+            - runtimeFabric
+            - anypointSecurityTokenization
+            - anypointSecurityEdgePolicies
+            - runtimeFabricCloud
+            - serviceMesh
+            - messaging
+            - workerClouds
+            title: entitlements
+            type: object
+        environments:
+            default: []
+            description: An explanation about the purpose of this instance.
+            items:
+                anyOf:
+                -   additionalProperties: true
+                    default: {}
+                    description: An explanation about the purpose of this instance.
+                    properties:
+                        clientId:
+                            default: ''
+                            description: An explanation about the purpose of this instance.
+                            title: clientId
+                            type: string
+                        id:
+                            default: ''
+                            description: An explanation about the purpose of this instance.
+                            title: id
+                            type: string
+                        isProduction:
+                            default: false
+                            description: An explanation about the purpose of this instance.
+                            title: isProduction
+                            type: boolean
+                        name:
+                            default: ''
+                            description: An explanation about the purpose of this instance.
+                            title: name
+                            type: string
+                        organizationId:
+                            default: ''
+                            description: An explanation about the purpose of this instance.
+                            title: organizationId
+                            type: string
+                        type:
+                            default: ''
+                            description: An explanation about the purpose of this instance.
+                            title: type
+                            type: string
+                    required:
+                    - id
+                    - name
+                    - organizationId
+                    - isProduction
+                    - type
+                    - clientId
+                    title: environment
+                    type: object
+            title: environments
+            type: array
+        id:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: id
+            type: string
+        idprovider_id:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: idprovider_id
+            type: string
+        isAutomaticAdminPromotionExempt:
+            default: false
+            description: An explanation about the purpose of this instance.
+            title: isAutomaticAdminPromotionExempt
+            type: boolean
+        isFederated:
+            default: false
+            description: An explanation about the purpose of this instance.
+            title: isFederated
+            type: boolean
+        isMaster:
+            default: false
+            description: An explanation about the purpose of this instance.
+            title: isMaster
+            type: boolean
+        mfaRequired:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: mfaRequired
+            type: string
+        name:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: name
+            type: string
+        ownerId:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: ownerId
+            type: string
+        parentOrganizationIds:
+            default: []
+            description: An explanation about the purpose of this instance.
+            items:
+              title: parentOrganizationId
+              type: string
+            title: parentOrganizationIds
+            type: array
+        properties:
+            additionalProperties: true
+            default: {}
+            description: An explanation about the purpose of this instance.
+            title: properties
+            type: object
+        subOrganizationIds:
+            default: []
+            description: An explanation about the purpose of this instance.
+            items:
+                anyOf:
+                -   default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: subOrganizationId
+                    type: string
+            title: subOrganizationIds
+            type: array
+        tenantOrganizationIds:
+            default: []
+            description: An explanation about the purpose of this instance.
+            items:
+              title: tenantOrganizationId
+              type: string
+            title: tenantOrganizationIds
+            type: array
+        updatedAt:
+            default: ''
+            description: An explanation about the purpose of this instance.
+            title: updatedAt
+            type: string
+      required:
+        - name
+        - id
+        - createdAt
+        - updatedAt
+        - ownerId
+        - clientId
+        - idprovider_id
+        - isFederated
+        - parentOrganizationIds
+        - subOrganizationIds
+        - tenantOrganizationIds
+        - mfaRequired
+        - isAutomaticAdminPromotionExempt
+        - domain
+        - isMaster
+        - environments
+        - entitlements
+        - properties
+        - owner
+      title: BGCore
+      type: object
+
+    BGDetail:
+      title: BGDetail
+      allOf:
+        - $ref: "#/components/schemas/BGCore"
+        - properties:
+            createdAt:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: createdAt
+                type: string
+            deleted:
+                default: false
+                description: An explanation about the purpose of this instance.
+                title: deleted
+                type: boolean
+            email:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: The email schema
+                type: string
+            enabled:
+                default: false
+                description: An explanation about the purpose of this instance.
+                title: enabled
+                type: boolean
+            firstName:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: firstName
+                type: string
+            id:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: id
+                type: string
+            idprovider_id:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: idprovider_id
+                type: string
+            lastLogin:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: lastLogin
+                type: string
+            lastName:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: lastName
+                type: string
+            mfaVerificationExcluded:
+                default: false
+                description: An explanation about the purpose of this instance.
+                title: mfaVerificationExcluded
+                type: boolean
+            mfaVerifiersConfigured:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: mfaVerifiersConfigured
+                type: string
+            organizationId:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: organizationId
+                type: string
+            phoneNumber:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: phoneNumber
+                type: string
+            type:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: type
+                type: string
+            updatedAt:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: updatedAt
+                type: string
+            username:
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: username
+                type: string
+          required:
+          - id
+          - createdAt
+          - updatedAt
+          - organizationId
+          - firstName
+          - lastName
+          - email
+          - phoneNumber
+          - username
+          - idprovider_id
+          - enabled
+          - deleted
+          - lastLogin
+          - mfaVerificationExcluded
+          - mfaVerifiersConfigured
+          - type
+          title: The owner schema
+          type: object
+
+    masterBGDetail:
+      title: masterBGDetail
+      allOf:
+        - $ref: "#/components/schemas/BGCore"
+        - properties:
+            sessionTimeout:
+                default: 0
+                description: An explanation about the purpose of this instance.
+                title: sessionTimeout
+                type: integer
+            subscription:
+                additionalProperties: true
+                default: {}
+                description: An explanation about the purpose of this instance.
+                properties:
+                    category:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: category
+                        type: string
+                    expiration:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: expiration
+                        type: string
+                    type:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: type
+                        type: string
+                required:
+                - category
+                - type
+                - expiration
+                title: subscription
+                type: object
+          required:
+            - subscription
+            - sessionTimeout
+          title: masterBGSpecificDetails
+          type: object
+      
