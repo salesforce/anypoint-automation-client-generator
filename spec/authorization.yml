@@ -4,14 +4,14 @@ info:
   description: Description of the Authentication API
   version: 1.0.0
 servers:
-  - url: https://anypoint.mulesoft.com/accounts/api/v2/
+  - url: https://anypoint.mulesoft.com/accounts/
     description: Anypoint Cloudhub 
-  - url: https://eu1.anypoint.mulesoft.com/accounts/api/v2/
+  - url: https://eu1.anypoint.mulesoft.com/accounts/
     description: Anypoint Cloudhub EU
 
 
 paths:
-  /oauth2/token:
+  /api/v2/oauth2/token:
     post:
       summary: Returns access token
       description: Authenticates a connected app and returns access token
@@ -27,6 +27,22 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           $ref: '#/components/responses/SuccessAuth'
+  /login:
+    post:
+      summary: Returns access token
+      description: Authenticates a user and returns access token
+      requestBody:
+        description: Request body containing credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userPwdCredentials'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessAuthUserPwd'
 
 
 components:
@@ -52,6 +68,26 @@ components:
                 type: string
                 title: token type
                 example: "brearer"
+    SuccessAuthUserPwd:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                title: Authorization token
+                example: "e4abe472725d-93b3-426e-8ca7-5a45636b"
+              redirectUrl:
+                type: string
+                title: redirect url
+                example: "/home/"
+              token_type:
+                type: string
+                title: token type
+                example: "brearer"
+
 
   schemas:
     credentials:
@@ -69,3 +105,14 @@ components:
           type: string
           title: the connected app client_secret
           example: "084ADC05A977a4044e1B604Cfd4F4238"
+    userPwdCredentials:
+      type: object
+      properties:
+        username:
+          default: ""
+          type: string
+          title: username
+        password:
+          default: ""
+          type: string
+          title: password

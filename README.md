@@ -36,3 +36,4 @@ Here's some rules to keep in mind when you write your spec:
 * [open api generator](https://openapi-generator.tech/)
 * [openapi placeholders maven](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator-maven-plugin/README.md)
 * [openapi cli placeholders](https://github.com/OpenAPITools/openapi-generator-cli/tree/master/apps/generator-cli/src#available-placeholders)
+* [JSON to JSONSchema Converter Tool](https://www.jsonschema.net/home)
