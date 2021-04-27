@@ -97,14 +97,14 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/BGDetail'
+              - $ref: '#/components/schemas/BGCore'
               - $ref: '#/components/schemas/masterBGDetail'
     SuccessPostBG:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BGDetail'
+            $ref: '#/components/schemas/BGCore'
     SuccessDeleteBG:
       description: Success response
       content:
@@ -117,7 +117,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BGDetail'
+            $ref: '#/components/schemas/BGCore'
     
 
   schemas:
@@ -1050,6 +1050,107 @@ components:
             description: An explanation about the purpose of this instance.
             title: updatedAt
             type: string
+        owner:
+            properties:
+                createdAt:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: createdAt
+                    type: string
+                deleted:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: deleted
+                    type: boolean
+                email:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: The email schema
+                    type: string
+                enabled:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: enabled
+                    type: boolean
+                firstName:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: firstName
+                    type: string
+                id:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: id
+                    type: string
+                idprovider_id:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: idprovider_id
+                    type: string
+                lastLogin:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: lastLogin
+                    type: string
+                lastName:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: lastName
+                    type: string
+                mfaVerificationExcluded:
+                    default: false
+                    description: An explanation about the purpose of this instance.
+                    title: mfaVerificationExcluded
+                    type: boolean
+                mfaVerifiersConfigured:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: mfaVerifiersConfigured
+                    type: string
+                organizationId:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: organizationId
+                    type: string
+                phoneNumber:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: phoneNumber
+                    type: string
+                type:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: type
+                    type: string
+                updatedAt:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: updatedAt
+                    type: string
+                username:
+                    default: ''
+                    description: An explanation about the purpose of this instance.
+                    title: username
+                    type: string
+            required:
+            - id
+            - createdAt
+            - updatedAt
+            - organizationId
+            - firstName
+            - lastName
+            - email
+            - phoneNumber
+            - username
+            - idprovider_id
+            - enabled
+            - deleted
+            - lastLogin
+            - mfaVerificationExcluded
+            - mfaVerifiersConfigured
+            - type
+            title: owner
+            type: object
       required:
         - name
         - id
@@ -1072,111 +1173,6 @@ components:
         - owner
       title: BGCore
       type: object
-
-    BGDetail:
-      title: BGDetail
-      allOf:
-        - $ref: "#/components/schemas/BGCore"
-        - properties:
-            createdAt:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: createdAt
-                type: string
-            deleted:
-                default: false
-                description: An explanation about the purpose of this instance.
-                title: deleted
-                type: boolean
-            email:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: The email schema
-                type: string
-            enabled:
-                default: false
-                description: An explanation about the purpose of this instance.
-                title: enabled
-                type: boolean
-            firstName:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: firstName
-                type: string
-            id:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: id
-                type: string
-            idprovider_id:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: idprovider_id
-                type: string
-            lastLogin:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: lastLogin
-                type: string
-            lastName:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: lastName
-                type: string
-            mfaVerificationExcluded:
-                default: false
-                description: An explanation about the purpose of this instance.
-                title: mfaVerificationExcluded
-                type: boolean
-            mfaVerifiersConfigured:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: mfaVerifiersConfigured
-                type: string
-            organizationId:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: organizationId
-                type: string
-            phoneNumber:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: phoneNumber
-                type: string
-            type:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: type
-                type: string
-            updatedAt:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: updatedAt
-                type: string
-            username:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: username
-                type: string
-          required:
-          - id
-          - createdAt
-          - updatedAt
-          - organizationId
-          - firstName
-          - lastName
-          - email
-          - phoneNumber
-          - username
-          - idprovider_id
-          - enabled
-          - deleted
-          - lastLogin
-          - mfaVerificationExcluded
-          - mfaVerifiersConfigured
-          - type
-          title: The owner schema
-          type: object
 
     masterBGDetail:
       title: masterBGDetail
