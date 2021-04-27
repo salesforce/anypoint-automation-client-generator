@@ -179,12 +179,10 @@ components:
             title: domain
             type: string
         entitlements:
-            additionalProperties: true
             default: {}
             description: An explanation about the purpose of this instance.
             properties:
                 angGovernance:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -200,7 +198,6 @@ components:
                     title: angGovernance
                     type: object
                 anypointSecurityEdgePolicies:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -214,7 +211,6 @@ components:
                     title: anypointSecurityEdgePolicies
                     type: object
                 anypointSecurityTokenization:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -228,7 +224,6 @@ components:
                     title: anypointSecurityTokenization
                     type: object
                 apiCommunityManager:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -242,7 +237,6 @@ components:
                     title: apiCommunityManager
                     type: object
                 apiMonitoring:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -256,7 +250,6 @@ components:
                     title: apiMonitoring
                     type: object
                 apiQuery:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -276,7 +269,6 @@ components:
                     title: apiQuery
                     type: object
                 apiQueryC360:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -290,7 +282,6 @@ components:
                     title: apiQueryC360
                     type: object
                 apis:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -319,7 +310,6 @@ components:
                     title: autoscaling
                     type: boolean
                 cam:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -343,7 +333,6 @@ components:
                     title: createSubOrgs
                     type: boolean
                 crowd:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -369,7 +358,6 @@ components:
                     title: crowd
                     type: object
                 crowdSelfServiceMigration:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -383,7 +371,6 @@ components:
                     title: crowdSelfServiceMigration
                     type: object
                 designCenter:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -403,7 +390,6 @@ components:
                     title: The designCenter schema
                     type: object
                 exchange2:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -422,7 +408,6 @@ components:
                     title: externalIdentity
                     type: boolean
                 gateways:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -441,7 +426,6 @@ components:
                     title: globalDeployment
                     type: boolean
                 hybrid:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -465,7 +449,6 @@ components:
                     title: hybridInsight
                     type: boolean
                 kpiDashboard:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -479,7 +462,6 @@ components:
                     title: kpiDashboard
                     type: object
                 loadBalancer:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -499,7 +481,6 @@ components:
                     title: loadBalancer
                     type: object
                 messaging:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -513,7 +494,6 @@ components:
                     title: messaging
                     type: object
                 monitoringCenter:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -527,7 +507,6 @@ components:
                     title: monitoringCenter
                     type: object
                 mqAdvancedFeatures:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -541,7 +520,6 @@ components:
                     title: mqAdvancedFeatures
                     type: object
                 mqMessages:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -561,7 +539,6 @@ components:
                     title: mqMessages
                     type: object
                 mqRequests:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -581,7 +558,6 @@ components:
                     title: mqRequests
                     type: object
                 objectStoreKeys:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -601,7 +577,6 @@ components:
                     title: objectStoreKeys
                     type: object
                 objectStoreRequestUnits:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -621,7 +596,6 @@ components:
                     title: objectStoreRequestUnits
                     type: object
                 partnersProduction:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -635,7 +609,6 @@ components:
                     title: partnersProduction
                     type: object
                 partnersSandbox:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -659,7 +632,6 @@ components:
                     title: runtimeFabric
                     type: boolean
                 runtimeFabricCloud:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -673,7 +645,6 @@ components:
                     title: runtimeFabricCloud
                     type: object
                 serviceMesh:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -687,7 +658,6 @@ components:
                     title: serviceMesh
                     type: object
                 staticIps:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -707,7 +677,6 @@ components:
                     title: staticIps
                     type: object
                 tradingPartnersProduction:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -721,7 +690,6 @@ components:
                     title: tradingPartnersProduction
                     type: object
                 tradingPartnersSandbox:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -735,7 +703,6 @@ components:
                     title: tradingPartnersSandbox
                     type: object
                 vCoresDesign:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -755,7 +722,6 @@ components:
                     title: vCoresDesign
                     type: object
                 vCoresProduction:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -775,7 +741,6 @@ components:
                     title: vCoresProduction
                     type: object
                 vCoresSandbox:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -795,7 +760,6 @@ components:
                     title: vCoresSandbox
                     type: object
                 vpcs:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -815,7 +779,6 @@ components:
                     title: vpcs
                     type: object
                 vpns:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -835,7 +798,6 @@ components:
                     title: vpns
                     type: object
                 workerClouds:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -855,7 +817,6 @@ components:
                     title: workerClouds
                     type: object
                 workerLoggingOverride:
-                    additionalProperties: true
                     default: {}
                     description: An explanation about the purpose of this instance.
                     properties:
@@ -924,50 +885,48 @@ components:
             default: []
             description: An explanation about the purpose of this instance.
             items:
-                anyOf:
-                -   additionalProperties: true
-                    default: {}
-                    description: An explanation about the purpose of this instance.
-                    properties:
-                        clientId:
-                            default: ''
-                            description: An explanation about the purpose of this instance.
-                            title: clientId
-                            type: string
-                        id:
-                            default: ''
-                            description: An explanation about the purpose of this instance.
-                            title: id
-                            type: string
-                        isProduction:
-                            default: false
-                            description: An explanation about the purpose of this instance.
-                            title: isProduction
-                            type: boolean
-                        name:
-                            default: ''
-                            description: An explanation about the purpose of this instance.
-                            title: name
-                            type: string
-                        organizationId:
-                            default: ''
-                            description: An explanation about the purpose of this instance.
-                            title: organizationId
-                            type: string
-                        type:
-                            default: ''
-                            description: An explanation about the purpose of this instance.
-                            title: type
-                            type: string
-                    required:
-                    - id
-                    - name
-                    - organizationId
-                    - isProduction
-                    - type
-                    - clientId
-                    title: environment
-                    type: object
+                default: {}
+                description: An explanation about the purpose of this instance.
+                properties:
+                    clientId:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: clientId
+                        type: string
+                    id:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: id
+                        type: string
+                    isProduction:
+                        default: false
+                        description: An explanation about the purpose of this instance.
+                        title: isProduction
+                        type: boolean
+                    name:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: name
+                        type: string
+                    organizationId:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: organizationId
+                        type: string
+                    type:
+                        default: ''
+                        description: An explanation about the purpose of this instance.
+                        title: type
+                        type: string
+                required:
+                - id
+                - name
+                - organizationId
+                - isProduction
+                - type
+                - clientId
+                title: environment
+                type: object
             title: environments
             type: array
         id:
@@ -1019,7 +978,6 @@ components:
             title: parentOrganizationIds
             type: array
         properties:
-            additionalProperties: true
             default: {}
             description: An explanation about the purpose of this instance.
             title: properties
@@ -1028,11 +986,10 @@ components:
             default: []
             description: An explanation about the purpose of this instance.
             items:
-                anyOf:
-                -   default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: subOrganizationId
-                    type: string
+                default: ''
+                description: An explanation about the purpose of this instance.
+                title: subOrganizationId
+                type: string
             title: subOrganizationIds
             type: array
         tenantOrganizationIds:
@@ -1183,7 +1140,6 @@ components:
                 title: sessionTimeout
                 type: integer
             subscription:
-                additionalProperties: true
                 default: {}
                 description: An explanation about the purpose of this instance.
                 properties:
