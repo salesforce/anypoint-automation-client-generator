@@ -96,9 +96,7 @@ components:
       content:
         application/json:
           schema:
-            oneOf:
-              - $ref: '#/components/schemas/BGCore'
-              - $ref: '#/components/schemas/masterBGDetail'
+            $ref: '#/components/schemas/masterBGDetail'
     SuccessPostBG:
       description: Success response
       content:

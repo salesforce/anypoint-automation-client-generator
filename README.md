@@ -30,7 +30,7 @@ Here's some rules to keep in mind when you write your spec:
   * Define your objects schemas in `#/components/schema` and reference them in your path definitions.
   * Use enheritance and polymorphism when you define your schemas to avoid redefining the same attributes multiple times. [ref](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/).
   * For each attribute of your schemas make sure to provide a `title`. The `title` will be used to generate a structure name for that attribute, therefore use a short and consitent name. look in the existent specs for examples.
-  * 
+  * For each of your api resource, return a deterministic result and never user OneOf for example. The generator will not be able to create the appropriate Type. 
 
 ## Reference
 * [open api generator](https://openapi-generator.tech/)
