@@ -716,7 +716,7 @@ components:
                             default: 0
                             description: An explanation about the purpose of this instance.
                             title: assigned
-                            type: integer
+                            type: number
                         reassigned:
                             default: 0.0
                             description: An explanation about the purpose of this instance.
@@ -735,7 +735,7 @@ components:
                             default: 0
                             description: An explanation about the purpose of this instance.
                             title: assigned
-                            type: integer
+                            type: number
                         reassigned:
                             default: 0.0
                             description: An explanation about the purpose of this instance.
@@ -754,7 +754,7 @@ components:
                             default: 0
                             description: An explanation about the purpose of this instance.
                             title: assigned
-                            type: integer
+                            type: number
                         reassigned:
                             default: 0.0
                             description: An explanation about the purpose of this instance.
