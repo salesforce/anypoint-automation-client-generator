@@ -32,6 +32,7 @@ Here's some rules to keep in mind when you write your spec:
   * For each attribute of your schemas make sure to provide a `title`. The `title` will be used to generate a structure name for that attribute, therefore use a short and consitent name. look in the existent specs for examples.
   * For each of your api resource, return a deterministic result and never user OneOf for example. The generator will not be able to create the appropriate Type. 
   * For all simple types (e.g integer, string ...) Don't use `$ref` to refer to the definition.
+  * Make sure to remove any unnecessary `required` attributes. 
 
 ## Reference
 * [open api generator](https://openapi-generator.tech/)
