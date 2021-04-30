@@ -271,7 +271,6 @@ components:
                             type: integer
                     required:
                     - enabled
-                    - productSKU
                     title: apiQuery
                     type: object
                 apiQueryC360:
@@ -390,9 +389,6 @@ components:
                             description: An explanation about the purpose of this instance.
                             title: mozart
                             type: boolean
-                    required:
-                    - api
-                    - mozart
                     title: The designCenter schema
                     type: object
                 exchange2:
@@ -483,7 +479,6 @@ components:
                             type: integer
                     required:
                     - assigned
-                    - reassigned
                     title: loadBalancer
                     type: object
                 messaging:
@@ -539,9 +534,6 @@ components:
                             description: An explanation about the purpose of this instance.
                             title: base
                             type: integer
-                    required:
-                    - base
-                    - addOn
                     title: mqMessages
                     type: object
                 mqRequests:
@@ -558,9 +550,6 @@ components:
                             description: An explanation about the purpose of this instance.
                             title: base
                             type: integer
-                    required:
-                    - base
-                    - addOn
                     title: mqRequests
                     type: object
                 objectStoreKeys:
@@ -577,9 +566,6 @@ components:
                             description: An explanation about the purpose of this instance.
                             title: base
                             type: integer
-                    required:
-                    - base
-                    - addOn
                     title: objectStoreKeys
                     type: object
                 objectStoreRequestUnits:
@@ -596,9 +582,6 @@ components:
                             description: An explanation about the purpose of this instance.
                             title: base
                             type: integer
-                    required:
-                    - base
-                    - addOn
                     title: objectStoreRequestUnits
                     type: object
                 partnersProduction:
@@ -679,7 +662,6 @@ components:
                             type: integer
                     required:
                     - assigned
-                    - reassigned
                     title: staticIps
                     type: object
                 tradingPartnersProduction:
@@ -724,7 +706,6 @@ components:
                             type: number
                     required:
                     - assigned
-                    - reassigned
                     title: vCoresDesign
                     type: object
                 vCoresProduction:
@@ -743,7 +724,6 @@ components:
                             type: number
                     required:
                     - assigned
-                    - reassigned
                     title: vCoresProduction
                     type: object
                 vCoresSandbox:
@@ -762,7 +742,6 @@ components:
                             type: number
                     required:
                     - assigned
-                    - reassigned
                     title: vCoresSandbox
                     type: object
                 vpcs:
@@ -781,7 +760,6 @@ components:
                             type: integer
                     required:
                     - assigned
-                    - reassigned
                     title: vpcs
                     type: object
                 vpns:
@@ -800,7 +778,6 @@ components:
                             type: integer
                     required:
                     - assigned
-                    - reassigned
                     title: vpns
                     type: object
                 workerClouds:
@@ -819,7 +796,6 @@ components:
                             type: integer
                     required:
                     - assigned
-                    - reassigned
                     title: workerClouds
                     type: object
                 workerLoggingOverride:
@@ -839,52 +815,13 @@ components:
             - createEnvironments
             - globalDeployment
             - createSubOrgs
-            - hybrid
-            - hybridInsight
-            - hybridAutoDiscoverProperties
             - vCoresProduction
             - vCoresSandbox
             - vCoresDesign
             - staticIps
             - vpcs
             - vpns
-            - workerLoggingOverride
-            - mqMessages
-            - mqRequests
-            - objectStoreRequestUnits
-            - objectStoreKeys
-            - mqAdvancedFeatures
-            - gateways
-            - designCenter
-            - partnersProduction
-            - partnersSandbox
-            - tradingPartnersProduction
-            - tradingPartnersSandbox
             - loadBalancer
-            - externalIdentity
-            - autoscaling
-            - armAlerts
-            - apis
-            - apiMonitoring
-            - apiCommunityManager
-            - monitoringCenter
-            - apiQuery
-            - apiQueryC360
-            - angGovernance
-            - crowd
-            - cam
-            - exchange2
-            - crowdSelfServiceMigration
-            - kpiDashboard
-            - pcf
-            - appViz
-            - runtimeFabric
-            - anypointSecurityTokenization
-            - anypointSecurityEdgePolicies
-            - runtimeFabricCloud
-            - serviceMesh
-            - messaging
-            - workerClouds
             title: entitlements
             type: object
         environments:
@@ -1093,45 +1030,8 @@ components:
                     description: An explanation about the purpose of this instance.
                     title: username
                     type: string
-            required:
-            - id
-            - createdAt
-            - updatedAt
-            - organizationId
-            - firstName
-            - lastName
-            - email
-            - phoneNumber
-            - username
-            - idprovider_id
-            - enabled
-            - deleted
-            - lastLogin
-            - mfaVerificationExcluded
-            - mfaVerifiersConfigured
-            - type
             title: owner
             type: object
-      required:
-        - name
-        - id
-        - createdAt
-        - updatedAt
-        - ownerId
-        - clientId
-        - idprovider_id
-        - isFederated
-        - parentOrganizationIds
-        - subOrganizationIds
-        - tenantOrganizationIds
-        - mfaRequired
-        - isAutomaticAdminPromotionExempt
-        - domain
-        - isMaster
-        - environments
-        - entitlements
-        - properties
-        - owner
       title: BGCore
       type: object
 
@@ -1164,15 +1064,8 @@ components:
                         description: An explanation about the purpose of this instance.
                         title: type
                         type: string
-                required:
-                - category
-                - type
-                - expiration
                 title: subscription
                 type: object
-          required:
-            - subscription
-            - sessionTimeout
           title: masterBGSpecificDetails
           type: object
       
