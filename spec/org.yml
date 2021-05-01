@@ -148,18 +148,25 @@ components:
 
     BGPutReqBody:
       title: BGPutReqBody
-      allOf:
-        - $ref: "#/components/schemas/BGPostReqBody"
-        - properties:
-            sessionTimeout:
-              default: 0
-              description: An explanation about the purpose of this instance.
-              title: sessionTimeout
-              type: integer
-          required:
-            - sessionTimeout
-          title: BGPutSpecificProperties
-          type: object
+      type: object
+      properties:
+        entitlements:
+          $ref: "#/components/schemas/BGCore/properties/entitlements"
+        name:
+          default: ''
+          description: An explanation about the purpose of this instance.
+          title: name
+          type: string
+        ownerId:
+          default: ''
+          description: An explanation about the purpose of this instance.
+          title: ownerId
+          type: string
+        sessionTimeout:
+            default: 0
+            description: An explanation about the purpose of this instance.
+            title: sessionTimeout
+            type: integer
 
     BGCore:
       properties:
