@@ -1065,6 +1065,17 @@ components:
               - enabled
               title: workerLoggingOverride
               type: object
+      required:
+      - createEnvironments
+      - globalDeployment
+      - createSubOrgs
+      - vCoresProduction
+      - vCoresSandbox
+      - vCoresDesign
+      - staticIps
+      - vpcs
+      - vpns
+      - loadBalancer
       title: entitlements
       type: object
 
@@ -1224,5 +1235,5 @@ components:
       - vpcs
       - vpns
       - loadBalancer
-      title: entitlements
+      title: entitlementsCore
       type: object
