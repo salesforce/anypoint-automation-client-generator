@@ -439,7 +439,6 @@ components:
           type: object
 
     entitlements:
-      default: {}
       description: An explanation about the purpose of this instance.
       properties:
           angGovernance:
