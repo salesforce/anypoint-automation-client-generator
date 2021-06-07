@@ -70,6 +70,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: rolegroupId
+          in: path
+          description: The id of a rolegroup
+          required: true
+          schema:
+            type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -78,12 +84,18 @@ paths:
     post:
       description: Assigns a role to a rolegroup.
       parameters:
-      - name: orgId
-        in: path
-        description: The ID of the organization in GUID format
-        required: true
-        schema:
-          type: string
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: rolegroupId
+          in: path
+          description: The id of a rolegroup
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -96,9 +108,8 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '201':
           $ref: '#/components/responses/SuccessAssignRoles'
-
     delete:
-      description: Delete a rolegroup
+      description: Delete assigned roles
       parameters:
       - name: orgId
         in: path
