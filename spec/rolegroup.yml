@@ -1,0 +1,263 @@
+openapi: 3.0.0
+info:
+  title: RoleGroup API
+  description: Description of the RoleGroup API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/rolegroups:
+    get:
+      description: Returns all rolegroups within the organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListRoleGroups'
+    post:
+      description: Creates an rolegroup. Name must be unique.
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/rolegroupPostBody"
+
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPostRoleGroup'
+  
+  /organizations/{orgId}/rolegroups/{rolegroupId}:
+    get:
+      description: Retrieves a rolegroup by id
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: rolegroupId
+        in: path
+        description: The id of rolegroup
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetRoleGroup'
+    put:
+      description: Update a role gorup, implemented as a patch. Note that only the
+        name (must be unique) and description is allowed to be updated.
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: rolegroupId
+        in: path
+        description: The id of an rolegroup
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/rolegroupPutBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPutRoleGroup'
+    delete:
+      description: Delete a rolegroup
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: rolegroupId
+        in: path
+        description: The id of a rolegroup
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteRoleGroup'
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    SuccessGetRoleGroup:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/rolegroup'
+    SuccessPostRoleGroup:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/rolegroup'
+    SuccessPutRoleGroup:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/rolegroup'
+    SuccessDeleteRoleGroup:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+              description: organization id
+    SuccessListRoleGroups:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of rolegroups
+                items:
+                  $ref: '#/components/schemas/rolegroup'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    rolegroupPostBody:
+      title: rolegroupPostBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            type: string
+            title: externalName
+    rolegroupPutBody:
+      title: rolegroupPutBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            type: string
+            title: externalName
+    rolegroup:
+      title: rolegroup
+      type: object
+      properties:
+        role_group_id:
+          type: string
+          title: id
+          example: "a1a8b488-1e48-44ac-ba40-d53f518808af"
+        name:
+          type: string
+          title: name
+          example: "API Creators"
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            title: externalName
+            type: string
+        description:
+          type: string
+          title: description
+          example: "API Creators"
+        org_id:
+          type: string
+          title: orgId
+          example: "aa1f55d6-213d-4f60-845c-207286484cd1"
+        editable:
+          type: boolean
+          title: editable
+        created_at:
+          type: string
+          title: createdAt
+          example: "2021-03-05T14:06:52.976Z"
+        updated_at:
+          type: string
+          title: updatedAt
+          example: "2021-03-05T14:06:52.976Z"
