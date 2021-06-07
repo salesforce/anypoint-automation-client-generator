@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: ENV API
-  description: Description of the ENV API 
+  title: RoleGroup API
+  description: Description of the RoleGroup API 
   version: 1.0.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
@@ -13,9 +13,9 @@ security:
   - bearerAuth: [] 
 
 paths:
-  /organizations/{orgId}/environments:
+  /organizations/{orgId}/rolegroups:
     get:
-      description: Returns all matching environments
+      description: Returns all rolegroups within the organization
       parameters:
         - name: orgId
           in: path
@@ -27,9 +27,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
-          $ref: '#/components/responses/SuccessListENVs'
+          $ref: '#/components/responses/SuccessListRoleGroups'
     post:
-      description: Creates an environment
+      description: Creates an rolegroup. Name must be unique.
       parameters:
       - name: orgId
         in: path
@@ -41,25 +41,19 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  title: name 
-                type:
-                  type: string
-                  title: type 
-        required: false
+              $ref: "#/components/schemas/rolegroupPostBody"
+
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '201':
-          $ref: '#/components/responses/SuccessPostENV'
-  /organizations/{orgId}/environments/{environmentId}:
+          $ref: '#/components/responses/SuccessPostRoleGroup'
+  
+  /organizations/{orgId}/rolegroups/{rolegroupId}:
     get:
-      description: Retrieves an environment by id
+      description: Retrieves a rolegroup by id
       parameters:
       - name: orgId
         in: path
@@ -67,9 +61,9 @@ paths:
         required: true
         schema:
           type: string
-      - name: environmentId
+      - name: rolegroupId
         in: path
-        description: The id of an environment
+        description: The id of rolegroup
         required: true
         schema:
           type: string
@@ -77,10 +71,10 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
-          $ref: '#/components/responses/SuccessGetENV'
+          $ref: '#/components/responses/SuccessGetRoleGroup'
     put:
-      description: Update an environment, implemented as a patch. Note that only the
-        name is allowed to be updated, isProduction and type can not.
+      description: Update a role gorup, implemented as a patch. Note that only the
+        name (must be unique) and description is allowed to be updated.
       parameters:
       - name: orgId
         in: path
@@ -88,9 +82,9 @@ paths:
         required: true
         schema:
           type: string
-      - name: environmentId
+      - name: rolegroupId
         in: path
-        description: The id of an environment
+        description: The id of an rolegroup
         required: true
         schema:
           type: string
@@ -98,21 +92,16 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  title: name 
-        required: false
+              $ref: "#/components/schemas/rolegroupPutBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '201':
-          $ref: '#/components/responses/SuccessPutENV'
+          $ref: '#/components/responses/SuccessPutRoleGroup'
     delete:
-      description: Delete an environment
+      description: Delete a rolegroup
       parameters:
       - name: orgId
         in: path
@@ -120,9 +109,9 @@ paths:
         required: true
         schema:
           type: string
-      - name: environmentId
+      - name: rolegroupId
         in: path
-        description: The id of an environment
+        description: The id of a rolegroup
         required: true
         schema:
           type: string
@@ -130,7 +119,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '204':
-          $ref: '#/components/responses/SuccessDeleteENV'
+          $ref: '#/components/responses/SuccessDeleteRoleGroup'
 
 
 
@@ -159,27 +148,34 @@ components:
                 type: string
                 title: the error message
                 example: A sample message here 
-    SuccessGetENV:
+    SuccessGetRoleGroup:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/env'
-    SuccessPostENV:
+            $ref: '#/components/schemas/rolegroup'
+    SuccessPostRoleGroup:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/env'
-    SuccessPutENV:
+            $ref: '#/components/schemas/rolegroup'
+    SuccessPutRoleGroup:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/env'
-    SuccessDeleteENV:
+            $ref: '#/components/schemas/rolegroup'
+    SuccessDeleteRoleGroup:
       description: Success response
-    SuccessListENVs:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+              description: organization id
+    SuccessListRoleGroups:
       description: Success response
       content:
         application/json:
@@ -188,49 +184,80 @@ components:
             properties:
               data:
                 type: array
-                title: List of envs
+                title: List of rolegroups
                 items:
-                  $ref: '#/components/schemas/env'
+                  $ref: '#/components/schemas/rolegroup'
               total:
                 type: integer
                 title: Total number of results
 
   schemas:
-    env:
-      title: env
-      allOf:
-        - type: object
-          title: envId
-          required:
-            - id
-          properties:
-            id:
-              description: The env Id
-              title: id
-              type: string
-              example: '9149aec2-f882-4d36-b419-3fb07c'
-        - $ref: "#/components/schemas/envCore"
-    envCore:
-      title: envCore
+    rolegroupPostBody:
+      title: rolegroupPostBody
       type: object
       properties:
         name:
           type: string
           title: name
-          example: "myAwesomeENV"
-        organizationId:
+        description:
           type: string
-          title: organizationId
-          example: "0000-1111-2222-3333-4444"
-        isProduction:
+          title: description
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            type: string
+            title: externalName
+    rolegroupPutBody:
+      title: rolegroupPutBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            type: string
+            title: externalName
+    rolegroup:
+      title: rolegroup
+      type: object
+      properties:
+        role_group_id:
+          type: string
+          title: id
+          example: "a1a8b488-1e48-44ac-ba40-d53f518808af"
+        name:
+          type: string
+          title: name
+          example: "API Creators"
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            title: externalName
+            type: string
+        description:
+          type: string
+          title: description
+          example: "API Creators"
+        org_id:
+          type: string
+          title: orgId
+          example: "aa1f55d6-213d-4f60-845c-207286484cd1"
+        editable:
           type: boolean
-          title: isProduction
-          default: false
-        type:
+          title: editable
+        created_at:
           type: string
-          title: type
-          example: "sandbox"
-        clientId:
+          title: createdAt
+          example: "2021-03-05T14:06:52.976Z"
+        updated_at:
           type: string
-          title: clientId
-          example: "11-2222-3333-444"
+          title: updatedAt
+          example: "2021-03-05T14:06:52.976Z"
