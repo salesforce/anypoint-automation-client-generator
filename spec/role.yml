@@ -1,0 +1,333 @@
+openapi: 3.0.0
+info:
+  title: Role API
+  description: Description of the Role API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+
+  /roles:
+    get:
+      description: Retrieves all availables roles (permissions)
+      parameters:
+        - in: query
+          name: name
+          description: search by role name
+          schema:
+            type: string
+        - in: query
+          name: description
+          description: search by role description
+          schema:
+            type: string
+        - in: query
+          name: include_internal
+          description: include internal roles in search
+          schema:
+            type: boolean
+        - in: query
+          name: search
+          description: A search string to use for partial matches of role names
+          schema:
+            type: string
+        - in: query
+          name: offset
+          description: Pagination parameter to start returning results from this position of matches
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          description: Pagination parameter for how many results to return
+          schema:
+            type: integer
+        - in: query
+          name: ascending
+          description: Sort order for filtering
+          schema:
+            type: boolean          
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListRoles'
+
+
+  /organizations/{orgId}/rolegroups/{rolegroupId}/roles:
+    get:
+      description: Returns all roles assigned to the given rolegroup within the organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListAssingedRoles'
+    post:
+      description: Assigns a role to a rolegroup.
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/rolePostBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessAssignRoles'
+
+    delete:
+      description: Delete a rolegroup
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: rolegroupId
+        in: path
+        description: The id of a rolegroup
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteAssignedRoles'
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    SuccessListRoles:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of available roles
+                items:
+                  $ref: '#/components/schemas/role'
+              total:
+                type: integer
+                title: Total number of results
+    SuccessAssignRoles:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/rolePostResponseBody'
+    SuccessDeleteAssignedRoles:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: integer
+              description: number of deleted roles
+    SuccessListAssingedRoles:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of assigned roles
+                items:
+                  $ref: '#/components/schemas/assignedRole'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    rolePostBody:
+      title: rolePostBody
+      type: array
+      items:
+        title: roleToAssign
+        type: object
+        properties:
+          context_params:
+            type: object
+            title: context_params
+            properties:
+              org:
+                type: string
+                title: org
+          role_id:
+            type: string
+            title: roleId
+
+    rolePostResponseBody:
+      title: rolePostResponseBody
+      type: array
+      items:
+        type: object
+        title: rolePostResponseItem
+        properties:
+          role_group_id:
+            type: string
+            title: rolegroupId
+          role_id:
+            type: string
+            title: roleId
+          role_group_assignment_id:
+            type: string
+            title: roleGroupAssignmentId
+          context_params_json:
+            type: object
+            title: contextParamsJson
+            properties:
+              org:
+                type: string
+                title: org
+          context_params:
+            type: object
+            title: contextParams
+            properties:
+              org:
+                type: string
+                title: org
+
+    roleDeleteBody:
+      type: array
+      title: roleDeleteBody
+      items:
+        type: object
+        title: roleToDelete
+        properties:
+          context_params:
+            type: object
+            title: contextParams
+            properties:
+              org:
+                type: string
+                title: org
+          role_group_assignment_id:
+            type: string
+            title: roleGroupAssignmentId
+          role_group_id:
+            type: string
+            title: roleGroupId
+          role_id:
+            type: string
+            title: roleId
+
+    role:
+      title: role
+      type: object
+      properties:
+        role_id:
+          type: string
+          title: roleId
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        internal:
+          type: boolean
+          title: internal
+        org_id:
+          type: string
+          nullable: true
+          title: orgId
+        namespaces:
+          type: array
+          title: namespaces
+          items:
+            type: string
+            title: namespace
+        shareable:
+          type: boolean
+          title: shareable
+
+    assignedRole:
+      title: assignedRole
+      type: object
+      properties:
+        context_params:
+          type: object
+          title: contextParams
+          properties:
+            org:
+              type: string
+              title: org
+        created_at:
+          type: string
+          title: createdAt
+          example: "2021-06-07T15:58:33.755Z"
+        role_group_assignment_id:
+          type: string
+          title: roleGroupAssignmentId
+        role_group_id:
+          type: string
+          title: roleGroupId
+        role_id:
+          type: string
+          title: roleId
+        org_id:
+          type: string
+          title: orgId
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        internal:
+          type: boolean
+          title: internal
+
