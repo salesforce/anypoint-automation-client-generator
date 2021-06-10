@@ -1,0 +1,266 @@
+openapi: 3.0.0
+info:
+  title: User API
+  description: Description of the User API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/users:
+    get:
+      description: Returns the group of users that belong to the specified organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: A search string to specify the type of user you want to retrieve.
+          required: false
+          schema:
+            type: string
+            enum: [host, proxy, all]
+        - name: limit
+          in: query
+          description: Maximum number of users to retrieve per request.
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The number of records to omit from the response.
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListUsers'
+    post:
+      description: Creates a User
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  title: username
+                firstName:
+                  type: string
+                  title: firstName
+                lastName:
+                  type: string
+                  title: lastName
+                email:
+                  type: string
+                  title: email
+                phoneNumber:
+                  type: string
+                  title: phoneNumber
+                password:
+                  type: string
+                  title: password
+        required: false
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPostUser'
+    put:
+      description: Update an User
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                properties:
+                  username:
+                    type: string
+                    title: username
+                  firstName:
+                    type: string
+                    title: firstName
+                  lastName:
+                    type: string
+                    title: lastName
+                  email:
+                    type: string
+                    title: email
+                  phoneNumber:
+                    type: string
+                    title: phoneNumber
+                  password:
+                    type: string
+                    title: password
+        required: false
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPutUsers'
+    delete:
+      description: Delete one or more users
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+        requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                properties:
+                  inviteId:
+                    type: string
+                    title: userId
+        required: false
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteUsers'
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    SuccessPostUser:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/user'
+    SuccessPutUsers:
+      description: Success response
+    SuccessDeleteUsers:
+      description: Success response
+    SuccessListUsers:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of users
+                items:
+                  $ref: '#/components/schemas/user'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    user:
+      title: user
+      allOf:
+        - type: object
+          title: userId
+          required:
+            - id
+          properties:
+            id:
+              description: The user Id
+              title: id
+              type: string
+              example: '4b353f44-6486-42ae-ae77-18b4032f9643'
+        - $ref: "#/components/schemas/userCore"
+    userCore:
+      title: userCore
+      type: object
+      properties:
+        username:
+          type: string
+          title: username
+          example: "UzerMule.test"
+        firstName:
+          type: string
+          title: firstName
+          example: "Uzer"
+        lastName:
+          type: string
+          title: lastName
+          default: "Mule"
+        email:
+          type: string
+          title: email
+          example: "api.platform.qa+uzer@gmail.com"
+        enabled:
+          type: boolean
+          title: enabled
+          example: true
+        idprovider_id:
+          type: string
+          title: idprovider_id
+          example: "mulesoft"
+        createdAt:
+          type: string
+          title: createdAt
+          example: "Mon Feb 09 2015 17:47:26 GMT-0300 (ART)"
+        updatedAt:
+          type: string
+          title: updatedAt
+          example: "Mon Feb 09 2015 17:47:26 GMT-0300 (ART)"
+        isApiConsumer:
+          type: boolean
+          title: isFederated
+          example: false
