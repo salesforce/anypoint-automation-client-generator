@@ -15,7 +15,7 @@ security:
 paths:
   /organizations/{orgId}/users:
     get:
-      description: Returns the group of users that belong to the specified organization
+      description: Returns the group of users that belong to the specified organization.
       parameters:
         - name: orgId
           in: path
@@ -128,7 +128,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
-        '201':
+        '204':
           $ref: '#/components/responses/SuccessPutUsers'
     delete:
       description: Delete one or more users
