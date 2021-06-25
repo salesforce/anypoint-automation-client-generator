@@ -60,27 +60,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  title: username
-                firstName:
-                  type: string
-                  title: firstName
-                lastName:
-                  type: string
-                  title: lastName
-                email:
-                  type: string
-                  title: email
-                phoneNumber:
-                  type: string
-                  title: phoneNumber
-                password:
-                  type: string
-                  title: password
-        required: false
+              $ref: '#/components/schemas/usersPostBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -101,28 +81,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                properties:
-                  username:
-                    type: string
-                    title: username
-                  firstName:
-                    type: string
-                    title: firstName
-                  lastName:
-                    type: string
-                    title: lastName
-                  email:
-                    type: string
-                    title: email
-                  phoneNumber:
-                    type: string
-                    title: phoneNumber
-                  password:
-                    type: string
-                    title: password
-        required: false
+              $ref: '#/components/schemas/usersPutBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -139,17 +98,11 @@ paths:
         required: true
         schema:
           type: string
-        requestBody:
+      requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                properties:
-                  inviteId:
-                    type: string
-                    title: userId
-        required: false
+              $ref: '#/components/schemas/usersDeleteBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -210,6 +163,59 @@ components:
                 title: Total number of results
 
   schemas:
+    usersPostBody:
+      type: object
+      title: usersPostBody
+      properties:
+        username:
+          type: string
+          title: username
+        firstName:
+          type: string
+          title: firstName
+        lastName:
+          type: string
+          title: lastName
+        email:
+          type: string
+          title: email
+        phoneNumber:
+          type: string
+          title: phoneNumber
+        password:
+          type: string
+          title: password
+    usersPutBody:
+      type: array
+      title: userPutBody
+      items:
+        properties:
+          username:
+            type: string
+            title: username
+          firstName:
+            type: string
+            title: firstName
+          lastName:
+            type: string
+            title: lastName
+          email:
+            type: string
+            title: email
+          phoneNumber:
+            type: string
+            title: phoneNumber
+          password:
+            type: string
+            title: password
+    usersDeleteBody:
+      type: array
+      title: userDeleteBody
+      items:
+        properties:
+          inviteId:
+            type: string
+            title: userId
     user:
       title: user
       allOf:
@@ -250,7 +256,7 @@ components:
           example: true
         idprovider_id:
           type: string
-          title: idprovider_id
+          title: idproviderId
           example: "mulesoft"
         createdAt:
           type: string
