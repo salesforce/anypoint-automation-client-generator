@@ -59,21 +59,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  title: email 
-                role_groups:
-                  type: object
-                  properties:
-                    role_group_id:
-                      type: string
-                      title: role_group_id
-                    name:
-                      type: string
-                      title: name
-        required: false
+              $ref: '#/components/schemas/invitePostBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -90,16 +76,11 @@ paths:
         required: true
         schema:
           type: string
-        requestBody:
+      requestBody:
         content:
           application/json:
             schema:
-              type: array
-              properties:
-                inviteId:
-                  type: string
-                  title: inviteId
-        required: false
+              $ref: '#/components/schemas/invitesDeleteBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -158,6 +139,29 @@ components:
                 title: Total number of results
 
   schemas:
+    invitePostBody:
+      type: object
+      title: invitePostBody
+      properties:
+        email:
+          type: string
+          title: email 
+        role_groups:
+          type: object
+          properties:
+            role_group_id:
+              type: string
+              title: roleGroupId
+            name:
+              type: string
+              title: name
+    invitesDeleteBody:
+      type: array
+      title: invitesDeleteBody
+      properties:
+        inviteId:
+          type: string
+          title: inviteId
     invite:
       title: invite
       allOf:
@@ -182,15 +186,15 @@ components:
           example: "f2e8dfab-6699-4889-831f-6dc6f8428cb0"
         invited_at:
           type: string
-          title: invited_at
+          title: invitedAt
           example: "2015-01-30T22:23:55.433Z"
         invited_email:
           type: string
-          title: invited_email
+          title: invitedEmail
           default: "christopher.mordue@mulesoft.com"
         expires_at:
           type: string
-          title: expires_at
+          title: expiresAt
           example: "2015-04-10T22:23:55.433Z"
         status:
           type: string
