@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: Invite API
+  description: Description of the Invite API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/invites:
+    get:
+      description: Returns outstanding or expired invites
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: A search string to use for partial matches of invited emails
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Pagination parameter for choosing how many results include in the response
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Pagination parameter to start returning results from the specified position of matches
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListInvites'
+    post:
+      description: Creates an invite
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  title: email 
+                role_groups:
+                  type: object
+                  properties:
+                    role_group_id:
+                      type: string
+                      title: role_group_id
+                    name:
+                      type: string
+                      title: name
+        required: false
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPostInvite'
+    delete:
+      description: Delete one or more invites
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+        requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              properties:
+                inviteId:
+                  type: string
+                  title: inviteId
+        required: false
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteInvites'
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    SuccessPostInvite:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invite'
+    SuccessDeleteInvites:
+      description: Success response
+    SuccessListInvites:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of invites
+                items:
+                  $ref: '#/components/schemas/invite'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    invite:
+      title: invite
+      allOf:
+        - type: object
+          title: inviteId
+          required:
+            - id
+          properties:
+            id:
+              description: The invite Id
+              title: id
+              type: string
+              example: '520'
+        - $ref: "#/components/schemas/inviteCore"
+    inviteCore:
+      title: inviteCore
+      type: object
+      properties:
+        code:
+          type: string
+          title: code
+          example: "f2e8dfab-6699-4889-831f-6dc6f8428cb0"
+        invited_at:
+          type: string
+          title: invited_at
+          example: "2015-01-30T22:23:55.433Z"
+        invited_email:
+          type: string
+          title: invited_email
+          default: "christopher.mordue@mulesoft.com"
+        expires_at:
+          type: string
+          title: expires_at
+          example: "2015-04-10T22:23:55.433Z"
+        status:
+          type: string
+          title: status
+          example: "INVITED"
