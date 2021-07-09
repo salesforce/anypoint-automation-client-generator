@@ -261,3 +261,7 @@ components:
           type: string
           title: updatedAt
           example: "2021-03-05T14:06:52.976Z"
+        user_count:
+          type: integer
+          title: userCount
+          example: 0
