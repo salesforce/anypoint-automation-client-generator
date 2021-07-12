@@ -328,6 +328,8 @@ components:
           $ref: "#/components/schemas/organization"
         memberOfOrganizations:
           $ref: "#/components/schemas/memberOfOrganizations"
+        contributorOfOrganizations:
+          $ref: "#/components/schemas/contributorOfOrganizations"
         properties:
           type: object
           title: properties
@@ -428,76 +430,85 @@ components:
       type: array
       title: memberOfOrganizations
       items:
-        type: object
-        title: memberOfOrganization
-        properties:
-          parentName:
+        $ref: "#/components/schemas/org"
+    
+    contributorOfOrganizations:
+      type: array
+      title: contributorOfOrganizations
+      items:
+        $ref: "#/components/schemas/org"
+
+    org:
+      type: object
+      title: org
+      properties:
+        parentName:
+          type: string
+          nullable: true
+          title: parentName
+        parentId:
+          type: string
+          nullable: true
+          title: parentId
+        domain:
+          type: string
+          title: domain
+        id: 
+          type: string
+          title: id
+        createdAt:
+          type: string
+          title: createdAt
+        updatedAt:
+          type: string
+          title: updatedAt
+        ownerId:
+          type: string
+          title: ownerId
+        clientId:
+          type: string
+          title: clientId
+        idprovider_id:
+          type: string
+          title: idprovider_id
+        isFederated:
+          type: boolean
+          title: isFederated
+        parentOrganizationIds:
+          type: array
+          title: parentOrganizationIds
+          items:
             type: string
-            nullable: true
-            title: parentName
-          parentId:
+        subOrganizationIds:
+          type: array
+          title: subOrganizationIds
+          items:
             type: string
-            nullable: true
-            title: parentId
-          domain:
+        tenantOrganizationIds:
+          type: array
+          title: tenantOrganizationIds
+          items:
             type: string
-            title: domain
-          id: 
-            type: string
-            title: id
-          createdAt:
-            type: string
-            title: createdAt
-          updatedAt:
-            type: string
-            title: updatedAt
-          ownerId:
-            type: string
-            title: ownerId
-          clientId:
-            type: string
-            title: clientId
-          idprovider_id:
-            type: string
-            title: idprovider_id
-          isFederated:
-            type: boolean
-            title: isFederated
-          parentOrganizationIds:
-            type: array
-            title: parentOrganizationIds
-            items:
+        mfaRequired:
+          type: string
+          title: mfaRequired
+        isAutomaticAdminPromotionExempt:
+          type: boolean
+          title: isAutomaticAdminPromotionExempt
+        isMaster:
+          type: boolean
+          title: isMaster
+        subscription:
+          type: object
+          title: subscription
+          properties:
+            category:
               type: string
-          subOrganizationIds:
-            type: array
-            title: subOrganizationIds
-            items:
+              title: category
+            type:
               type: string
-          tenantOrganizationIds:
-            type: array
-            title: tenantOrganizationIds
-            items:
+              title: type
+            expiration:
               type: string
-          mfaRequired:
-            type: string
-            title: mfaRequired
-          isAutomaticAdminPromotionExempt:
-            type: boolean
-            title: isAutomaticAdminPromotionExempt
-          isMaster:
-            type: boolean
-            title: isMaster
-          subscription:
-            type: object
-            title: subscription
-            properties:
-              category:
-                type: string
-                title: category
-              type:
-                type: string
-                title: type
-              expiration:
-                type: string
-                title: expiration
+              title: expiration
 
