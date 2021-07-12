@@ -60,7 +60,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/usersPostBody'
+              $ref: '#/components/schemas/userPostBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -68,8 +68,30 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '201':
           $ref: '#/components/responses/SuccessPostUser'
+
+  /organizations/{orgId}/users/{userId}:
+    get:
+      description: Returns a specific user that belong to the specified organization.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetUser'
     put:
-      description: Update an User
+      description: Update a user
       parameters:
       - name: orgId
         in: path
@@ -77,20 +99,26 @@ paths:
         required: true
         schema:
           type: string
+      - name: userId
+        in: path
+        description: The ID of the user
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/usersPutBody'
+              $ref: '#/components/schemas/userPutBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '204':
-          $ref: '#/components/responses/SuccessPutUsers'
+          $ref: '#/components/responses/SuccessPutUser'
     delete:
-      description: Delete one or more users
+      description: Delete the user
       parameters:
       - name: orgId
         in: path
@@ -98,18 +126,17 @@ paths:
         required: true
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/usersDeleteBody'
+      - name: userId
+        in: path
+        description: The ID of the user
+        required: true
+        schema:
+          type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '204':
-          $ref: '#/components/responses/SuccessDeleteUsers'
-
-
+          $ref: '#/components/responses/SuccessDeleteUser'
 
 components:
   securitySchemes:
@@ -142,9 +169,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/user'
-    SuccessPutUsers:
+    SuccessPutUser:
       description: Success response
-    SuccessDeleteUsers:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/user"
+    SuccessDeleteUser:
       description: Success response
     SuccessListUsers:
       description: Success response
@@ -161,11 +192,17 @@ components:
               total:
                 type: integer
                 title: Total number of results
+    SuccessGetUser:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/user'
 
   schemas:
-    usersPostBody:
+    userPostBody:
       type: object
-      title: usersPostBody
+      title: userPostBody
       properties:
         username:
           type: string
@@ -185,37 +222,31 @@ components:
         password:
           type: string
           title: password
-    usersPutBody:
-      type: array
+    userPutBody:
+      type: object
       title: userPutBody
-      items:
+      properties:
+        username:
+          type: string
+          title: username
+        firstName:
+          type: string
+          title: firstName
+        lastName:
+          type: string
+          title: lastName
+        email:
+          type: string
+          title: email
+        phoneNumber:
+          type: string
+          title: phoneNumber
+        password:
+          type: string
+          title: password
         properties:
-          username:
-            type: string
-            title: username
-          firstName:
-            type: string
-            title: firstName
-          lastName:
-            type: string
-            title: lastName
-          email:
-            type: string
-            title: email
-          phoneNumber:
-            type: string
-            title: phoneNumber
-          password:
-            type: string
-            title: password
-    usersDeleteBody:
-      type: array
-      title: userDeleteBody
-      items:
-        properties:
-          inviteId:
-            type: string
-            title: userId
+          type: object
+          title: properties
     user:
       title: user
       allOf:
@@ -246,14 +277,38 @@ components:
           type: string
           title: lastName
           default: "Mule"
+        phoneNumber:
+          type: string
+          title: phoneNumber
+          example: "111-111-1111"
         email:
           type: string
           title: email
           example: "api.platform.qa+uzer@gmail.com"
+        organizationId:
+          type: string
+          title: organizationId
+          example: "xxxxxx-213d-4f60-845c-207286484cd1"
         enabled:
           type: boolean
           title: enabled
           example: true
+        deleted:
+          type: boolean
+          title: deleted
+          example: false
+        lastLogin:
+          type: string
+          title: lastLogin
+          example: "2021-07-12T09:28:43.569Z"
+        mfaVerificationExcluded:
+          type: boolean
+          title: mfaVerificationExcluded
+          example: false
+        mfaVerifiersConfigured:
+          type: boolean
+          title: mfaVerifiersConfigured
+          example: false
         idprovider_id:
           type: string
           title: idproviderId
@@ -266,7 +321,198 @@ components:
           type: string
           title: updatedAt
           example: "Mon Feb 09 2015 17:47:26 GMT-0300 (ART)"
-        isApiConsumer:
+        isFederated:
           type: boolean
           title: isFederated
           example: false
+        type:
+          type: string
+          title: type
+        organization:
+          $ref: "#/components/schemas/organization"
+        memberOfOrganizations:
+          $ref: "#/components/schemas/memberOfOrganizations"
+        contributorOfOrganizations:
+          $ref: "#/components/schemas/contributorOfOrganizations"
+        properties:
+          type: object
+          title: properties
+          properties:
+            cs_auth:
+              type: object
+              title: cs_auth
+        organizationPreferences:
+          type: object
+          title: organizationPreferences
+        primaryOrganization:
+          type: object
+          title: primaryOrganization
+          properties:
+            id: 
+              type: string
+              title: id
+            name:
+              type: string
+              title: name
+
+    organization:
+      title: organization
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        id:
+          type: string
+          title: id
+        createdAt:
+          type: string
+          title: createdAt
+        updatedAt:
+          type: string
+          title: updatedAt
+        ownerId:
+          type: string
+          title: ownerId
+        clientId:
+          type: string
+          title: clientId
+        idprovider_id:
+          type: string
+          title: idprovider_id
+        isFederated:
+          type: boolean
+          title: isFederated
+        parentOrganizationIds:
+          type: array
+          title: parentOrganizationIds
+          items:
+            type: string
+        subOrganizationIds:
+          type: array
+          title: subOrganizationIds
+          items:
+            type: string
+        tenantOrganizationIds:
+          type: array
+          title: tenantOrganizationIds
+          items:
+            type: string
+        mfaRequired:
+          type: string
+          title: mfaRequired
+        isAutomaticAdminPromotionExempt:
+          type: boolean
+          title: isAutomaticAdminPromotionExempt
+        domain:
+          type: string
+          title: domain
+        isMaster:
+          type: boolean
+          title: isMaster
+        subscription:
+          type: object
+          title: subscription
+          properties:
+            category:
+              type: string
+              title: category
+            type:
+              type: string
+              title: type
+            expiration:
+              type: string
+              title: expiration
+        properties:
+          type: object
+          title: properties
+        entitlements:
+          type: object
+          title: entitlements
+
+    memberOfOrganizations:
+      type: array
+      title: memberOfOrganizations
+      items:
+        $ref: "#/components/schemas/org"
+    
+    contributorOfOrganizations:
+      type: array
+      title: contributorOfOrganizations
+      items:
+        $ref: "#/components/schemas/org"
+
+    org:
+      type: object
+      title: org
+      properties:
+        parentName:
+          type: string
+          nullable: true
+          title: parentName
+        parentId:
+          type: string
+          nullable: true
+          title: parentId
+        domain:
+          type: string
+          title: domain
+        id: 
+          type: string
+          title: id
+        createdAt:
+          type: string
+          title: createdAt
+        updatedAt:
+          type: string
+          title: updatedAt
+        ownerId:
+          type: string
+          title: ownerId
+        clientId:
+          type: string
+          title: clientId
+        idprovider_id:
+          type: string
+          title: idprovider_id
+        isFederated:
+          type: boolean
+          title: isFederated
+        parentOrganizationIds:
+          type: array
+          title: parentOrganizationIds
+          items:
+            type: string
+        subOrganizationIds:
+          type: array
+          title: subOrganizationIds
+          items:
+            type: string
+        tenantOrganizationIds:
+          type: array
+          title: tenantOrganizationIds
+          items:
+            type: string
+        mfaRequired:
+          type: string
+          title: mfaRequired
+        isAutomaticAdminPromotionExempt:
+          type: boolean
+          title: isAutomaticAdminPromotionExempt
+        isMaster:
+          type: boolean
+          title: isMaster
+        subscription:
+          type: object
+          title: subscription
+          properties:
+            category:
+              type: string
+              title: category
+            type:
+              type: string
+              title: type
+            expiration:
+              type: string
+              title: expiration
+
