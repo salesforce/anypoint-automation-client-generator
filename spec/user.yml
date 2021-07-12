@@ -338,6 +338,16 @@ components:
         organizationPreferences:
           type: object
           title: organizationPreferences
+        primaryOrganization:
+          type: object
+          title: primaryOrganization
+          properties:
+            id: 
+              type: string
+              title: id
+            name:
+              type: string
+              title: name
 
     organization:
       title: organization
