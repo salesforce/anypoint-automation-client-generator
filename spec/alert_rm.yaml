@@ -2,31 +2,29 @@ openapi: 3.0.0
 info:
   title: Alert Runtime Manager
   description: Description of the Alert in Runtime Manager API
-  version: '1.0'
+  version: 1.0.0
 servers:
-- url: https://anypoint.mulesoft.com/armui/api/v1
+- url: https://anypoint.mulesoft.com/armui/api
   description: Anypoint Cloudhub 
-- url: https://eu1.anypoint.mulesoft.com/armui/api/v1
+- url: https://eu1.anypoint.mulesoft.com/armui/api
   description: Anypoint Cloudhub EU
 
 security:
   - bearerAuth: []
 
 paths:
-  /alerts:
+  /v1/alerts:
     parameters:
       - in: header
         name: orgId
-        description: ''
+        description: The organization ID
         required: true
-        style: simple
         schema:
           type: string
       - in: header
         name: envId
-        description: ''
+        description: The environment ID
         required: true
-        style: simple
         schema:
           type: string
 
@@ -34,125 +32,93 @@ paths:
       summary: Get all the alert instances from the run time manager
       description: Get alerts
       responses:
-        '200':
-          description: 'success response'
-          content: {}
+        '401': 
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetAlerts'
+          
   
-  /alerts/cloudhub/{cloudhub-rm-alert}:
+  /v1/alerts/cloudhub/{cloudhub-rm-alert}:
+
+    parameters:
+      - name: orgId
+        in: header
+        description: the org id
+        required: true
+        schema:
+          type: string
+      - name: envId
+        in: header
+        description: the env id
+        required: true
+        schema:
+          type: string
+      - name: cloudhub-rm-alert
+        in: path
+        description: the name of the cloud hub alert
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+
     get:
       summary: Get one specific alert
       description: Get one specific alert
-      parameters:
-      - name: orgId
-        in: header
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
-      - name: envId
-        in: header
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
-      - name: cloudhub-rm-alert
-        in: path
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
       responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetAlerts'
 
     put:
-      tags:
-      - Misc
-      summary: Modifyonealert
       description: Modify one alert
-      operationId: Modifyonealert
+      operationId: Modify one alert
       parameters:
       - name: Authorization
         in: header
-        description: ''
-        style: simple
+        description: authorization key
         schema:
           type: string
           default: Bearer {token}
-      - name: orgId
-        in: header
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
-      - name: envId
-        in: header
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
-      - name: cloudhub-rm-alert
-        in: path
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
+      
       requestBody:
         description: ''
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ModifyonealertRequest'
-            example:
-              name: max-wdr{{$randomInt}}
-              severity: INFO
-              actions:
-              - type: email
-                content: >-
-                  Hello,
-
-                  You are receiving this alert because:
-
-                  The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
-                subject: '${severity}: CPU usage ${state}'
-                userIds:
-                - 5d277560-1426-459c-ae5b-3031aa56298f
-              condition:
-                operator: GREATER_THAN
-                periodCount: 10
-                value: 80
-                resourceType: cloudhub-application
-                type: cpu
-                periodMins: 1
-                resources:
-                - dummy-app
-        required: true
+              $ref: '#/components/schemas/AlertWithId'
       responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':
+        
+          $ref: '#/components/responses/SuccessCreateAlert'
+
     delete:
-      tags:
-      - Misc
       summary: Deleteonealert
       description: Delete one alert
       operationId: Deleteonealert
-      parameters:
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          description: "No content"
+          content: 
+            text/plain:
+              example:
+               "successfully deleted"
+  
+  /v1/alerts/cloudhub:
+    parameters:
       - name: Authorization
         in: header
         description: ''
-        style: simple
         schema:
           type: string
           default: Bearer {token}
@@ -160,101 +126,86 @@ paths:
         in: header
         description: ''
         required: true
-        style: simple
         schema:
           type: string
       - name: envId
         in: header
         description: ''
-        required: true
         style: simple
         schema:
           type: string
-      - name: cloudhub-rm-alert
-        in: path
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
-      responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
-  
-  /alerts/cloudhub:
+
     post:
-      tags:
-      - Misc
-      summary: Addnewalert
       description: Add new alert
       operationId: Addnewalert
-      parameters:
-      - name: Authorization
-        in: header
-        description: ''
-        style: simple
-        schema:
-          type: string
-          default: Bearer {token}
-      - name: orgId
-        in: header
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
-      - name: envId
-        in: header
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
       requestBody:
-        description: ''
+        description: 'Add a new alert'
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddnewalertRequest'
-            example:
-              name: max-{{$randomInt}}
-              severity: INFO
-              actions:
-              - type: email
-                content: >-
-                  Hello,
-
-                  You are receiving this alert because:
-
-                  The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
-                subject: '${severity}: CPU usage ${state}'
-                userIds:
-                - 5d277560-1426-459c-ae5b-3031aa56298f
-              condition:
-                operator: GREATER_THAN
-                periodCount: 10
-                value: 80
-                resourceType: cloudhub-application
-                type: cpu
-                periodMins: 1
-                resources:
-                - dummy-app
+              $ref: '#/components/schemas/Alert'
         required: true
       responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
-
-
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':
+          $ref: '#/components/responses/SuccessCreateAlert'
 components:
+
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: api error message 
+    SuccessGetAlerts:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: array
+            title: alerts from GET
+            items:
+              $ref: '#/components/schemas/AlertWithId'
+    SuccessGetAlert:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alert from GET one alert
+            $ref: '#/components/schemas/AlertWithId'
+    SuccessCreateAlert:
+      description: Success create an alert
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alert created after POST
+            $ref: '#/components/schemas/AlertWithId'
+
+
   schemas:
-    AddnewalertRequest:
-      title: AddnewalertRequest
+    Alert:
+      title: Alert
       required:
       - name
       - severity
@@ -273,29 +224,7 @@ components:
           description: ''
         condition:
           $ref: '#/components/schemas/Condition'
-      example:
-        name: max-{{$randomInt}}
-        severity: INFO
-        actions:
-        - type: email
-          content: >-
-            Hello,
-
-            You are receiving this alert because:
-
-            The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
-          subject: '${severity}: CPU usage ${state}'
-          userIds:
-          - 5d277560-1426-459c-ae5b-3031aa56298f
-        condition:
-          operator: GREATER_THAN
-          periodCount: 10
-          value: 80
-          resourceType: cloudhub-application
-          type: cpu
-          periodMins: 1
-          resources:
-          - dummy-app
+    
     Action:
       title: Action
       required:
@@ -316,17 +245,7 @@ components:
           items:
             type: string
           description: ''
-      example:
-        type: email
-        content: >-
-          Hello,
-
-          You are receiving this alert because:
-
-          The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
-        subject: '${severity}: CPU usage ${state}'
-        userIds:
-        - 5d277560-1426-459c-ae5b-3031aa56298f
+      
     Condition:
       title: Condition
       required:
@@ -359,17 +278,9 @@ components:
           items:
             type: string
           description: ''
-      example:
-        operator: GREATER_THAN
-        periodCount: 10
-        value: 80
-        resourceType: cloudhub-application
-        type: cpu
-        periodMins: 1
-        resources:
-        - dummy-app
-    ModifyonealertRequest:
-      title: ModifyonealertRequest
+     
+    AlertWithId:
+      title: AlertWithId
       required:
       - name
       - severity
@@ -388,29 +299,6 @@ components:
           description: ''
         condition:
           $ref: '#/components/schemas/Condition'
-      example:
-        name: max-wdr{{$randomInt}}
-        severity: INFO
-        actions:
-        - type: email
-          content: >-
-            Hello,
+      
+        
 
-            You are receiving this alert because:
-
-            The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
-          subject: '${severity}: CPU usage ${state}'
-          userIds:
-          - 5d277560-1426-459c-ae5b-3031aa56298f
-        condition:
-          operator: GREATER_THAN
-          periodCount: 10
-          value: 80
-          resourceType: cloudhub-application
-          type: cpu
-          periodMins: 1
-          resources:
-          - dummy-app
-tags:
-- name: Misc
-  description: ''
