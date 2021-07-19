@@ -1,0 +1,416 @@
+openapi: 3.0.0
+info:
+  title: Alert Runtime Manager
+  description: Description of the Alert in Runtime Manager API
+  version: '1.0'
+servers:
+- url: https://anypoint.mulesoft.com/armui/api/v1
+  description: Anypoint Cloudhub 
+- url: https://eu1.anypoint.mulesoft.com/armui/api/v1
+  description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: []
+
+paths:
+  /alerts:
+    parameters:
+      - in: header
+        name: orgId
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - in: header
+        name: envId
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+
+    get:
+      summary: Get all the alert instances from the run time manager
+      description: Get alerts
+      responses:
+        '200':
+          description: 'success response'
+          content: {}
+  
+  /alerts/cloudhub/{cloudhub-rm-alert}:
+    get:
+      summary: Get one specific alert
+      description: Get one specific alert
+      parameters:
+      - name: orgId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: envId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: cloudhub-rm-alert
+        in: path
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+
+    put:
+      tags:
+      - Misc
+      summary: Modifyonealert
+      description: Modify one alert
+      operationId: Modifyonealert
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      - name: orgId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: envId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: cloudhub-rm-alert
+        in: path
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyonealertRequest'
+            example:
+              name: max-wdr{{$randomInt}}
+              severity: INFO
+              actions:
+              - type: email
+                content: >-
+                  Hello,
+
+                  You are receiving this alert because:
+
+                  The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
+                subject: '${severity}: CPU usage ${state}'
+                userIds:
+                - 5d277560-1426-459c-ae5b-3031aa56298f
+              condition:
+                operator: GREATER_THAN
+                periodCount: 10
+                value: 80
+                resourceType: cloudhub-application
+                type: cpu
+                periodMins: 1
+                resources:
+                - dummy-app
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+    delete:
+      tags:
+      - Misc
+      summary: Deleteonealert
+      description: Delete one alert
+      operationId: Deleteonealert
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      - name: orgId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: envId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: cloudhub-rm-alert
+        in: path
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+  
+  /alerts/cloudhub:
+    post:
+      tags:
+      - Misc
+      summary: Addnewalert
+      description: Add new alert
+      operationId: Addnewalert
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      - name: orgId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      - name: envId
+        in: header
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddnewalertRequest'
+            example:
+              name: max-{{$randomInt}}
+              severity: INFO
+              actions:
+              - type: email
+                content: >-
+                  Hello,
+
+                  You are receiving this alert because:
+
+                  The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
+                subject: '${severity}: CPU usage ${state}'
+                userIds:
+                - 5d277560-1426-459c-ae5b-3031aa56298f
+              condition:
+                operator: GREATER_THAN
+                periodCount: 10
+                value: 80
+                resourceType: cloudhub-application
+                type: cpu
+                periodMins: 1
+                resources:
+                - dummy-app
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+
+
+components:
+  schemas:
+    AddnewalertRequest:
+      title: AddnewalertRequest
+      required:
+      - name
+      - severity
+      - actions
+      - condition
+      type: object
+      properties:
+        name:
+          type: string
+        severity:
+          type: string
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+          description: ''
+        condition:
+          $ref: '#/components/schemas/Condition'
+      example:
+        name: max-{{$randomInt}}
+        severity: INFO
+        actions:
+        - type: email
+          content: >-
+            Hello,
+
+            You are receiving this alert because:
+
+            The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
+          subject: '${severity}: CPU usage ${state}'
+          userIds:
+          - 5d277560-1426-459c-ae5b-3031aa56298f
+        condition:
+          operator: GREATER_THAN
+          periodCount: 10
+          value: 80
+          resourceType: cloudhub-application
+          type: cpu
+          periodMins: 1
+          resources:
+          - dummy-app
+    Action:
+      title: Action
+      required:
+      - type
+      - content
+      - subject
+      - userIds
+      type: object
+      properties:
+        type:
+          type: string
+        content:
+          type: string
+        subject:
+          type: string
+        userIds:
+          type: array
+          items:
+            type: string
+          description: ''
+      example:
+        type: email
+        content: >-
+          Hello,
+
+          You are receiving this alert because:
+
+          The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
+        subject: '${severity}: CPU usage ${state}'
+        userIds:
+        - 5d277560-1426-459c-ae5b-3031aa56298f
+    Condition:
+      title: Condition
+      required:
+      - operator
+      - periodCount
+      - value
+      - resourceType
+      - type
+      - periodMins
+      - resources
+      type: object
+      properties:
+        operator:
+          type: string
+        periodCount:
+          type: integer
+          format: int32
+        value:
+          type: integer
+          format: int32
+        resourceType:
+          type: string
+        type:
+          type: string
+        periodMins:
+          type: integer
+          format: int32
+        resources:
+          type: array
+          items:
+            type: string
+          description: ''
+      example:
+        operator: GREATER_THAN
+        periodCount: 10
+        value: 80
+        resourceType: cloudhub-application
+        type: cpu
+        periodMins: 1
+        resources:
+        - dummy-app
+    ModifyonealertRequest:
+      title: ModifyonealertRequest
+      required:
+      - name
+      - severity
+      - actions
+      - condition
+      type: object
+      properties:
+        name:
+          type: string
+        severity:
+          type: string
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+          description: ''
+        condition:
+          $ref: '#/components/schemas/Condition'
+      example:
+        name: max-wdr{{$randomInt}}
+        severity: INFO
+        actions:
+        - type: email
+          content: >-
+            Hello,
+
+            You are receiving this alert because:
+
+            The application ${resource} is now in an ${state} state, based on the condition 'CPU ${operator} ${value}%'.
+          subject: '${severity}: CPU usage ${state}'
+          userIds:
+          - 5d277560-1426-459c-ae5b-3031aa56298f
+        condition:
+          operator: GREATER_THAN
+          periodCount: 10
+          value: 80
+          resourceType: cloudhub-application
+          type: cpu
+          periodMins: 1
+          resources:
+          - dummy-app
+tags:
+- name: Misc
+  description: ''

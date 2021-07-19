@@ -1,0 +1,388 @@
+openapi: 3.0.0
+info:
+  title: Alert API Manager
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://anypoint.mulesoft.com/apimanager/api/v1/organizations/{organizationId}/environments/{environmentId}/apis/{apiVersion}
+  variables: 
+    organizationId:
+      default: "aa1f55d6-213d-4f60-845c-207286484cd1"
+    environmentId:
+      default: "7074fcdd-9b23-4ab3-97c8-5db5f4adf17d"
+    apiVersion:
+      default: "17014332"
+      
+paths:
+  /alerts:
+    get:
+      tags:
+      - Misc
+      summary: GetAlertsfromAPImanager
+      description: Get Alerts from API manager
+      operationId: GetAlertsfromAPImanager
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+    post:
+      tags:
+      - Misc
+      summary: CreatanewalertfromAPImanager
+      description: Creat a new alert from API manager
+      operationId: CreatanewalertfromAPImanager
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatanewalertfromAPImanagerRequest'
+            example:
+              apiAlertsVersion: 1.0.0
+              name: 'test-alert-max-from postman {{$randomInt}} '
+              type: api-request-count
+              enabled: true
+              severity: Info
+              recipients:
+              - type: user
+                value: fa4bb84b-2b64-4331-b926-0153e48103d8
+                firstName: Abhiraj
+                lastName: Kane
+              condition:
+                resourceType: api-version
+                aggregate: COUNT
+                operator: GREATER_THAN
+                value: 2
+              period:
+                duration:
+                  count: 2
+                  weight: HOURS
+                repeat: 2
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+  /alerts/{cloudhub-apim-alert}:
+    get:
+      tags:
+      - Misc
+      summary: Getonealert
+      description: Get one alert
+      operationId: Getonealert
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      - name: cloudhub-apim-alert
+        in: path
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+    patch:
+      tags:
+      - Misc
+      summary: ModifyonealertfromAPImanger
+      description: Modify one alert from API manger
+      operationId: ModifyonealertfromAPImanger
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      - name: cloudhub-apim-alert
+        in: path
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyonealertfromAPImangerRequest'
+            example:
+              apiAlertsVersion: 1.0.0
+              name: test-alert-max- {{$randomInt}}
+              type: api-request-count
+              enabled: false
+              severity: Info
+              recipients:
+              - type: user
+                value: fa4bb84b-2b64-4331-b926-0153e48103d8
+                firstName: Abhiraj
+                lastName: Kane
+              condition:
+                resourceType: api-version
+                aggregate: COUNT
+                operator: GREATER_THAN
+                value: 2
+              period:
+                duration:
+                  count: 2
+                  weight: HOURS
+                repeat: 2
+              id: 9339ff66-b229-4a40-979d-043b3b8cef9e
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+    delete:
+      tags:
+      - Misc
+      summary: DeleteanAlertfromAPImanager
+      description: Delete an Alert from API manager
+      operationId: DeleteanAlertfromAPImanager
+      parameters:
+      - name: Authorization
+        in: header
+        description: ''
+        style: simple
+        schema:
+          type: string
+          default: Bearer {token}
+      - name: cloudhub-apim-alert
+        in: path
+        description: ''
+        required: true
+        style: simple
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+components:
+  schemas:
+    CreatanewalertfromAPImanagerRequest:
+      title: CreatanewalertfromAPImanagerRequest
+      required:
+      - apiAlertsVersion
+      - name
+      - type
+      - enabled
+      - severity
+      - recipients
+      - condition
+      - period
+      type: object
+      properties:
+        apiAlertsVersion:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        enabled:
+          type: boolean
+        severity:
+          type: string
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: ''
+        condition:
+          $ref: '#/components/schemas/Condition'
+        period:
+          $ref: '#/components/schemas/Period'
+      example:
+        apiAlertsVersion: 1.0.0
+        name: 'test-alert-max-from postman {{$randomInt}} '
+        type: api-request-count
+        enabled: true
+        severity: Info
+        recipients:
+        - type: user
+          value: fa4bb84b-2b64-4331-b926-0153e48103d8
+          firstName: Abhiraj
+          lastName: Kane
+        condition:
+          resourceType: api-version
+          aggregate: COUNT
+          operator: GREATER_THAN
+          value: 2
+        period:
+          duration:
+            count: 2
+            weight: HOURS
+          repeat: 2
+    Recipient:
+      title: Recipient
+      required:
+      - type
+      - value
+      - firstName
+      - lastName
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+      example:
+        type: user
+        value: fa4bb84b-2b64-4331-b926-0153e48103d8
+        firstName: Abhiraj
+        lastName: Kane
+    Condition:
+      title: Condition
+      required:
+      - resourceType
+      - aggregate
+      - operator
+      - value
+      type: object
+      properties:
+        resourceType:
+          type: string
+        aggregate:
+          type: string
+        operator:
+          type: string
+        value:
+          type: integer
+          format: int32
+      example:
+        resourceType: api-version
+        aggregate: COUNT
+        operator: GREATER_THAN
+        value: 2
+    Period:
+      title: Period
+      required:
+      - duration
+      - repeat
+      type: object
+      properties:
+        duration:
+          $ref: '#/components/schemas/Duration'
+        repeat:
+          type: integer
+          format: int32
+      example:
+        duration:
+          count: 2
+          weight: HOURS
+        repeat: 2
+    Duration:
+      title: Duration
+      required:
+      - count
+      - weight
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        weight:
+          type: string
+      example:
+        count: 2
+        weight: HOURS
+    ModifyonealertfromAPImangerRequest:
+      title: ModifyonealertfromAPImangerRequest
+      required:
+      - apiAlertsVersion
+      - name
+      - type
+      - enabled
+      - severity
+      - recipients
+      - condition
+      - period
+      - id
+      type: object
+      properties:
+        apiAlertsVersion:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        enabled:
+          type: boolean
+        severity:
+          type: string
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: ''
+        condition:
+          $ref: '#/components/schemas/Condition'
+        period:
+          $ref: '#/components/schemas/Period'
+        id:
+          type: string
+      example:
+        apiAlertsVersion: 1.0.0
+        name: test-alert-max- {{$randomInt}}
+        type: api-request-count
+        enabled: false
+        severity: Info
+        recipients:
+        - type: user
+          value: fa4bb84b-2b64-4331-b926-0153e48103d8
+          firstName: Abhiraj
+          lastName: Kane
+        condition:
+          resourceType: api-version
+          aggregate: COUNT
+          operator: GREATER_THAN
+          value: 2
+        period:
+          duration:
+            count: 2
+            weight: HOURS
+          repeat: 2
+        id: 9339ff66-b229-4a40-979d-043b3b8cef9e
+tags:
+- name: Misc
+  description: ''
