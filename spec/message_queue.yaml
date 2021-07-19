@@ -1,388 +1,225 @@
 openapi: 3.0.0
+
 info:
-  title: Alert API Manager
-  contact: {}
-  version: '1.0'
+  title: Message Queue
+  description: Manage Queues in Cloudhub
+  version: 1.0.0
+
+# https://anypoint.mulesoft.com/mq/admin/api/v1/organizations/{{org-id}}/environments/{{env-id}}/regions/:location/destinations
 servers:
-- url: https://anypoint.mulesoft.com/apimanager/api/v1/organizations/{organizationId}/environments/{environmentId}/apis/{apiVersion}
-  variables: 
-    organizationId:
-      default: "aa1f55d6-213d-4f60-845c-207286484cd1"
-    environmentId:
-      default: "7074fcdd-9b23-4ab3-97c8-5db5f4adf17d"
-    apiVersion:
-      default: "17014332"
+  - url: https://anypoint.mulesoft.com/mq/admin/api/
+    description: Anypoint Cloudhub MQ
+
+security:
+  - bearerAuth: [] 
       
 paths:
-  /alerts:
-    get:
-      tags:
-      - Misc
-      summary: GetAlertsfromAPImanager
-      description: Get Alerts from API manager
-      operationId: GetAlertsfromAPImanager
-      parameters:
-      - name: Authorization
-        in: header
-        description: ''
-        style: simple
-        schema:
-          type: string
-          default: Bearer {token}
-      responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
-    post:
-      tags:
-      - Misc
-      summary: CreatanewalertfromAPImanager
-      description: Creat a new alert from API manager
-      operationId: CreatanewalertfromAPImanager
-      parameters:
-      - name: Authorization
-        in: header
-        description: ''
-        style: simple
-        schema:
-          type: string
-          default: Bearer {token}
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreatanewalertfromAPImanagerRequest'
-            example:
-              apiAlertsVersion: 1.0.0
-              name: 'test-alert-max-from postman {{$randomInt}} '
-              type: api-request-count
-              enabled: true
-              severity: Info
-              recipients:
-              - type: user
-                value: fa4bb84b-2b64-4331-b926-0153e48103d8
-                firstName: Abhiraj
-                lastName: Kane
-              condition:
-                resourceType: api-version
-                aggregate: COUNT
-                operator: GREATER_THAN
-                value: 2
-              period:
-                duration:
-                  count: 2
-                  weight: HOURS
-                repeat: 2
+  /v1/organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
         required: true
-      responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
-  /alerts/{cloudhub-apim-alert}:
-    get:
-      tags:
-      - Misc
-      summary: Getonealert
-      description: Get one alert
-      operationId: Getonealert
-      parameters:
-      - name: Authorization
-        in: header
-        description: ''
-        style: simple
         schema:
           type: string
-          default: Bearer {token}
-      - name: cloudhub-apim-alert
-        in: path
-        description: ''
+      - in: path
+        name: envId
+        description: The environment id
         required: true
-        style: simple
         schema:
           type: string
+      - in: path
+        name: regionId
+        description: The region id for MQ
+        required: true
+        schema:
+          type: string
+    get:
+      description: Get a list of queues in a region
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
+          $ref: '#/components/responses/SuccessGetQueues'
+  /v1/organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations/queues/{queueId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: regionId
+        description: The region id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: queueId
+        description: The id of a specific queue
+        required: true
+        schema:
+          type: string
+    
+    get:
+      description: Get details about a queue
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessGetQueue'
     patch:
-      tags:
-      - Misc
-      summary: ModifyonealertfromAPImanger
-      description: Modify one alert from API manger
-      operationId: ModifyonealertfromAPImanger
-      parameters:
-      - name: Authorization
-        in: header
-        description: ''
-        style: simple
-        schema:
-          type: string
-          default: Bearer {token}
-      - name: cloudhub-apim-alert
-        in: path
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
+      description: Modify a queue's properties
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          $ref: '#/components/responses/SuccessGetQueue'
       requestBody:
-        description: ''
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ModifyonealertfromAPImangerRequest'
-            example:
-              apiAlertsVersion: 1.0.0
-              name: test-alert-max- {{$randomInt}}
-              type: api-request-count
-              enabled: false
-              severity: Info
-              recipients:
-              - type: user
-                value: fa4bb84b-2b64-4331-b926-0153e48103d8
-                firstName: Abhiraj
-                lastName: Kane
-              condition:
-                resourceType: api-version
-                aggregate: COUNT
-                operator: GREATER_THAN
-                value: 2
-              period:
-                duration:
-                  count: 2
-                  weight: HOURS
-                repeat: 2
-              id: 9339ff66-b229-4a40-979d-043b3b8cef9e
-        required: true
+              $ref: '#/components/schemas/QueueOptional'
+    put:
+      description: Create queue      
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
+          $ref: '#/components/responses/SuccessGetQueue'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueueOptional'
     delete:
-      tags:
-      - Misc
-      summary: DeleteanAlertfromAPImanager
-      description: Delete an Alert from API manager
-      operationId: DeleteanAlertfromAPImanager
-      parameters:
-      - name: Authorization
-        in: header
-        description: ''
-        style: simple
-        schema:
-          type: string
-          default: Bearer {token}
-      - name: cloudhub-apim-alert
-        in: path
-        description: ''
-        required: true
-        style: simple
-        schema:
-          type: string
+      description: Delete queue 
       responses:
-        '200':
-          description: ''
-          headers: {}
-          content: {}
-      deprecated: false
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteQueue'
+
+
+
+
+#############
+
 components:
+  securitySchemes:
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: api error message 
+    NotFound:
+      description: Queue not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 404
+              message:
+                type: string
+                title: the error message
+                example: api error message
+    SuccessGetQueues:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: array
+            title: alerts from GET
+            items:
+              $ref: '#/components/schemas/Queue'
+    SuccessGetQueue:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alerts from GET
+            $ref: '#/components/schemas/Queue'
+    SuccessCreateQueue:
+      description: Successfully created queue
+      content:
+        application/json:
+          schema:
+            type: object
+            title: queue created after POST
+            $ref: '#/components/schemas/Queue'
+    SuccessDeleteQueue:
+      description: Success response
+
   schemas:
-    CreatanewalertfromAPImanagerRequest:
-      title: CreatanewalertfromAPImanagerRequest
+    Queue:
+      title: Queue
       required:
-      - apiAlertsVersion
-      - name
+      - defaultTtl
+      - defaultLockTtl
       - type
-      - enabled
-      - severity
-      - recipients
-      - condition
-      - period
+      - encrypted
       type: object
       properties:
-        apiAlertsVersion:
-          type: string
-        name:
-          type: string
+        defaultTtl:
+          type: integer
+          format: int32
+        defaultLockTtl:
+          type: integer
+          format: int32
         type:
           type: string
-        enabled:
+        encrypted:
           type: boolean
-        severity:
-          type: string
-        recipients:
-          type: array
-          items:
-            $ref: '#/components/schemas/Recipient'
-          description: ''
-        condition:
-          $ref: '#/components/schemas/Condition'
-        period:
-          $ref: '#/components/schemas/Period'
-      example:
-        apiAlertsVersion: 1.0.0
-        name: 'test-alert-max-from postman {{$randomInt}} '
-        type: api-request-count
-        enabled: true
-        severity: Info
-        recipients:
-        - type: user
-          value: fa4bb84b-2b64-4331-b926-0153e48103d8
-          firstName: Abhiraj
-          lastName: Kane
-        condition:
-          resourceType: api-version
-          aggregate: COUNT
-          operator: GREATER_THAN
-          value: 2
-        period:
-          duration:
-            count: 2
-            weight: HOURS
-          repeat: 2
-    Recipient:
-      title: Recipient
-      required:
-      - type
-      - value
-      - firstName
-      - lastName
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-      example:
-        type: user
-        value: fa4bb84b-2b64-4331-b926-0153e48103d8
-        firstName: Abhiraj
-        lastName: Kane
-    Condition:
-      title: Condition
-      required:
-      - resourceType
-      - aggregate
-      - operator
-      - value
-      type: object
-      properties:
-        resourceType:
-          type: string
-        aggregate:
-          type: string
-        operator:
-          type: string
-        value:
+        defaultDeliveryDelay:
           type: integer
           format: int32
-      example:
-        resourceType: api-version
-        aggregate: COUNT
-        operator: GREATER_THAN
-        value: 2
-    Period:
-      title: Period
-      required:
-      - duration
-      - repeat
-      type: object
-      properties:
-        duration:
-          $ref: '#/components/schemas/Duration'
-        repeat:
-          type: integer
-          format: int32
-      example:
-        duration:
-          count: 2
-          weight: HOURS
-        repeat: 2
-    Duration:
-      title: Duration
-      required:
-      - count
-      - weight
-      type: object
-      properties:
-        count:
-          type: integer
-          format: int32
-        weight:
-          type: string
-      example:
-        count: 2
-        weight: HOURS
-    ModifyonealertfromAPImangerRequest:
-      title: ModifyonealertfromAPImangerRequest
-      required:
-      - apiAlertsVersion
-      - name
-      - type
-      - enabled
-      - severity
-      - recipients
-      - condition
-      - period
-      - id
-      type: object
-      properties:
-        apiAlertsVersion:
-          type: string
-        name:
-          type: string
-        type:
-          type: string
-        enabled:
+        fifo:
           type: boolean
-        severity:
+    QueueOptional:
+      title: Queue with optional properties
+      type: object
+      properties:
+        defaultTtl:
+          type: integer
+          format: int32
+        defaultLockTtl:
+          type: integer
+          format: int32
+        type:
           type: string
-        recipients:
-          type: array
-          items:
-            $ref: '#/components/schemas/Recipient'
-          description: ''
-        condition:
-          $ref: '#/components/schemas/Condition'
-        period:
-          $ref: '#/components/schemas/Period'
-        id:
-          type: string
-      example:
-        apiAlertsVersion: 1.0.0
-        name: test-alert-max- {{$randomInt}}
-        type: api-request-count
-        enabled: false
-        severity: Info
-        recipients:
-        - type: user
-          value: fa4bb84b-2b64-4331-b926-0153e48103d8
-          firstName: Abhiraj
-          lastName: Kane
-        condition:
-          resourceType: api-version
-          aggregate: COUNT
-          operator: GREATER_THAN
-          value: 2
-        period:
-          duration:
-            count: 2
-            weight: HOURS
-          repeat: 2
-        id: 9339ff66-b229-4a40-979d-043b3b8cef9e
-tags:
-- name: Misc
-  description: ''
+        encrypted:
+          type: boolean
+        defaultDeliveryDelay:
+          type: integer
+          format: int32
+        fifo:
+          type: boolean
+
