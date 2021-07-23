@@ -185,6 +185,8 @@ components:
       - encrypted
       type: object
       properties:
+        queueId:
+          type: string
         defaultTtl:
           type: integer
           format: int32
