@@ -457,6 +457,9 @@ components:
         domain:
           type: string
           title: domain
+        name:
+          type: string
+          title: name
         id: 
           type: string
           title: id
