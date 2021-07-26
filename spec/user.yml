@@ -306,9 +306,9 @@ components:
           title: mfaVerificationExcluded
           example: false
         mfaVerifiersConfigured:
-          type: boolean
+          type: string
           title: mfaVerifiersConfigured
-          example: false
+          example: "false"
         idprovider_id:
           type: string
           title: idproviderId
