@@ -1,0 +1,310 @@
+openapi: 3.0.0 
+info:
+  title: Alert API Manager
+  description: Alert for API Manager
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/apimanager/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/apimanager/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+      
+paths:
+  /v1/organizations/{orgId}/environments/{envId}/apis/{apiVersion}/alerts:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiVersion
+        description: The api version
+        required: true
+        schema:
+          type: string
+    get:
+      summary: GetAlertsfromAPImanager
+      description: Get Alerts from API manager
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetAlerts'
+   
+    post:
+      description: Create a new alert for API manager
+      operationId: CreateAlertForAPIManagerInstance
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alert'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':
+        
+          $ref: '#/components/responses/SuccessCreateAlert'
+  
+  
+  /v1/organizations/{orgId}/environments/{envId}/apis/{apiVersion}/alerts/{cloudhubApimAlert}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: the environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiVersion
+        description: the api version
+        required: true
+        schema:
+          type: string
+      - name: cloudhubApimAlert
+        in: path
+        description: the id of the alert
+        required: true
+        style: simple
+        schema:
+          type: string
+    
+    get:
+      summary: Getonealert
+      description: Get one alert
+      operationId: Getonealert
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: "#/components/responses/SuccessGetAlert"
+
+    patch:
+      summary: ModifyonealertfromAPImanger
+      description: Modify one alert from API manger
+      operationId: ModifyonealertfromAPImanger
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertWithId'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessGetAlert'
+    
+    delete:
+      summary: DeleteanAlertfromAPImanager
+      description: Delete an Alert from API manager
+      operationId: DeleteanAlertfromAPImanager
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          description: "No content"
+          content: 
+            text/plain:
+              example:
+               "successfully deleted"
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: api error message 
+    SuccessGetAlerts:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: array
+            title: alerts from GET
+            items:
+              $ref: '#/components/schemas/AlertWithId'
+    SuccessGetAlert:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alert from GET one alert
+            $ref: '#/components/schemas/AlertWithId'
+    SuccessCreateAlert:
+      description: Success create an alert
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alert created after POST
+            $ref: '#/components/schemas/AlertWithId'
+      
+
+
+
+  schemas:
+    Alert:
+      title: Alert
+      required:
+      - apiAlertsVersion
+      - name
+      - type
+      - enabled
+      - severity
+      - recipients
+      - condition
+      - period
+      type: object
+      properties:
+        apiAlertsVersion:
+          type: string
+        name: 
+          type: string
+        type:
+          type: string
+        enabled:
+          type: boolean
+        severity:
+          type: string
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: ''
+        condition:
+          $ref: '#/components/schemas/Condition'
+        period:
+          $ref: '#/components/schemas/Period'
+    Recipient:
+      title: recipient
+      required:
+      - type
+      - value
+      - firstName
+      - lastName
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+    Condition:
+      title: condition
+      required:
+      - resourceType
+      - aggregate
+      - operator
+      - value
+      type: object
+      properties:
+        resourceType:
+          type: string
+        aggregate:
+          type: string
+        operator:
+          type: string
+        value:
+          type: integer
+          format: int32
+    Period:
+      title: period
+      required:
+      - duration
+      - repeat
+      type: object
+      properties:
+        duration:
+          $ref: '#/components/schemas/Duration'
+        repeat:
+          type: integer
+          format: int32
+    Duration:
+      title: duration
+      required:
+      - count
+      - weight
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        weight:
+          type: string
+    AlertWithId:
+      title: AlertWithId
+      required:
+      - apiAlertsVersion
+      - name
+      - type
+      - enabled
+      - severity
+      - recipients
+      - condition
+      - period
+      - id
+      type: object
+      properties:
+        apiAlertsVersion:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        enabled:
+          type: boolean
+        severity:
+          type: string
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: ''
+        condition:
+          $ref: '#/components/schemas/Condition'
+        period:
+          $ref: '#/components/schemas/Period'
+        id:
+          type: string
