@@ -287,10 +287,8 @@ components:
                 type: string
                 title: keyword
               schema:
-                type: array
-                items:
-                  type: string
-                  title: schemaItem
+                type: string
+                title: schema
               data:
                 type: string
                 title: data

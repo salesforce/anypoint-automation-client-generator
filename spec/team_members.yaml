@@ -16,7 +16,7 @@ security:
 paths: 
   /organizations/{orgId}/teams/{teamId}/members:
     get:
-      description: retrieves team by id
+      description: retrieves team members
       parameters:
         - name: orgId
           in: path
@@ -93,7 +93,7 @@ paths:
     
   /organizations/{orgId}/teams/{teamId}/members/{userId}:
     put:
-      description: moves a team (along with its nested teams) from one parent team to another
+      description: adds the given user to the given team
       parameters:
         - name: orgId
           in: path
@@ -124,7 +124,7 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessPutTeamMember'
     delete:
-      description: delete a team
+      description: delete the given user from the given team
       parameters:
         - name: orgId
           in: path
@@ -201,10 +201,8 @@ components:
                 type: string
                 title: keyword
               schema:
-                type: array
-                items:
-                  type: string
-                  title: schemaItem
+                type: string
+                title: schema
               data:
                 type: string
                 title: data
