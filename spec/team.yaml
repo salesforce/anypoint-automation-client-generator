@@ -29,13 +29,17 @@ paths:
           description: team_id that must appear in the team's ancestor_team_ids.
           required: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
         - name: parent_team_id
           in: query
           description: team_id of the immediate parent of the team to return.
           required: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
         - name: team_id
           in: query
           description: id of the team to return.
