@@ -1,0 +1,374 @@
+openapi: 3.0.0
+info:
+  title: Team API
+  description: Description of the Team API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+
+paths:
+  /organizations/{orgId}/teams:
+    get:
+      description: Returns teams.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: ancestor_team_id
+          in: query
+          description: team_id that must appear in the team's ancestor_team_ids.
+          required: false
+          schema:
+            type: string
+        - name: parent_team_id
+          in: query
+          description: team_id of the immediate parent of the team to return.
+          required: false
+          schema:
+            type: string
+        - name: team_id
+          in: query
+          description: id of the team to return.
+          required: false
+          schema:
+            type: string
+        - name: team_type
+          in: query
+          description: return only teams that are of this type
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: A search string to use for case-insensitive partial matches on team name
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of rolegroups to retrieve per request.
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The number of records to omit from the response.
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: The field to sort on. default team_name
+          required: false
+          schema:
+            type: string
+            enum:
+              - team_name
+              - created_at
+              - team_id
+        - name: ascending
+          in: query
+          description: Whether to sort ascending or descending. Default true
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListTeams'
+    post:
+      description: Creates a new team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/teamPostBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostTeam'
+    
+  /organizations/{orgId}/teams/{teamId}:
+    get:
+      description: retrieves team by id
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessGetTeam'
+    patch:
+      description: updates a team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/teamPatchBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPatchTeam'
+    put:
+      description: moves a team (along with its nested teams) from one parent team to another
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/teamPutBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPutTeam'
+    delete:
+      description: delete a team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteTeam'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorsResponse"
+    NotFoundError:
+      description: resource not found
+    SuccessListTeams:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/teamCollection"
+    SuccessGetTeam:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/team"
+    SuccessPostTeam:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/team"
+    SuccessPatchTeam:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/team"
+    SuccessPutTeam:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/team"
+              - type: object
+                title: previousTeamState
+                properties:
+                  previous_ancestor_team_ids:
+                    type: array
+                    title: previousAncestorTeamIds
+                    items:
+                      type: string
+    SuccessDeleteTeam:
+      description: Success response
+
+
+  schemas:
+    errorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    teamPostBody:
+      type: object
+      title: teamPostBody
+      properties:
+        parent_team_id:
+          type: string
+          title: parentTeamId
+        team_name:
+          type: string
+          title: teamName
+        team_type:
+          type: string
+          title: teamType
+          default: internal
+
+    teamPatchBody:
+      type: object
+      title: teamPatchBody
+      properties:
+        team_name:
+          type: string
+          title: teamName
+        team_type:
+          type: string
+          title: teamType
+          default: internal
+
+    teamPutBody:
+      type: object
+      title: teamPutBody
+      properties:
+        parent_team_id:
+          type: string
+          title: parentTeamId
+
+    team:
+      type: object
+      title: team
+      properties:
+        org_id:
+          type: string
+          title: orgId
+        team_id:
+          type: string
+          title: teamId
+        team_name:
+          type: string
+          title: teamName
+        team_type:
+          type: string
+          title: teamType
+        ancestor_team_ids:
+          type: array
+          title: ancestorTeamIds
+          items:
+            type: string
+        created_at:
+          type: string
+          title: createdAt
+        updated_at:
+          type: string
+          title: updatedAt
+    
+    teamCollection:
+      type: object
+      title: teamCollection
+      properties:
+        data:
+          type: array
+          title: data
+          items:
+            $ref: "#/components/schemas/team"
+        total:
+          type: integer
+          title: total
+

@@ -1,0 +1,262 @@
+openapi: 3.0.0
+info:
+  title: Team Members API
+  description: Description of the Team Members API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+
+paths: 
+  /organizations/{orgId}/teams/{teamId}/members:
+    get:
+      description: retrieves team members
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+        - name: membership_type
+          in: query
+          description: Include the group access mappings that grant the provided membership type By default, all group access mappings are returned
+          required: false
+          schema:
+            type: string
+        - name: identity_type
+          in: query
+          description: A search string to use for case-insensitive partial matches on external group name
+          required: false
+          schema:
+            type: string
+        - name: member_ids
+          in: query
+          description: Include the members of the team that have ids in this list
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: A search string to use for case-insensitive partial matches on team name
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of rolegroups to retrieve per request.
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The number of records to omit from the response.
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: The field to sort on. default identity_type
+          required: false
+          schema:
+            type: string
+            enum:
+              - identity_type
+              - name
+        - name: ascending
+          in: query
+          description: Whether to sort ascending or descending. Default true
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessListTeamMembers'
+    
+  /organizations/{orgId}/teams/{teamId}/members/{userId}:
+    put:
+      description: adds the given user to the given team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: The ID of the user in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/teamMemberPutBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPutTeamMember'
+    delete:
+      description: delete the given user from the given team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: The ID of the user in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteTeamMember'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorsResponse"
+    NotFoundError:
+      description: resource not found
+    SuccessListTeamMembers:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/teamMemberCollection"
+    SuccessPutTeamMember:
+      description: Success response
+    SuccessDeleteTeamMember:
+      description: Success response
+
+
+  schemas:
+    errorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    teamMemberPutBody:
+      type: object
+      title: teamMemberPutBody
+      properties:
+        membership_type:
+          type: string
+          title: membershipType
+          enum:
+            - member
+            - maintainer
+
+    teamMember:
+      type: object
+      title: teamMember
+      properties:
+        identity_type:
+          type: string
+          title: identityType
+        id:
+          type: string
+          title: id
+        name:
+          type: string
+          title: name
+        membership_type:
+          type: string
+          title: membershipType
+        is_assigned_via_external_groups:
+          type: boolean
+          title: isAssignedViaExternalGroups
+        created_at:
+          type: string
+          title: createdAt
+        updated_at:
+          type: string
+          title: updatedAt
+    
+    teamMemberCollection:
+      type: object
+      title: teamMemberCollection
+      properties:
+        data:
+          type: array
+          title: data
+          items:
+            $ref: "#/components/schemas/teamMember"
+        total:
+          type: integer
+          title: total
+

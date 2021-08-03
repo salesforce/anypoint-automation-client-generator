@@ -1,0 +1,193 @@
+openapi: 3.0.0
+info:
+  title: User RoleGroups API
+  description: Description of the User Group API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/users/{userId}/rolegroups:
+    get:
+      description: Returns the users' rolegroups.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: The ID of the user in GUID format
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of rolegroups to retrieve per request.
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The number of records to omit from the response.
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListUserRoleGroups'
+
+  /organizations/{orgId}/users/{userId}/rolegroups/{rolegroupId}:
+    post:
+      description: Assign rolegroup to user
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: userId
+        in: path
+        description: The ID of the user
+        required: true
+        schema:
+          type: string
+      - name: rolegroupId
+        in: path
+        description: The ID of the user's rolegroup
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessPostUserRoleGroup'
+    delete:
+      description: Delete user rolegroup assignment
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: userId
+        in: path
+        description: The ID of the user
+        required: true
+        schema:
+          type: string
+      - name: rolegroupId
+        in: path
+        description: The ID of the user's rolegroup
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessDeleteUserRoleGroup'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    SuccessPostUserRoleGroup:
+      description: Success response
+    SuccessDeleteUserRoleGroup:
+      description: Success response
+    SuccessListUserRoleGroups:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: userRolegroups 
+                items:
+                  $ref: '#/components/schemas/rolegroup'
+              total:
+                type: integer
+                title: total
+
+  schemas:
+    rolegroup:
+      title: rolegroup
+      type: object
+      properties:
+        role_group_id:
+          type: string
+          title: id
+          example: "a1a8b488-1e48-44ac-ba40-d53f518808af"
+        name:
+          type: string
+          title: name
+          example: "API Creators"
+        external_names:
+          type: array
+          title: externalNames
+          items:
+            title: externalName
+            type: string
+        description:
+          type: string
+          title: description
+          example: "API Creators"
+        org_id:
+          type: string
+          title: orgId
+          example: "aa1f55d6-213d-4f60-845c-207286484cd1"
+        editable:
+          type: boolean
+          title: editable
+        created_at:
+          type: string
+          title: createdAt
+          example: "2021-03-05T14:06:52.976Z"
+        updated_at:
+          type: string
+          title: updatedAt
+          example: "2021-03-05T14:06:52.976Z"
+        context_params:
+          type: object
+          title: contextParams
+        user_role_group_id:
+          type: string
+          title: userRolegroupId
+

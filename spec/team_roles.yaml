@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  title: Team Roles API
+  description: Description of the Team Roles API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+
+paths: 
+  /organizations/{orgId}/teams/{teamId}/roles:
+    get:
+      description: retrieves team assigned roles
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+        - name: role_id
+          in: query
+          description: return only role assignments containing one of the supplied role_ids
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: A search string to use for case-insensitive partial matches on team name
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of rolegroups to retrieve per request.
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The number of records to omit from the response.
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessListTeamRoles'
+    post:
+      description: assignes a set of roles to the given team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/teamRolesPostBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostTeamRoles'
+    delete:
+      description: deletes a set of roles from the given team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/teamRolesDeleteBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteTeamRoles'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorsResponse"
+    NotFoundError:
+      description: resource not found
+    SuccessListTeamRoles:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/teamRoleCollection"
+    SuccessPostTeamRoles:
+      description: Success response
+    SuccessDeleteTeamRoles:
+      description: Success response
+
+
+  schemas:
+    errorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    teamRolesPostBody:
+      type: array
+      title: teamRolesPostBody
+      items:
+        type: object
+        title: teamRolePostBody
+        properties:
+          role_id:
+            type: string
+            title: roleId
+          context_params:
+            type: object
+            title: contextParams
+            properties:
+              org:
+                type: string
+                title: org
+
+    teamRolesDeleteBody:
+      type: array
+      title: teamRolesDeleteBody
+      items:
+        type: object
+        title: teamRoleDeleteBody
+        properties:
+          role_id:
+            type: string
+            title: roleId
+          context_params:
+            type: object
+            title: contextParams
+            properties:
+              org:
+                type: string
+                title: org
+
+    teamRole:
+      type: object
+      title: teamRole
+      properties:
+        name:
+          type: string
+          title: name
+        role_id:
+          type: string
+          title: roleId
+        context_params:
+          type: object
+          title: contextParams
+          properties:
+            org:
+              type: string
+              title: org
+    
+    teamRoleCollection:
+      type: object
+      title: teamRoleCollection
+      properties:
+        data:
+          type: array
+          title: data
+          items:
+            $ref: "#/components/schemas/teamRole"
+        total:
+          type: integer
+          title: total
+
