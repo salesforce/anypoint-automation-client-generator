@@ -47,7 +47,9 @@ paths:
           description: Include the members of the team that have ids in this list
           required: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
         - name: search
           in: query
           description: A search string to use for case-insensitive partial matches on team name
