@@ -163,6 +163,28 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPatchTeam'
+    delete:
+      description: delete a team
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          description: The ID of the team in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteTeam'
+
+  /organizations/{orgId}/teams/{teamId}/parent:
     put:
       description: moves a team (along with its nested teams) from one parent team to another
       parameters:
@@ -188,26 +210,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPutTeam'
-    delete:
-      description: delete a team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '204':    # status code
-          $ref: '#/components/responses/SuccessDeleteTeam'
 
 components:
   securitySchemes:
