@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Team Roles API
-  description: Description of the Team Roles API 
+  title: Team Group Mappings API
+  description: Description of the Team Group Mappings API 
   version: 1.0.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
@@ -14,9 +14,9 @@ security:
 
 
 paths: 
-  /organizations/{orgId}/teams/{teamId}/roles:
+  /organizations/{orgId}/teams/{teamId}/groupmappings:
     get:
-      description: retrieves team assigned roles
+      description: retrieves team groupmappings
       parameters:
         - name: orgId
           in: path
@@ -28,18 +28,6 @@ paths:
           in: path
           description: The ID of the team in GUID format
           required: true
-          schema:
-            type: string
-        - name: role_id
-          in: query
-          description: return only role assignments containing one of the supplied role_ids
-          required: false
-          schema:
-            type: string
-        - name: search
-          in: query
-          description: A search string to use for case-insensitive partial matches on team name
-          required: false
           schema:
             type: string
         - name: limit
@@ -62,9 +50,10 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
         '201':    # status code
-          $ref: '#/components/responses/SuccessListTeamRoles'
-    post:
-      description: assignes a set of roles to the given team
+          $ref: '#/components/responses/SuccessListTeamGroupMappings'
+    
+    put:
+      description: adds the given group mappings to the given team
       parameters:
         - name: orgId
           in: path
@@ -82,37 +71,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamRolesPostBody"
+              $ref: "#/components/schemas/teamGroupMappingsPutBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
-          $ref: '#/components/responses/SuccessPostTeamRoles'
-    delete:
-      description: deletes a set of roles from the given team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/teamRolesDeleteBody"
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '204':    # status code
-          $ref: '#/components/responses/SuccessDeleteTeamRoles'
+          $ref: '#/components/responses/SuccessPutGroupMappings'
 
 components:
   securitySchemes:
@@ -133,15 +97,13 @@ components:
             $ref: "#/components/schemas/errorsResponse"
     NotFoundError:
       description: resource not found
-    SuccessListTeamRoles:
+    SuccessListTeamGroupMappings:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/teamRoleCollection"
-    SuccessPostTeamRoles:
-      description: Success response
-    SuccessDeleteTeamRoles:
+            $ref: "#/components/schemas/teamGroupMappingsCollection"
+    SuccessPutGroupMappings:
       description: Success response
 
 
@@ -174,78 +136,43 @@ components:
                 type: string
                 title: message
 
-    teamRolesPostBody:
-      type: array
-      title: teamRolesPostBody
-      items:
-        type: object
-        title: teamRolePostBody
-        properties:
-          role_id:
-            type: string
-            title: roleId
-          context_params:
-            type: object
-            title: contextParams
-            properties:
-              org:
-                type: string
-                title: org
-              envId:
-                type: string
-                title: envId
-
-    teamRolesDeleteBody:
-      type: array
-      title: teamRolesDeleteBody
-      items:
-        type: object
-        title: teamRoleDeleteBody
-        properties:
-          role_id:
-            type: string
-            title: roleId
-          context_params:
-            type: object
-            title: contextParams
-            properties:
-              org:
-                type: string
-                title: org
-              envId:
-                type: string
-                title: envId
-
-    teamRole:
+    teamGroupMappingsPutBody:
       type: object
-      title: teamRole
+      title: teamGroupMappingsPutBody
       properties:
-        name:
+        membership_type:
           type: string
-          title: name
-        role_id:
+          title: membershipType
+          enum:
+            - member
+            - maintainer
+        external_group_name:
           type: string
-          title: roleId
-        context_params:
-          type: object
-          title: contextParams
-          properties:
-            org:
-              type: string
-              title: org
-            envId:
-              type: string
-              title: envId
+          title: externalGroupName
 
-    teamRoleCollection:
+    teamGroupMapping:
       type: object
-      title: teamRoleCollection
+      title: teamGroupMapping
+      properties:
+        membership_type:
+          type: string
+          title: membershipType
+        external_group_name:
+          type: string
+          title: externalGroupName
+        provider_id:
+          type: string
+          title: providerId
+    
+    teamGroupMappingsCollection:
+      type: object
+      title: teamGroupMappingsCollection
       properties:
         data:
           type: array
           title: data
           items:
-            $ref: "#/components/schemas/teamRole"
+            $ref: "#/components/schemas/teamGroupMapping"
         total:
           type: integer
           title: total
