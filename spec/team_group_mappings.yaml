@@ -52,7 +52,6 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessListTeamGroupMappings'
     
-  /organizations/{orgId}/teams/{teamId}/groupmappings:
     put:
       description: adds the given group mappings to the given team
       parameters:
