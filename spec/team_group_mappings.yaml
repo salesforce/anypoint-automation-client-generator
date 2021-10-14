@@ -137,18 +137,21 @@ components:
                 title: message
 
     teamGroupMappingsPutBody:
-      type: object
+      type: array
       title: teamGroupMappingsPutBody
-      properties:
-        membership_type:
-          type: string
-          title: membershipType
-          enum:
-            - member
-            - maintainer
-        external_group_name:
-          type: string
-          title: externalGroupName
+      items:
+        type: object
+        title: teamGroupMappingPutBody
+        properties:
+          membership_type:
+            type: string
+            title: membershipType
+            enum:
+              - member
+              - maintainer
+          external_group_name:
+            type: string
+            title: externalGroupName
 
     teamGroupMapping:
       type: object
