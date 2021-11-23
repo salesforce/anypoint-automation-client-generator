@@ -1,0 +1,394 @@
+openapi: 3.0.0
+info:
+  title: Dedicated Load Balancer API
+  description: Description of the DLB API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/cloudhub/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/cloudhub/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/vpcs/{vpcId}/loadbalancers:
+    get:
+      description: Returns all loadbalancers in the given vpc
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: vpcId
+          in: path
+          description: The ID of the VPC in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code 200
+          $ref: '#/components/responses/SuccessListDLBs'
+    post:
+      description: create a DLB
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: vpcId
+          in: path
+          description: The ID of the VPC in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/dlbCore"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code 200
+          $ref: '#/components/responses/SuccessListDLBs'
+  /organizations/{orgId}/vpcs/{vpcId}/loadbalancers/{dlbId}:
+    get:
+      description: Retrieves a DLB by id
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: vpcId
+          in: path
+          description: The ID of the VPC in GUID format
+          required: true
+          schema:
+            type: string
+        - name: dlbId
+          in: path
+          description: The ID of the DLB in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetDLB'
+    patch:
+      description: Updates a dlb. uses JSON Patch body object
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: vpcId
+          in: path
+          description: The ID of the VPC in GUID format
+          required: true
+          schema:
+            type: string
+        - name: dlbId
+          in: path
+          description: The ID of the DLB in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/jsonPatch"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':
+          $ref: '#/components/responses/SuccessPutDLB'
+    delete:
+      description: Deletes a DLB
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: vpcId
+          in: path
+          description: The ID of the VPC in GUID format
+          required: true
+          schema:
+            type: string
+        - name: dlbId
+          in: path
+          description: The ID of the DLB in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteDLB'
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    SuccessGetDLB:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/dlb'
+    SuccessPostDLB:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/dlb'
+    SuccessPutDLB:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/dlb'
+    SuccessDeleteDLB:
+      description: Success response
+    SuccessListDLBs:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of DLBs
+                items:
+                  $ref: '#/components/schemas/dlb'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    dlb:
+      title: dlb
+      allOf:
+        - type: object
+          title: dlbExtras
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: The dlb Id
+              title: id
+              example: '619d1c270322c72f81663c12'
+            domain:
+              type: string
+              description: dlb domain
+              title: domain
+            deploymentId:
+              type: string
+              title: deploymentId
+              description: the dlb deployment id
+            instanceConfig:
+              type: object
+              title: instanceConfig
+              properties:
+                imageName:
+                  type: string
+                  title: imageName
+            ipAddresses:
+              type: array
+              title: ipAddresses
+              items:
+                type: string
+            staticIPsDisabled:
+              type: boolean
+              title: staticIPsDisabled
+            vpcId:
+              type: string
+              title: vpcId
+            workers:
+              type: integer
+              title: workers
+            defaultCipherSuite:
+              type: string
+              title: defaultCipherSuite
+            keepUrlEncoding:
+              type: boolean
+              title: keepUrlEncoding
+            upstreamTlsv12:
+              type: boolean
+              title: upstreamTlsv12
+            proxyReadTimeout:
+              type: integer
+              title: proxyReadTimeout
+            ipAddressesInfo:
+              type: array
+              items:
+                type: object
+                properties:
+                  ip:
+                    type: string
+                    title: ip
+                  status:
+                    type: string
+                    title: status
+                  staticIp:
+                    type: boolean
+                    title: staticIp
+            doubleStaticIps:
+              type: string
+              title: doubleStaticIps
+        - $ref: "#/components/schemas/dlbCore"
+    dlbCore:
+      title: dlbCore
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+          example: "myAwesomeDLB"
+        state:
+          type: string
+          description: dlb state
+          title: state
+          default: "STOPPED"
+        ipWhitelist:
+          type: array
+          items:
+            type: string
+          title: ipWhitelist
+        httpMode:
+          type: string
+          title: httpMode
+          default: "redirect"
+        defaultSslEndpoint:
+          type: integer
+          title: defaultSslEndpoint
+          default: 0
+          example: 0
+        tlsv1:
+          type: boolean
+          title: tlsv1
+          example: false
+        sslEndpoints:
+          type: array
+          items:
+            type: object
+            properties:
+              privateKeyLabel:
+                type: string
+                title: privateKeyLabel
+              privateKeyDigest:
+                type: string
+                title: privateKeyDigest
+              privateKey:
+                type: string
+                title: privateKey
+              publicKeyLabel:
+                type: string
+                title: publicKeyLabel
+              publicKeyDigest:
+                type: string
+                title: publicKeyDigest
+              publicKeyCN:
+                type: string
+                title: publicKeyCN
+              publicKey:
+                type: string
+                title: publicKey
+              verifyClientMode:
+                type: string
+                title: verifyClientMode
+                default: "off"
+              mappings:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    inputUri:
+                      type: string
+                      title: inputUri
+                      example: "{app}/"
+                    appName:
+                      type: string
+                      title: appName
+                      example: "{app}"
+                    appUri:
+                      type: string
+                      title: appUri
+                      example: "/"
+    jsonPatch:
+      type: array
+      title: doubleStaticIps
+      items:
+        type: object
+        properties:
+          op:
+            type: string
+            enum:
+              - replace
+              - add
+              - remove
+            title: op
+          path:
+            type: string
+            title: path
+            example: "/state"
+          value:
+            oneOf:
+              - type: string
+                title: value
+              - type: object
+                title: value
+              - type: array
+                title: value
+              - type: integer
+                title: value
+              - type: boolean
+                title: value
+
