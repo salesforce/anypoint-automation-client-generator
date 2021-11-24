@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
   title: Dedicated Load Balancer API
   description: Description of the DLB API 
@@ -215,75 +215,9 @@ components:
     dlb:
       title: dlb
       allOf:
-        - type: object
-          title: dlbExtras
-          required:
-            - id
-          properties:
-            id:
-              type: string
-              description: The dlb Id
-              title: id
-              example: '619d1c270322c72f81663c12'
-            domain:
-              type: string
-              description: dlb domain
-              title: domain
-            deploymentId:
-              type: string
-              title: deploymentId
-              description: the dlb deployment id
-            instanceConfig:
-              type: object
-              title: instanceConfig
-              properties:
-                imageName:
-                  type: string
-                  title: imageName
-            ipAddresses:
-              type: array
-              title: ipAddresses
-              items:
-                type: string
-            staticIPsDisabled:
-              type: boolean
-              title: staticIPsDisabled
-            vpcId:
-              type: string
-              title: vpcId
-            workers:
-              type: integer
-              title: workers
-            defaultCipherSuite:
-              type: string
-              title: defaultCipherSuite
-            keepUrlEncoding:
-              type: boolean
-              title: keepUrlEncoding
-            upstreamTlsv12:
-              type: boolean
-              title: upstreamTlsv12
-            proxyReadTimeout:
-              type: integer
-              title: proxyReadTimeout
-            ipAddressesInfo:
-              type: array
-              items:
-                type: object
-                properties:
-                  ip:
-                    type: string
-                    title: ip
-                  status:
-                    type: string
-                    title: status
-                  staticIp:
-                    type: boolean
-                    title: staticIp
-            doubleStaticIps:
-              type: string
-              title: doubleStaticIps
-        - $ref: "#/components/schemas/dlbCore"
+        - $ref: '#/components/schemas/dlbExtras'
+        - $ref: '#/components/schemas/dlbCore'
+    
     dlbCore:
       title: dlbCore
       type: object
@@ -362,11 +296,81 @@ components:
                       type: string
                       title: appUri
                       example: "/"
+
+    dlbExtras:
+      type: object
+      title: dlbExtras
+      properties:
+        id:
+          type: string
+          description: The dlb Id
+          title: id
+          example: '619d1c270322c72f81663c12'
+        domain:
+          type: string
+          description: dlb domain
+          title: domain
+        deploymentId:
+          type: string
+          title: deploymentId
+          description: the dlb deployment id
+        instanceConfig:
+          type: object
+          title: instanceConfig
+          properties:
+            imageName:
+              type: string
+              title: imageName
+        ipAddresses:
+          type: array
+          title: ipAddresses
+          items:
+            type: string
+        staticIPsDisabled:
+          type: boolean
+          title: staticIPsDisabled
+        vpcId:
+          type: string
+          title: vpcId
+        workers:
+          type: integer
+          title: workers
+        defaultCipherSuite:
+          type: string
+          title: defaultCipherSuite
+        keepUrlEncoding:
+          type: boolean
+          title: keepUrlEncoding
+        upstreamTlsv12:
+          type: boolean
+          title: upstreamTlsv12
+        proxyReadTimeout:
+          type: integer
+          title: proxyReadTimeout
+        ipAddressesInfo:
+          type: array
+          items:
+            type: object
+            properties:
+              ip:
+                type: string
+                title: ip
+              status:
+                type: string
+                title: status
+              staticIp:
+                type: boolean
+                title: staticIp
+        doubleStaticIps:
+          type: string
+          title: doubleStaticIps
+
     jsonPatch:
       type: array
-      title: doubleStaticIps
+      title: jsonPatch
       items:
         type: object
+        title: updateObject
         properties:
           op:
             type: string
@@ -380,15 +384,5 @@ components:
             title: path
             example: "/state"
           value:
-            oneOf:
-              - type: string
-                title: value
-              - type: object
-                title: value
-              - type: array
-                title: value
-              - type: integer
-                title: value
-              - type: boolean
-                title: value
+            title: value
 
