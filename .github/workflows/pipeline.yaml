@@ -4,7 +4,8 @@ name: Cloudhub Client Generator Pipeline
 on:
   # Triggers the workflow on push
   push:
-    branches: [ dev ]
+    branches:
+      - master
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
