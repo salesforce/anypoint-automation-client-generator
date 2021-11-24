@@ -1,0 +1,283 @@
+openapi: 3.0.0
+info:
+  title: Alert Runtime Manager
+  description: Description of the Alert in Runtime Manager API
+  version: 1.0.0
+servers:
+- url: https://anypoint.mulesoft.com/cloudhub/api/v2/
+  description: Anypoint Cloudhub 
+- url: https://eu1.anypoint.mulesoft.com/cloudhub/api/v2/
+  description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: []
+
+paths:
+  /alerts:
+    get:
+      summary: Get all alets for a given environment.
+      description: Retrieve all alerts in the specified environment. Requires 'Read Alerts' role.
+      parameters:
+        - in: header
+          name: X-ANYPNT-ENV-ID
+          description: The ID of your current environment
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: offset
+          description: Offset to return alerts from
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          description: Maximum number of alerts to return
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: resource
+          description: Only return alerts which are connected to this resource (application name)
+          required: false
+          schema:
+            type: string
+      responses:
+        '401': 
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetAlerts'
+    
+    post:
+      description: Create a new Alert
+      parameters:
+        - in: header
+          name: X-ANYPNT-ENV-ID
+          description: The ID of your current environment
+          schema:
+            type: string
+      requestBody:
+        description: 'Add a new alert'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/alertBody'
+        required: true
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':
+          $ref: '#/components/responses/SuccessCreateAlert'
+  
+  /alerts/{alertId}:
+    parameters:
+      - name: alertId
+        in: path
+        description: the alert Id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get one specific alert
+      description: Get one specific alert
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetAlerts'
+
+    put:
+      description: Modify one alert
+      operationId: Modify one alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/alertBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessCreateAlert'
+
+    delete:
+      summary: Delete a specific alert
+      description: Delete alert using its Id
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteAlert'
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: api error message 
+    SuccessGetAlerts:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: array
+            title: alerts from GET
+            items:
+              $ref: '#/components/schemas/alert'
+    SuccessGetAlert:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alert from GET one alert
+            $ref: '#/components/schemas/alert'
+    SuccessCreateAlert:
+      description: Success create an alert
+      content:
+        application/json:
+          schema:
+            type: object
+            title: alert created after POST
+            $ref: '#/components/schemas/alert'
+    SuccessDeleteAlert:
+      description: Success delete alert
+      content: 
+        text/plain:
+          example:
+            "successfully deleted"
+
+  schemas:
+    alert:
+      title: alert
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        name:
+          type: string
+          title: name
+        severity:
+          type: string
+          title: severity
+        organizationId:
+          type: string
+          title: organizationId
+        environmentId:
+          type: string
+          title: environmentId
+        productName:
+          type: string
+          title: productName
+        actions:
+          type: array
+          title: actions
+          items:
+            $ref: '#/components/schemas/action'
+        condition:
+          $ref: '#/components/schemas/condition'
+        enabled:
+          type: boolean
+          title: enabled
+        lastModified:
+          type: integer
+          title: lastModified
+        isSystem:
+          type: boolean
+          title: isSystem
+        createdAt:
+          type: integer
+          title: createdAt
+    
+    action:
+      title: action
+      type: object
+      properties:
+        type:
+          type: string
+          title: type
+        content:
+          type: string
+          title: content
+        subject:
+          type: string
+          title: subejct
+        userIds:
+          type: array
+          title: userIds
+          items:
+            type: string
+      
+    condition:
+      title: condition
+      type: object
+      properties:
+        operator:
+          type: string
+          title: operator
+        periodCount:
+          type: integer
+          title: periodCount
+        value:
+          type: integer
+          title: value
+        resourceType:
+          type: string
+          title: resourceType
+        type:
+          type: string
+          title: type
+        periodMins:
+          type: integer
+          title: periodMins
+        resources:
+          type: array
+          title: resources
+          items:
+            type: string
+    
+    alertBody:
+      title: postAlertBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        severity:
+          type: string
+          title: severity
+          enum: 
+            - INFO
+            - WARNING
+            - CRITICAL
+        condition:
+          $ref: '#/components/schemas/condition'
+        actions:
+          title: actions
+          type: array
+          items:
+            $ref: '#/components/schemas/action'
+
+
+

@@ -5,16 +5,16 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://anypoint.mulesoft.com/apimanager/api/
+  - url: https://anypoint.mulesoft.com/apimanager/api/v1/
     description: Anypoint Cloudhub 
-  - url: https://eu1.anypoint.mulesoft.com/apimanager/api/
+  - url: https://eu1.anypoint.mulesoft.com/apimanager/api/v1/
     description: Anypoint Cloudhub EU
 
 security:
   - bearerAuth: [] 
       
 paths:
-  /v1/organizations/{orgId}/environments/{envId}/apis/{apiVersion}/alerts:
+  /organizations/{orgId}/environments/{envId}/apis/{apiVersion}/alerts:
     parameters:
       - in: path
         name: orgId
@@ -51,7 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Alert'
+              $ref: '#/components/schemas/alertCore'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -60,7 +60,7 @@ paths:
           $ref: '#/components/responses/SuccessCreateAlert'
   
   
-  /v1/organizations/{orgId}/environments/{envId}/apis/{apiVersion}/alerts/{cloudhubApimAlert}:
+  /organizations/{orgId}/environments/{envId}/apis/{apiVersion}/alerts/{alertId}:
     parameters:
       - in: path
         name: orgId
@@ -80,18 +80,16 @@ paths:
         required: true
         schema:
           type: string
-      - name: cloudhubApimAlert
+      - name: alertId
         in: path
         description: the id of the alert
         required: true
         style: simple
         schema:
           type: string
-    
     get:
       summary: Getonealert
       description: Get one alert
-      operationId: Getonealert
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -106,7 +104,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AlertWithId'
+              $ref: '#/components/schemas/alertCore'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -121,11 +119,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '204':
-          description: "No content"
-          content: 
-            text/plain:
-              example:
-               "successfully deleted"
+          $ref: '#/components/responses/SuccessDeleteAlert'
 
 components:
   securitySchemes:
@@ -160,7 +154,7 @@ components:
             type: array
             title: alerts from GET
             items:
-              $ref: '#/components/schemas/AlertWithId'
+              $ref: '#/components/schemas/alert'
     SuccessGetAlert:
       description: Success response
       content:
@@ -168,7 +162,7 @@ components:
           schema:
             type: object
             title: alert from GET one alert
-            $ref: '#/components/schemas/AlertWithId'
+            $ref: '#/components/schemas/alert'
     SuccessCreateAlert:
       description: Success create an alert
       content:
@@ -176,14 +170,32 @@ components:
           schema:
             type: object
             title: alert created after POST
-            $ref: '#/components/schemas/AlertWithId'
+            $ref: '#/components/schemas/alert'
+    SuccessDeleteAlert:
+      description: Success delete alert
+      content: 
+        text/plain:
+          example:
+            "successfully deleted"
       
 
 
 
   schemas:
-    Alert:
-      title: Alert
+    alert:
+      title: alert
+      allOf:
+        - type: object
+          title: alertId
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              title: id
+        - $ref: '#/components/schemas/alertCore'
+    alertCore:
+      title: alertCore
       required:
       - apiAlertsVersion
       - name
@@ -201,20 +213,23 @@ components:
           type: string
         type:
           type: string
+          title: type
         enabled:
           type: boolean
+          title: enabled
         severity:
           type: string
+          title: severity
         recipients:
           type: array
+          title: recipients
           items:
-            $ref: '#/components/schemas/Recipient'
-          description: ''
+            $ref: '#/components/schemas/recipient'
         condition:
-          $ref: '#/components/schemas/Condition'
+          $ref: '#/components/schemas/condition'
         period:
-          $ref: '#/components/schemas/Period'
-    Recipient:
+          $ref: '#/components/schemas/period'
+    recipient:
       title: recipient
       required:
       - type
@@ -231,7 +246,7 @@ components:
           type: string
         lastName:
           type: string
-    Condition:
+    condition:
       title: condition
       required:
       - resourceType
@@ -249,7 +264,7 @@ components:
         value:
           type: integer
           format: int32
-    Period:
+    period:
       title: period
       required:
       - duration
@@ -257,11 +272,11 @@ components:
       type: object
       properties:
         duration:
-          $ref: '#/components/schemas/Duration'
+          $ref: '#/components/schemas/duration'
         repeat:
           type: integer
           format: int32
-    Duration:
+    duration:
       title: duration
       required:
       - count
@@ -273,38 +288,4 @@ components:
           format: int32
         weight:
           type: string
-    AlertWithId:
-      title: AlertWithId
-      required:
-      - apiAlertsVersion
-      - name
-      - type
-      - enabled
-      - severity
-      - recipients
-      - condition
-      - period
-      - id
-      type: object
-      properties:
-        apiAlertsVersion:
-          type: string
-        name:
-          type: string
-        type:
-          type: string
-        enabled:
-          type: boolean
-        severity:
-          type: string
-        recipients:
-          type: array
-          items:
-            $ref: '#/components/schemas/Recipient'
-          description: ''
-        condition:
-          $ref: '#/components/schemas/Condition'
-        period:
-          $ref: '#/components/schemas/Period'
-        id:
-          type: string
+
