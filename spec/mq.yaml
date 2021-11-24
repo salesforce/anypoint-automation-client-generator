@@ -6,7 +6,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://anypoint.mulesoft.com/mq/admin/api/
+  - url: https://anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub 
   - url: https://eu1.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub EU
