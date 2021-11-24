@@ -4,16 +4,18 @@ info:
   title: Message Queue
   description: Manage Queues in Cloudhub
   version: 1.0.0
- 
+
 servers:
   - url: https://anypoint.mulesoft.com/mq/admin/api/
-    description: Anypoint Cloudhub MQ
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/mq/admin/api/v1/
+    description: Anypoint Cloudhub EU
 
 security:
   - bearerAuth: [] 
       
 paths:
-  /v1/organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations:
+  /organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations:
     parameters:
       - in: path
         name: orgId
@@ -40,7 +42,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '200':
           $ref: '#/components/responses/SuccessGetQueues'
-  /v1/organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations/queues/{queueId}:
+  /organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations/queues/{queueId}:
     parameters:
       - in: path
         name: orgId
@@ -87,9 +89,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QueueOptional'
+              $ref: '#/components/schemas/queueBody'
     put:
-      description: Create queue      
+      description: Create queue
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -99,7 +101,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QueueOptional'
+              $ref: '#/components/schemas/queueBody'
     delete:
       description: Delete queue 
       responses:
@@ -155,7 +157,7 @@ components:
             type: array
             title: alerts from GET
             items:
-              $ref: '#/components/schemas/Queue'
+              $ref: '#/components/schemas/queue'
     SuccessGetQueue:
       description: Success response
       content:
@@ -163,7 +165,7 @@ components:
           schema:
             type: object
             title: alerts from GET
-            $ref: '#/components/schemas/Queue'
+            $ref: '#/components/schemas/queue'
     SuccessCreateQueue:
       description: Successfully created queue
       content:
@@ -171,54 +173,57 @@ components:
           schema:
             type: object
             title: queue created after POST
-            $ref: '#/components/schemas/Queue'
+            $ref: '#/components/schemas/queue'
     SuccessDeleteQueue:
       description: Success response
 
   schemas:
-    Queue:
-      title: Queue
-      required:
-      - defaultTtl
-      - defaultLockTtl
-      - type
-      - encrypted
+    queue:
+      title: queue
       type: object
       properties:
         queueId:
           type: string
+          title: queueId
         defaultTtl:
           type: integer
-          format: int32
+          title: defaultTtl
         defaultLockTtl:
           type: integer
-          format: int32
+          title: defaultLockTtl
         type:
           type: string
+          title: type
         encrypted:
           type: boolean
+          title: encrypted
         defaultDeliveryDelay:
           type: integer
-          format: int32
+          title: defaultDeliveryDelay
         fifo:
           type: boolean
-    QueueOptional:
-      title: Queue with optional properties
+          title: fifo
+
+    queueBody:
+      title: queueBody
       type: object
       properties:
         defaultTtl:
           type: integer
-          format: int32
+          title: defaultTtl
         defaultLockTtl:
           type: integer
-          format: int32
+          title: defaultLockTtl
         type:
           type: string
+          title: type
         encrypted:
           type: boolean
+          title: encrypted
         defaultDeliveryDelay:
           type: integer
-          format: int32
+          title: defaultDeliveryDelay
         fifo:
           type: boolean
+          title: fifo
 
