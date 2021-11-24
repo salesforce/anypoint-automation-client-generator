@@ -288,6 +288,7 @@ components:
       type: array
       items:
         type: object
+        title: assetSearchResultItem
         properties:
           groupId:
             type: string
@@ -468,6 +469,8 @@ components:
         versions:
           type: array
           title: versions
+          items:
+            type: string
         dependencies:
           type: array
           title: dependencies
