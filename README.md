@@ -36,6 +36,7 @@ Here's some rules to keep in mind when you write your spec:
   * For all simple types (e.g integer, string ...) Don't use `$ref` to refer to the definition.
   * Make sure to remove any unnecessary `required` attributes. 
   * Though the use of body parameter is discouraged for `DELETE` operations, some APIs may require it (to delete multiple specific items for example...). In that case some editors like Swagger may show an error when you add a `requestBody` on a `DELETE` resource operation. Don't pay attention to that error since our code generator supports it. If you are annoyed by that, try using your favorite editor's plugin for openapi (example on vscode openapi [plugin](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)).
+  * If a given field supports multiple types, don't use `oneOf` or `anyOf`. Instead, leave the type empty (add title field or description only for example). 
 
 ## Reference
 * [open api generator](https://openapi-generator.tech/)
