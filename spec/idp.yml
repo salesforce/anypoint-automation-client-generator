@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  title: Identity Provider Management API
+  description: Description of Identity Provider API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/identityProviders:
+    get:
+      description: Returns all identity providers for the given organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code 200
+          $ref: '#/components/responses/SuccessListIDPs'
+    
+  /organizations/{orgId}/identityProviders/idpId:
+    get:
+      description: Returns all identity providers for the given organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: idpId
+          in: path
+          description: The ID of the Identity Provider in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code 200
+          $ref: '#/components/responses/SuccessListIDPs'
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here 
+    NotFoundError:
+      description: Not Found response
+      content:
+        plain/text:
+          schema:
+            example: The requested identity management provider is not found in the provider org
+    SuccessGetIDP:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/idp'
+    SuccessListIDPs:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of envs
+                items:
+                  $ref: '#/components/schemas/idpSummary'
+              total:
+                type: integer
+                title: Total number of results
+
+  schemas:
+    idpSummary:
+      title: idpSummary
+      type: object
+      properties:
+        provider_id:
+          type: string
+          title: provider_id
+        org_id:
+          type: string
+          title: org_id
+        name:
+          type: string
+          title: name
+        type:
+          type: object
+          title: type
+          properties:
+            description:
+              type: string
+              title: description
+            name:
+              type: string
+              title: name
+              enum:
+                - saml
+                - openid
+
+    idpSAML:
+      type: object
+      title: idpSAML
+      properties:
+        saml:
+          type: object
+          title: saml 
+          properties:
+            issuer:
+              type: string
+              title: issuer
+            audience:
+              type: string
+              title: audience
+            public_key:
+              type: array
+              title: public_key
+              items:
+                type: string
+            claims_mapping:
+              type: object
+              title: claims_mapping
+              properties:
+                email_attribute:
+                  type: string
+                  title: email_attribute
+                group_attribute:
+                  type: string
+                  title: group_attribute
+                lastname_attribute:
+                  type: string
+                  title: lastname_attribute
+                username_attribute:
+                  type: string
+                  title: username_attribute
+                firstname_attribute:
+                  type: string
+                  title: firstname_attribute
+            sp_initiated_sso_enabled:
+              type: boolean
+              title: sp_initiated_sso_enabled
+            idp_initiated_sso_enabled:
+              type: boolean
+              title: idp_initiated_sso_enabled
+            require_encrypted_saml_assertions:
+              type: boolean
+              title: require_encrypted_saml_assertions
+
+    idpOIDC:
+      title: idpOIDC
+      type: object
+      properties:
+        urls:
+          type: object
+          title: urls
+          properties:
+            token:
+              type: string
+              title: token
+            redirect:
+              type: string
+              title: redirect
+            userinfo:
+              type: string
+              title: userinfo
+            authorize:
+              type: string
+              title: authorize
+        client:
+          type: string
+          title: client
+          properties:
+            credentials:
+              type: object
+              title: credentials
+              properties:
+                id:
+                  type: string
+                  title: id
+            token_endpoint_auth_methods_supported:
+              type: array
+              title: token_endpoint_auth_methods_supported
+              items:
+                type: string
+        issuer:
+          type: string
+          title: issuer
+        group_scope:
+          type: string
+          title: group_scope
+        allow_untrusted_certificates:
+          type: boolean
+          title: allow_untrusted_certificates
+
+    idp:
+      title: idp
+      allOf:
+        - $ref: "#/components/schemas/idpSummary"
+        - $ref: "#/components/schemas/idpSAML"
+        - $ref: "#/components/schemas/idpOIDC"
+        - type: object
+          title: idpCommonProps
+          properties:
+            service_provider:
+              type: object
+              title: service_provider
+              properties:
+                urls:
+                  type: object
+                  title: urls
+                  properties:
+                    sign_on:
+                      type: string
+                      title: sign_on
+                    sign_out:
+                      type: string
+                      title: sign_out
+
+    idpPostBody:
+      title: idpPostBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        type:
+          type: object
+          properties:
+            description:
+              type: string
+              title: description
+            name:
+              type: string
+              title: name
+              enum:
+                - saml
+                - openid
+        oidc_provider:
+          type: object
+          title: oidc_provider
+          properties:
+            client:
+              title: client
+              type: object
+              properties:
+                urls:
+                  type: object
+                  title: urls
+                  properties:
+                    register:
+                      type: string
+                      title: register
+            issuer:
+              type: string
+              title: issuer
+            urls:
+              type: object
+              title: urls
+              properties:
+                authorize:
+                  type: string
+                  title: authorize
+                token:
+                  type: string
+                  title: token
+                userinfo:
+                  type: string
+                  title: userinfo
+            group_scope:
+              type: string
+              title: group_scope
+            claims_mapping:
+              type: object
+              title: claims_mapping
+              properties:
+                group_expression:
+                  type: string
+                  title: group_expression
+
