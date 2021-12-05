@@ -362,7 +362,7 @@ components:
                 type: boolean
                 title: staticIp
         doubleStaticIps:
-          type: string
+          type: boolean
           title: doubleStaticIps
 
     jsonPatch:
