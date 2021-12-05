@@ -296,6 +296,10 @@ components:
                       type: string
                       title: appUri
                       example: "/"
+                    upstreamProtocol:
+                      type: string
+                      title: upstreamProtocol
+                      example: "http"
 
     dlbExtras:
       type: object
