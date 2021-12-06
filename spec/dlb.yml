@@ -60,7 +60,7 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequestError'
         '201':    # status code 200
-          $ref: '#/components/responses/SuccessListDLBs'
+          $ref: '#/components/responses/SuccessPostDLB'
   /organizations/{orgId}/vpcs/{vpcId}/loadbalancers/{dlbId}:
     get:
       description: Retrieves a DLB by id
