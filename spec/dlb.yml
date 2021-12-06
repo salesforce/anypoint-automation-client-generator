@@ -53,7 +53,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/dlbCore"
+              $ref: "#/components/schemas/dlbPostBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -390,3 +390,67 @@ components:
           value:
             title: value
 
+    dlbPostBody:
+      title: dlbPostBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+          example: "myAwesomeDLB"
+        state:
+          type: string
+          description: dlb state
+          title: state
+          default: "STOPPED"
+        ipWhitelist:
+          type: array
+          items:
+            type: string
+          title: ipWhitelist
+        httpMode:
+          type: string
+          title: httpMode
+          default: "redirect"
+        tlsv1:
+          type: boolean
+          title: tlsv1
+          example: false
+        sslEndpoints:
+          type: array
+          items:
+            type: object
+            properties:
+              privateKeyLabel:
+                type: string
+                title: privateKeyLabel
+              privateKey:
+                type: string
+                title: privateKey
+              publicKeyLabel:
+                type: string
+                title: publicKeyLabel
+              publicKey:
+                type: string
+                title: publicKey
+              verifyClientMode:
+                type: string
+                title: verifyClientMode
+                default: "off"
+              mappings:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    inputUri:
+                      type: string
+                      title: inputUri
+                      example: "{app}/"
+                    appName:
+                      type: string
+                      title: appName
+                      example: "{app}"
+                    appUri:
+                      type: string
+                      title: appUri
+                      example: "/"
