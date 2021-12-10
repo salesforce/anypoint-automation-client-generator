@@ -1,0 +1,178 @@
+openapi: 3.0.0
+
+info:
+  title: Anypoint MQ Exchange specfication
+  description: Anypoint MQ Exchange API specification
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/mq/admin/api/v1/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/mq/admin/api/v1/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+      
+paths:
+  /organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations/exchanges/{exchangeId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: regionId
+        description: The region id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: exchangeId
+        description: The id of a specific exchange
+        required: true
+        schema:
+          type: string
+    get:
+      description: Get details about an exchange
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessGetExchange'
+    patch:
+      description: Modify an exchange's properties
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          $ref: '#/components/responses/SuccessUpdateExchange'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exchangeBody'
+    put:
+      description: Create exchange
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessCreateExchange'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exchangeBody'
+    delete:
+      description: Delete an exchange 
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteExchange'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: api error message 
+    NotFound:
+      description: Exchange not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code 
+                default: 404
+              message:
+                type: string
+                title: the error message
+                example: api error message
+
+    SuccessGetExchange:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: exchange from GET
+            $ref: '#/components/schemas/exchange'
+    SuccessCreateExchange:
+      description: Successfully created exchange
+      content:
+        application/json:
+          schema:
+            type: object
+            title: exchange created after PUT
+            $ref: '#/components/schemas/exchange'
+    SuccessUpdateExchange:
+      description: Successfully created exchange
+      content:
+        application/json:
+          schema:
+            type: object
+            title: exchange created after PATCH
+            $ref: '#/components/schemas/exchange'
+    SuccessDeleteExchange:
+      description: Success response
+
+  schemas:
+    exchange:
+      title: exchange
+      type: object
+      properties:
+        encrypted:
+          type: boolean
+          title: encrypted
+        type: 
+          type: string
+          title: type
+        exchangeId:
+          type: string
+          title: exchangeId
+    exchangeBody:
+      title: exchange
+      type: object
+      properties:
+        encrypted:
+          type: boolean
+          title: encrypted
+        type: 
+          type: string
+          title: type
+        exchangeId:
+          type: string
+          title: exchangeId
