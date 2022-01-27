@@ -28,8 +28,27 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code 200
           $ref: '#/components/responses/SuccessListIDPs'
+    post:
+      description: Creates an IDP connection through SAML or OIDC
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/idpPostBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code 200
+          $ref: '#/components/responses/SuccessPostIDP'
     
-  /organizations/{orgId}/identityProviders/idpId:
+  /organizations/{orgId}/identityProviders/{idpId}:
     get:
       description: Returns all identity providers for the given organization
       parameters:
@@ -50,8 +69,59 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '200':    # status code 200
+        '201':    # status code 200
           $ref: '#/components/responses/SuccessListIDPs'
+    patch:
+      description: Updates the given identity provider for the given organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: idpId
+          in: path
+          description: The ID of the Identity Provider in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/idpPatchBody"
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code 200
+          $ref: '#/components/responses/SuccessPatchIDP'
+    delete:
+      description: Deletes the given identity provider for the given organization
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: idpId
+          in: path
+          description: The ID of the Identity Provider in GUID format
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':    # status code 200
+          $ref: '#/components/responses/SuccessDeleteIDP'
 
 
 components:
@@ -71,26 +141,46 @@ components:
           schema:
             type: object
             properties:
-              status:
-                type: integer
-                title: the response status code 
-                default: 400
-              message:
-                type: string
-                title: the error message
-                example: A sample message here 
+              errors:
+                type: array
+                items:
+                  properties:
+                    type:
+                      type: string
+                    keyword:
+                      type: string
+                    schemas:
+                      type: string
+                    message:
+                      type: string
+                      title: the error message
+                      example: A sample message here 
     NotFoundError:
       description: Not Found response
       content:
         plain/text:
           schema:
-            example: The requested identity management provider is not found in the provider org
+            example: This resource does not exist
     SuccessGetIDP:
       description: Success response
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/idp'
+    SuccessPostIDP:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/idp'
+    SuccessPatchIDP:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/idp'
+    SuccessDeleteIDP:
+      description: Success response
     SuccessListIDPs:
       description: Success response
       content:
@@ -187,47 +277,58 @@ components:
       title: idpOIDC
       type: object
       properties:
-        urls:
-          type: object
-          title: urls
-          properties:
-            token:
-              type: string
-              title: token
-            redirect:
-              type: string
-              title: redirect
-            userinfo:
-              type: string
-              title: userinfo
-            authorize:
-              type: string
-              title: authorize
-        client:
-          type: string
-          title: client
-          properties:
-            credentials:
-              type: object
-              title: credentials
-              properties:
-                id:
-                  type: string
-                  title: id
-            token_endpoint_auth_methods_supported:
-              type: array
-              title: token_endpoint_auth_methods_supported
-              items:
-                type: string
-        issuer:
-          type: string
-          title: issuer
-        group_scope:
-          type: string
-          title: group_scope
         allow_untrusted_certificates:
           type: boolean
           title: allow_untrusted_certificates
+        oidc_provider:
+          type: object
+          title: oidc_provider
+          properties:
+            urls:
+              type: object
+              title: urls
+              properties:
+                token:
+                  type: string
+                  title: token
+                redirect:
+                  type: string
+                  title: redirect
+                userinfo:
+                  type: string
+                  title: userinfo
+                authorize:
+                  type: string
+                  title: authorize
+            client:
+              type: string
+              title: client
+              properties:
+                urls:
+                  type: object
+                  title: urls
+                  properties:
+                    register:
+                      type: string
+                      title: register
+                credentials:
+                  type: object
+                  title: credentials
+                  properties:
+                    id:
+                      type: string
+                      title: id
+                token_endpoint_auth_methods_supported:
+                  type: array
+                  title: token_endpoint_auth_methods_supported
+                  items:
+                    type: string
+            issuer:
+              type: string
+              title: issuer
+            group_scope:
+              type: string
+              title: group_scope
 
     idp:
       title: idp
@@ -252,6 +353,7 @@ components:
                     sign_out:
                       type: string
                       title: sign_out
+                      description: only available for SAML
 
     idpPostBody:
       title: idpPostBody
@@ -279,6 +381,7 @@ components:
             client:
               title: client
               type: object
+              description: either contains urls or credentials (mutually exclusive)
               properties:
                 urls:
                   type: object
@@ -287,6 +390,16 @@ components:
                     register:
                       type: string
                       title: register
+                credentials:
+                  type: object
+                  title: credentials
+                  properties:
+                    id:
+                      type: string
+                      title: id
+                    secret:
+                      type: string
+                      title: secret
             issuer:
               type: string
               title: issuer
@@ -313,4 +426,203 @@ components:
                 group_expression:
                   type: string
                   title: group_expression
+        allow_untrusted_certificates:
+          type: boolean
+          title: allow_untrusted_certificates
+        saml:
+          type: object
+          title: saml
+          properties:
+            issuer:
+              type: string
+              title: issuer
+            public_key:
+              type: array
+              title: public_key
+              items:
+                type: string
+            audience:
+              type: string
+              title: audience
+            claims_mapping:
+              type: object
+              title: claims_mapping
+              properties:
+                username_attribute:
+                  type: string
+                  title: username_attribute
+                  description: Field name in the SAML AttributeStatements that maps to username. By default, the NameID attribute in the SAML assertion is used.
+                firstname_attribute:
+                  type: string
+                  title: firstname_attribute
+                  description: Field name in the SAML AttributeStatements that maps to First Name. By default, the firstname attribute in the SAML assertion is used.
+                lastname_attribute:
+                  type: string
+                  title: lastname_attribute
+                  description: Field name in the SAML AttributeStatements that maps to Last Name. By default, the lastname attribute in the SAML assertion is used.
+                email_attribute:
+                  type: string
+                  title: email_attribute
+                  description: Field name in the SAML AttributeStatements that maps to Email. By default, the email attribute in the SAML assertion is used.
+                group_attribute:
+                  type: string
+                  title: group_attribute
+                  description: Field name in the SAML AttributeStatements that maps to Group.
+            require_encrypted_saml_assertions:
+              type: boolean
+              title: require_encrypted_saml_assertions
+            idp_initiated_sso_enabled:
+              type: boolean
+              title: idp_initiated_sso_enabled
+            sp_initiated_sso_enabled:
+              type: boolean
+              title: sp_initiated_sso_enabled
+        service_provider:
+          type: object
+          title: service_provider
+          properties:
+            urls:
+              type: object
+              title: urls
+              properties:
+                sign_on:
+                  type: string
+                  title: sign_on
+                  description: The Anypoint Platform URL where users must sign in.
+                sign_out:
+                  type: string
+                  title: sign_out
+                  description: URL to redirect sign out requests, so users both sign out of the Anypoint Platform and have their SAML user's status set to signed out.
 
+    idpPatchBody:
+      title: idpPatchBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        type:
+          type: object
+          properties:
+            description:
+              type: string
+              title: description
+        oidc_provider:
+          type: object
+          title: oidc_provider
+          properties:
+            client:
+              title: client
+              type: object
+              description: either contains urls or credentials (mutually exclusive)
+              properties:
+                urls:
+                  type: object
+                  title: urls
+                  properties:
+                    register:
+                      type: string
+                      title: register
+                credentials:
+                  type: object
+                  title: credentials
+                  properties:
+                    id:
+                      type: string
+                      title: id
+                    secret:
+                      type: string
+                      title: secret
+            issuer:
+              type: string
+              title: issuer
+            urls:
+              type: object
+              title: urls
+              properties:
+                authorize:
+                  type: string
+                  title: authorize
+                token:
+                  type: string
+                  title: token
+                userinfo:
+                  type: string
+                  title: userinfo
+            group_scope:
+              type: string
+              title: group_scope
+            claims_mapping:
+              type: object
+              title: claims_mapping
+              properties:
+                group_expression:
+                  type: string
+                  title: group_expression
+        allow_untrusted_certificates:
+          type: boolean
+          title: allow_untrusted_certificates
+        saml:
+          type: object
+          title: saml
+          properties:
+            issuer:
+              type: string
+              title: issuer
+            public_key:
+              type: array
+              title: public_key
+              items:
+                type: string
+            audience:
+              type: string
+              title: audience
+            claims_mapping:
+              type: object
+              title: claims_mapping
+              properties:
+                username_attribute:
+                  type: string
+                  title: username_attribute
+                  description: Field name in the SAML AttributeStatements that maps to username. By default, the NameID attribute in the SAML assertion is used.
+                firstname_attribute:
+                  type: string
+                  title: firstname_attribute
+                  description: Field name in the SAML AttributeStatements that maps to First Name. By default, the firstname attribute in the SAML assertion is used.
+                lastname_attribute:
+                  type: string
+                  title: lastname_attribute
+                  description: Field name in the SAML AttributeStatements that maps to Last Name. By default, the lastname attribute in the SAML assertion is used.
+                email_attribute:
+                  type: string
+                  title: email_attribute
+                  description: Field name in the SAML AttributeStatements that maps to Email. By default, the email attribute in the SAML assertion is used.
+                group_attribute:
+                  type: string
+                  title: group_attribute
+                  description: Field name in the SAML AttributeStatements that maps to Group.
+            require_encrypted_saml_assertions:
+              type: boolean
+              title: require_encrypted_saml_assertions
+            idp_initiated_sso_enabled:
+              type: boolean
+              title: idp_initiated_sso_enabled
+            sp_initiated_sso_enabled:
+              type: boolean
+              title: sp_initiated_sso_enabled
+        service_provider:
+          type: object
+          title: service_provider
+          properties:
+            urls:
+              type: object
+              title: urls
+              properties:
+                sign_on:
+                  type: string
+                  title: sign_on
+                  description: The Anypoint Platform URL where users must sign in.
+                sign_out:
+                  type: string
+                  title: sign_out
+                  description: URL to redirect sign out requests, so users both sign out of the Anypoint Platform and have their SAML user's status set to signed out.
