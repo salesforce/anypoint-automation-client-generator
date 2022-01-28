@@ -70,7 +70,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
         '201':    # status code 200
-          $ref: '#/components/responses/SuccessListIDPs'
+          $ref: '#/components/responses/SuccessGetIDP'
     patch:
       description: Updates the given identity provider for the given organization
       parameters:
