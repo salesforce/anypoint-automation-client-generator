@@ -301,7 +301,7 @@ components:
                   type: string
                   title: authorize
             client:
-              type: string
+              type: object
               title: client
               properties:
                 urls:
