@@ -416,6 +416,14 @@ components:
           type: boolean
           title: tlsv1
           example: false
+        keepUrlEncoding:
+          type: boolean
+          title: keepUrlEncoding
+          example: false
+        upstreamTlsv12:
+          type: boolean
+          title: upstreamTlsv12
+          example: false
         sslEndpoints:
           type: array
           items:
