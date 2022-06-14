@@ -1,0 +1,477 @@
+openapi: 3.0.0
+info:
+  title: VPN API
+  description: Description of the VPN API 
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/cloudhub/api/
+    description: Anypoint Cloudhub 
+  - url: https://eu1.anypoint.mulesoft.com/cloudhub/api/
+    description: Anypoint Cloudhub EU
+
+security:
+  - bearerAuth: [] 
+
+paths:
+  /organizations/{orgId}/vpcs/{vpcId}/ipsec:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: vpcId
+        description: The vpc Id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Returns a list of vpns.
+      description: Returns a list of VPNs for the given organization and VPC
+      responses:
+        '200':    # status code
+          $ref: '#/components/responses/SuccessListVPNs'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      summary: Creates a VPN.
+      description: Create a VPN connection from a VPC, up to a limit of 10 total VPN Connections per
+      requestBody:
+        description: VPN request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vpnPostReqBody'
+      responses:
+        '201':    # status code
+          $ref: '#/components/responses/SuccesPostVpn'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundRequestError'
+  
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  responses:
+    SuccessListVPNs:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                title: List of VPNs
+                items:
+                  $ref: '#/components/schemas/vpnGet'
+              total:
+                type: integer
+                title: Total number of results
+                example: 1
+    SuccesPostVpn:
+      description: VPN Infrastucture creation pending
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/vpnPost'
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request
+    NotFoundRequestError:
+      description: There is no org or VPC with this id
+  schemas:
+    vpnPostReqBody:
+      title: vpnPostReqBody
+      type: object
+      properties:
+        name: 
+          type: string
+          title: name
+          example: "myDatacenterVpn"
+        remoteAsn:
+          type: integer
+          title: remoteAsn
+          example: 65000
+        remoteIpAddress:
+          type: string
+          title: remoteIpAddress
+          example: 100.100.100.100
+        remoteNetworks:
+              default: []
+              example: ["10.0.0.0/24"]
+              title: remoteNetworks
+              type: array
+              items:
+                description: Remote network CIDR.
+                title: remoteNetwork
+                type: string
+        tunnelConfigs:
+              type: array
+              title: tunnelConfigs
+              example:
+                - psk: "23847329fn3u__..."
+                  ptpCidr: "169.254.12.0/30"
+                - psk: "nsdkjfnsauf23f2linf"
+                  ptpCidr: "169.254.12.4/30"
+              items:
+                title: tunnelConfig
+                type: object
+                required: 
+                  - psk
+                  - ptpCidr
+                properties:
+                  psk:
+                    default: ""
+                    description: Pre-shared secret key, this is used for authentication the VPN-tunnel. 
+                    title: psk
+                    type: string
+                    example: "23847329fn3u__..."
+                  ptpCidr:
+                    default: ""
+                    description: Point-to-point Classless Inter-Domain Routing (CIDR)
+                    title: ptpCidr
+                    type: string
+                    example: "169.254.12.0/30"
+    vpnGet:
+      title: vpnGet
+      allOf:
+        - type: object
+          title: vpnId
+          required:
+            - id
+          properties:
+            id:
+              description: The vpn Id
+              title: id
+              type: string
+              example: '62a07860f052884d1d129a31'
+        - $ref: "#/components/schemas/vpnCoreGet"
+    vpnPost:
+      title: vpnPost
+      allOf:
+        - type: object
+          title: vpnId
+          required:
+            - id
+          properties:
+            id:
+              description: The vpn Id
+              title: id
+              type: string
+              example: '62a07860f052884d1d129a31'
+        - $ref: "#/components/schemas/vpnCorePost"
+    vpnCoreGet:
+      title: vpnCoreGet
+      type: object
+      properties:
+        spec:
+          title: spec
+          type: object
+          required:
+            - name
+            - remoteIpAddress
+            - remoteNetworks
+          properties:
+            name:
+              type: string
+              title: name
+              example: "vpnforawesomevpc"
+            remoteAsn:
+              type: number
+              title: remoteAsn 
+              example: 65000
+            remoteIpAddress:
+              type: string
+              title: remoteIpAddress
+              example: 192.168.0.0
+            tunnelConfigs:
+              type: array
+              title: tunnelConfigs
+              example:
+                - psk: "23847329fn3u__..."
+                  ptpCidr: "169.254.12.0/30"
+                  rekeyMarginInSeconds: 0
+                  rekeyFuzz: 0
+                - psk: "nsdkjfnsauf23f2linf"
+                  ptpCidr: "169.254.12.4/30"
+                  rekeyMarginInSeconds: 0
+                  rekeyFuzz: 0
+              items:
+                title: tunnelConfig
+                type: object
+                required: 
+                  - psk
+                  - ptpCidr
+                  - rekeyMarginInSeconds
+                  - rekeyFuzz
+                properties:
+                  psk:
+                    default: ""
+                    description: Pre-shared secret key, this is used for authentication the VPN-tunnel. 
+                    title: psk
+                    type: string
+                    example: "23847329fn3u__..."
+                  ptpCidr:
+                    default: ""
+                    description: Point-to-point Classless Inter-Domain Routing (CIDR)
+                    title: ptpCidr
+                    type: string
+                    example: "169.254.12.0/30"
+                  rekeyMarginInSeconds:
+                    default: 0
+                    description: The margin time in seconds before connection expiration or keying-channel expiration, during which the local side of the VPN connection attempts to negotiate a replacement. The exact time of the rekey is randomly selected based on the value of Rekey fuzz. Relevant only locally, the remote side does not need to agree on it.
+                    title: rekeyMarginInSeconds
+                    type: integer
+                    example: 0
+                  rekeyFuzz:
+                    default: 0
+                    description:
+                      The maximum percentage by which marginbytes, marginpackets and margintime are randomly increased to randomize rekeying intervals (important for hosts with many connections).
+                    title: rekeyFuzz
+                    type: integer
+                    example: 0
+            remoteNetworks:
+              default: []
+              example: ["10.0.0.0/24"]
+              title: remoteNetworks
+              type: array
+              items:
+                description: Remote network CIDR.
+                title: remoteNetwork
+                type: string
+        state:
+          type: object
+          title: state
+          required:
+            - vpnConnectionStatus
+          properties:
+            vpnConnectionStatus:
+              default: ""
+              title: vpnConnectionStatus
+              type: string
+              example: "AVAILABLE"
+            createdAt: 
+              default: ""
+              title: createdAt
+              type: string
+              example: "2022-06-13T13:21:36.283Z"
+            remoteAsn:
+              default: 0
+              title: remoteAsn
+              type: integer
+              example: 65000
+            localAsn:
+              default: 0
+              title: localAsn
+              type: integer
+              example: 64512
+            vpnTunnels:
+              type: array
+              title: vpnTunnels
+              example:
+                - acceptedRouteCount: 0
+                  lastStatusChange": "2022-06-13T13:25:41Z"
+                  localExternalIpAddress": "3.20.144.122"
+                  localPtpIpAddress": "169.254.12.1"
+                  remotePtpIpAddress": "169.254.12.2"
+                  psk": "23847329fn3u__..."
+                  status": "DOWN"
+                  statusMessage": "IPSEC IS DOWN"
+                - acceptedRouteCount: 0
+                  lastStatusChange: "2022-06-13T13:24:06Z"
+                  localExternalIpAddress: "13.59.129.13"
+                  localPtpIpAddress: "169.254.12.5"
+                  remotePtpIpAddress: "169.254.12.6"
+                  psk: "nsdkjfnsauf23f2linf"
+                  status: "DOWN"
+                  statusMessage: "IPSEC IS DOWN"
+              items: 
+                title: vpnTunnel
+                type: object
+                required:
+                  - acceptedRouteCount
+                  - lastStatusChange
+                  - localExternalIpAddress
+                  - localPtpIpAddress
+                  - remotePtpIpAddress
+                  - psk
+                  - status
+                  - statusMessage
+                properties:
+                  acceptedRouteCount:
+                    default: 0
+                    description: Amount of routes that have been accepted by the VPN. 
+                    title: acceptedRouteCount
+                    type: integer
+                    example: 0
+                  lastStatusChange:
+                    default: ""
+                    description: The last time the status of the VPN changed. 
+                    title: lastStatusChange
+                    type: string
+                    example: "2022-06-13T13:24:06Z"
+                  localExternalIpAddress:
+                    default: ""
+                    description: The local external ip address.
+                    title: localExternalIpAddress
+                    type: string
+                    example: "3.20.144.122"
+                  localPtpIpAddress:
+                    default: ""
+                    description: Point-to-point Ip address of the VPN that connects with the VPC. This address can be used by internal VM's/apps to connect with another server/app.
+                    title: localPtpIpAddress
+                    type: string
+                    example: "169.254.12.1"
+                  remotePtpIpAddress:
+                    default: ""
+                    description: The remote point-to-point ip address which a connecting tool like Cisco Anyconnect can connect with to use the VPC.
+                    title: remotePtpIpAddress
+                    type: string
+                    example: "169.254.12.2"
+                  psk:
+                    default: ""
+                    description: "Pre-shared secret key, this is used for authentication the VPN-tunnel."
+                    title: psk
+                    type: string
+                    example: "23847329fn3u__..."
+                  status:
+                    default: ""
+                    description: "The current status of the VPN tunnel"
+                    title: status
+                    type: string
+                    example: "DOWN"
+                  statusMessage:
+                    default: ""
+                    description: "Message of the status"
+                    title: statusMessage
+                    type: string
+                    example: "IPSEC IS DOWN"
+            failedReason:
+              default: ""
+              title: failedReason
+              type: string
+        updateAvailable:
+          type: boolean
+          title: updateAvailable
+          default: false
+        name:
+          type: string
+          title: name
+          example: "vpnforawesomevpc"
+    vpnCorePost:
+      title: vpnCorePost
+      type: object
+      properties:
+        id:
+          description: The vpn Id
+          title: id
+          type: string
+          example: '62a33f23f052884d1d60af34'
+        spec:
+          title: spec
+          type: object
+          required:
+            - name
+            - remoteAsn
+            - remoteIpAddress
+            - tunnelConfigs
+          properties:
+            name:
+              type: string
+              title: name
+              example: "myDatacenterVpn"
+            remoteAsn:
+              type: integer
+              title: remoteAsn
+              example: 65000
+            remoteIpAddress:
+              type: string
+              title: remoteIpAddress
+              example: 100.100.100.100
+            tunnelConfigs:
+              type: array
+              title: tunnelConfigs
+              example:
+                - psk: "23847329fn3u__..."
+                  ptpCidr: "169.254.12.0/30"
+                  rekeyMarginInSeconds: 0
+                  rekeyFuzz: 0
+                - psk: "nsdkjfnsauf23f2linf"
+                  ptpCidr: "169.254.12.4/30"
+                  rekeyMarginInSeconds: 0
+                  rekeyFuzz: 0
+              items:
+                title: tunnelConfig
+                type: object
+                required: 
+                  - psk
+                  - ptpCidr
+                  - rekeyMarginInSeconds
+                  - rekeyFuzz
+                properties:
+                  psk:
+                    default: ""
+                    description: Pre-shared secret key, this is used for authentication the VPN-tunnel. 
+                    title: psk
+                    type: string
+                    example: "23847329fn3u__..."
+                  ptpCidr:
+                    default: ""
+                    description: Point-to-point Classless Inter-Domain Routing (CIDR)
+                    title: ptpCidr
+                    type: string
+                    example: "169.254.12.0/30"
+                  rekeyMarginInSeconds:
+                    default: 0
+                    description: The margin time in seconds before connection expiration or keying-channel expiration, during which the local side of the VPN connection attempts to negotiate a replacement. The exact time of the rekey is randomly selected based on the value of Rekey fuzz. Relevant only locally, the remote side does not need to agree on it.
+                    title: rekeyMarginInSeconds
+                    type: integer
+                    example: 0
+                  rekeyFuzz:
+                    default: 0
+                    description:
+                      The maximum percentage by which marginbytes, marginpackets and margintime are randomly increased to randomize rekeying intervals (important for hosts with many connections).
+                    title: rekeyFuzz
+                    type: integer
+                    example: 0
+            remoteNetworks:
+              default: []
+              example: ["10.0.0.0/24"]
+              title: remoteNetworks
+              type: array
+              items:
+                description: Remote network CIDR.
+                title: remoteNetwork
+                type: string
+        state:
+          title: state
+          type: object
+          required:
+            - vpnConnectionStatus
+          properties:
+            vpnConnectionStatus:
+              type: string
+              title: vpnConnectionStatus
+              example: "PENDING"
+        updateAvailable:
+          type: boolean
+          title: updateAvailable
+          default: false
+        name:
+          type: string
+          title: name
+          example: "myDatacenterVpn"
+
+          
