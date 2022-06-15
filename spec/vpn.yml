@@ -54,7 +54,47 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '404':
           $ref: '#/components/responses/NotFoundRequestError'
-  
+          
+  /organizations/{orgId}/vpcs/{vpcId}/ipsec/{vpnId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: vpcId
+        description: The vpc Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: vpnId
+        description: The vpn Id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Returns a a specific vpn
+      description: Returns a specific VPN for the given vpn, organization and VPC
+      responses:
+        '200':    # status code
+          $ref: '#/components/responses/SuccesGetVpn'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundRequestErrorVpn'
+    delete:
+      summary: Delete a VPN connection
+      description: The VPN connection from a VPC.
+      responses:
+        '204':    # status code
+          $ref: '#/components/responses/deletedSuccessful'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundRequestErrorVpn'
 components:
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
@@ -85,12 +125,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/vpnPost'
+    SuccesGetVpn:
+      description: Succes response for getting a VPN
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/vpnGet'
+    deletedSuccessful:
+      description: Succes response for deleting a VPN
     UnauthorizedError:
       description: Access token is missing or invalid
     BadRequestError:
       description: Bad request
     NotFoundRequestError:
       description: There is no org or VPC with this id
+    NotFoundRequestErrorVpn:
+      description: The orgId, vpcId or vpnId was not found.
   schemas:
     vpnPostReqBody:
       title: vpnPostReqBody
