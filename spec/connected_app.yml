@@ -341,4 +341,4 @@ components:
           type: array
           title: scopes
           items:
-            type: '#/components/schemas/scopeCore'
+            $ref: '#/components/schemas/scopeCore'
