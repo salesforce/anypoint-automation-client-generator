@@ -9,6 +9,8 @@ servers:
     description: Anypoint Cloudhub 
   - url: https://eu1.anypoint.mulesoft.com/apimanager/api/v1/
     description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub GOV
 
 security:
   - bearerAuth: [] 
