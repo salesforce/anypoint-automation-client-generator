@@ -154,6 +154,9 @@ components:
           external_group_name:
             type: string
             title: externalGroupName
+          provider_id:
+            type: string
+            title: providerId
 
     teamGroupMapping:
       type: object
