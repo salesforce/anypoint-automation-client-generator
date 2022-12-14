@@ -4,18 +4,18 @@ info:
   description: Description of the Connected App API 
   version: 1.0.0
 servers:
-  - url: https://anypoint.mulesoft.com/cloudhub/api/
+  - url: https://anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub 
-  - url: https://eu1.anypoint.mulesoft.com/cloudhub/api/
+  - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
-  - url: https://gov.anypoint.mulesoft.com/cloudhub/api/
+  - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
   - bearerAuth: [] 
 
 paths:
-  /accounts/api/connectedApplications:
+  /connectedApplications:
     get:
       description: Returns all connected apps
       responses:
@@ -38,7 +38,7 @@ paths:
         '201':
           $ref: '#/components/responses/SuccessPostConnApps'
 
-  /accounts/api/connectedApplications/{connAppId}:
+  /connectedApplications/{connAppId}:
     get:
       description: Returns all connected apps
       parameters:
@@ -89,7 +89,7 @@ paths:
         '204':
           $ref: '#/components/responses/SuccessDeleteConnApps'
 
-  /accounts/api/connectedApplications/{connAppId}/scopes:
+  /connectedApplications/{connAppId}/scopes:
     get:
       description: Returns all scopes of a Connected App
       parameters:
