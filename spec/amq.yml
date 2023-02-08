@@ -7,15 +7,15 @@ info:
 
 servers:
   - url: https://anypoint.mulesoft.com/mq/admin/api/v1/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
-      
+  - bearerAuth: []
+
 paths:
   /organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations:
     parameters:
@@ -38,6 +38,56 @@ paths:
         schema:
           type: string
     get:
+      operationId: GetAMQList
+      parameters:
+        - in: query
+          name: inclusion
+          description: Defines what to fetch
+          required: false
+          schema:
+            type: string
+            enum:
+              - all
+              - minimal
+        - in: query
+          name: destinationType
+          description: Defines what to fetch
+          required: false
+          schema:
+            type: string
+            enum:
+              - all
+              - queue
+              - exchange
+        - in: query
+          name: offset
+          description: Skip over a number of elements by specifying an offset value for the query.
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          description: Limit the number of elements in the response.
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: startsWith
+          description: Searchs the field from the left using the passed string.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: destinationIds
+          description: Includes only results with the given Ids.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+
       description: Get a list of queues in a region
       responses:
         '401':
@@ -70,8 +120,9 @@ paths:
         required: true
         schema:
           type: string
-    
+
     get:
+      operationId: GetAMQ
       description: Get details about a queue
       responses:
         '401':
@@ -79,6 +130,7 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessGetQueue'
     patch:
+      operationId: UpdateAMQ
       description: Modify a queue's properties
       responses:
         '401':
@@ -93,6 +145,7 @@ paths:
             schema:
               $ref: '#/components/schemas/queueBody'
     put:
+      operationId: CreateAMQ
       description: Create queue
       responses:
         '401':
@@ -105,7 +158,8 @@ paths:
             schema:
               $ref: '#/components/schemas/queueBody'
     delete:
-      description: Delete queue 
+      operationId: DeleteAMQ
+      description: Delete queue
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -130,12 +184,12 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 400
               message:
                 type: string
                 title: the error message
-                example: api error message 
+                example: api error message
     NotFound:
       description: Queue not found
       content:
@@ -145,7 +199,7 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 404
               message:
                 type: string
@@ -202,6 +256,12 @@ components:
         defaultDeliveryDelay:
           type: integer
           title: defaultDeliveryDelay
+        deadLetterQueueId:
+          type: string
+          title: deadLetterQueueId
+        maxDeliveries:
+          type: integer
+          title: maxDeliveries
         fifo:
           type: boolean
           title: fifo
@@ -212,20 +272,34 @@ components:
       properties:
         defaultTtl:
           type: integer
+          nullable: true
           title: defaultTtl
         defaultLockTtl:
           type: integer
+          nullable: true
           title: defaultLockTtl
         type:
           type: string
+          nullable: true
           title: type
         encrypted:
           type: boolean
+          nullable: true
           title: encrypted
         defaultDeliveryDelay:
           type: integer
+          nullable: true
           title: defaultDeliveryDelay
+        deadLetterQueueId:
+          type: string
+          nullable: true
+          title: deadLetterQueueId
+        maxDeliveries:
+          type: integer
+          nullable: true
+          title: maxDeliveries
         fifo:
           type: boolean
+          nullable: true
           title: fifo
 
