@@ -7,15 +7,15 @@ info:
 
 servers:
   - url: https://anypoint.mulesoft.com/mq/admin/api/v1/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
-      
+  - bearerAuth: []
+
 paths:
   /organizations/{orgId}/environments/{envId}/regions/{regionId}/bindings/exchanges/{exchangeId}/queues/{queueId}:
     parameters:
@@ -50,6 +50,7 @@ paths:
         schema:
           type: string
     get:
+      operationId: GetAMEBinding
       description: Get details about a queue bound to an exchange
       responses:
         '401':
@@ -57,6 +58,7 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessGetExchangeBinding'
     put:
+      operationId: CreateAMEBinding
       description: Create exchange queue binding
       responses:
         '401':
@@ -64,6 +66,7 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessCreateExchangeBinding'
     delete:
+      operationId: DeleteAMEBinding
       description: Delete an exchange queue binding
       responses:
         '401':
@@ -89,12 +92,12 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 400
               message:
                 type: string
                 title: the error message
-                example: api error message 
+                example: api error message
     NotFound:
       description: Queue not found
       content:
@@ -104,7 +107,7 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 404
               message:
                 type: string

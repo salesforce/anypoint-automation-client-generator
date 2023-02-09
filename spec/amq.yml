@@ -241,6 +241,9 @@ components:
         queueId:
           type: string
           title: queueId
+        exchangeId:
+          type: string
+          title: exchangeId
         defaultTtl:
           type: integer
           title: defaultTtl
@@ -265,6 +268,7 @@ components:
         fifo:
           type: boolean
           title: fifo
+
 
     queueBody:
       title: queueBody
