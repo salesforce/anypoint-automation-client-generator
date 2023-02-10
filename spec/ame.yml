@@ -7,15 +7,15 @@ info:
 
 servers:
   - url: https://anypoint.mulesoft.com/mq/admin/api/v1/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/mq/admin/api/v1/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
-      
+  - bearerAuth: []
+
 paths:
   /organizations/{orgId}/environments/{envId}/regions/{regionId}/destinations/exchanges/{exchangeId}:
     parameters:
@@ -44,6 +44,7 @@ paths:
         schema:
           type: string
     get:
+      operationId: GetAME
       description: Get details about an exchange
       responses:
         '401':
@@ -51,6 +52,7 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessGetExchange'
     patch:
+      operationId: UpdateAME
       description: Modify an exchange's properties
       responses:
         '401':
@@ -65,6 +67,7 @@ paths:
             schema:
               $ref: '#/components/schemas/exchangeBody'
     put:
+      operationId: CreateAME
       description: Create exchange
       responses:
         '401':
@@ -77,7 +80,8 @@ paths:
             schema:
               $ref: '#/components/schemas/exchangeBody'
     delete:
-      description: Delete an exchange 
+      operationId: DeleteAME
+      description: Delete an exchange
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -102,12 +106,12 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 400
               message:
                 type: string
                 title: the error message
-                example: api error message 
+                example: api error message
     NotFound:
       description: Exchange not found
       content:
@@ -117,7 +121,7 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 404
               message:
                 type: string
@@ -159,7 +163,7 @@ components:
         encrypted:
           type: boolean
           title: encrypted
-        type: 
+        type:
           type: string
           title: type
         exchangeId:
@@ -172,9 +176,3 @@ components:
         encrypted:
           type: boolean
           title: encrypted
-        type: 
-          type: string
-          title: type
-        exchangeId:
-          type: string
-          title: exchangeId
