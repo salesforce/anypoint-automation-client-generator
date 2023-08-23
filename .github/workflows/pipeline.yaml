@@ -18,11 +18,10 @@ jobs:
       matrix:
         node-version: [14.x]
     env:
-      #CLIENT_GO_REPO: git@github.com:mulesoft-anypoint/anypoint-client-go.git
       CLIENT_GO_REPO: https://github.com/mulesoft-anypoint/anypoint-client-go.git
       CLIENT_GO_BRANCH: dev
-      #GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
-      GIT_ANYPOINT_CLIENT_GO_KEY: ${{ secrets.GIT_ANYPOINT_CLIENT_GO_KEY }}
+      #should be the base64 of base64(x-access-token:<accessToken>). more info here https://milangatyas.com/Blog/Detail/11/github-git-repository-authentication-for-auto
+      GIT_AUTH_HEADER_B64: ${{ secrets.GIT_AUTH_HEADER_B64 }}
       GIT_PIPELINE_USER_EMAIL: pipeline@anypoint-client-generator.com
       GIT_PIPELINE_USER_NAME: pipeline-anypoint-clients-generator
       APP_NAME: anypoint-client-generator
@@ -51,15 +50,13 @@ jobs:
           export GENERATOR_FOLDER=`pwd`
           export GO_CLIENT_FOLDER=`pwd`/dist/${{env.APP_NAME}}
           export ANYPOINT_GENERATOR_GO_DEST="$GO_CLIENT_FOLDER"
-          export GIT_AUTH_HEADER_B64='eC1hY2Nlc3MtdG9rZW46Z2l0aHViX3BhdF8xMUFBNEhDQlkwbUV1cjVOS2dCMkV4XzEycUptb3BOWUI3ekQzVWxpcWNsNXI3UDJheUxhalYxQ0JUakpEN205d1RLRFlFVUdHWTFXR1JtZUF3'
-          echo "GIT_AUTH_HEADER_B64 --> $GIT_AUTH_HEADER_B64"
           npm install
-          git -c http.extraheader="AUTHORIZATION: basic $GIT_AUTH_HEADER_B64" clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
+          git -c http.extraheader="AUTHORIZATION: basic ${{env.GIT_AUTH_HEADER_B64}}" clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate
           cd $GO_CLIENT_FOLDER
           git add .
           git commit -am "${{env.COMMIT_MSG}}"
-          git -c http.extraheader="AUTHORIZATION: basic $GIT_AUTH_HEADER_B64" push
+          git -c http.extraheader="AUTHORIZATION: basic ${{env.GIT_AUTH_HEADER_B64}}" push
 
 
 
