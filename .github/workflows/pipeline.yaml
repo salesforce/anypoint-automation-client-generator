@@ -52,6 +52,7 @@ jobs:
           export GO_CLIENT_FOLDER=`pwd`/dist/${{env.APP_NAME}}
           export ANYPOINT_GENERATOR_GO_DEST="$GO_CLIENT_FOLDER"
           export GIT_AUTH_HEADER_B64=`echo "x-access-token:${{env.GIT_ANYPOINT_CLIENT_GO_KEY}}"|base64`
+          echo "GIT_AUTH_HEADER_B64 --> $GIT_AUTH_HEADER_B64"
           npm install
           git -c http.extraheader="AUTHORIZATION: basic $GIT_AUTH_HEADER_B64" clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate
