@@ -1,4 +1,4 @@
-name: Cloudhub Client Generator Pipeline
+name: Anypoint Clients Generator Pipeline
 
 # Controls when the action will run. 
 on:
@@ -18,7 +18,7 @@ jobs:
       matrix:
         node-version: [14.x]
     env:
-      CLIENT_GO_REPO: git@github.com:mulesoft-consulting/cloudhub-client-go.git
+      CLIENT_GO_REPO: git@github.com:mulesoft-anypoint/anypoint-client-go.git
       CLIENT_GO_BRANCH: dev
       GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
 
@@ -37,14 +37,14 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Copy Cloudhub-client-generator project
+      - name: Copy anypoint-client-generator project
         run: |
-          git config --global user.email "pipeline@cloudhub-client-generator.com"
-          git config --global user.name "pipeline-cloudhub-clients-generator"
+          git config --global user.email "pipeline@anypoint-client-generator.com"
+          git config --global user.name "pipeline-anypoint-clients-generator"
           export GENERATOR_FOLDER=`pwd`
-          export GO_CLIENT_FOLDER=`pwd`/dist/cloudhub-client-generator
+          export GO_CLIENT_FOLDER=`pwd`/dist/anypoint-client-generator
           export ANYPOINT_GENERATOR_GO_DEST="$GO_CLIENT_FOLDER"
-          npm install 
+          npm install
           git clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate
           cd $GO_CLIENT_FOLDER

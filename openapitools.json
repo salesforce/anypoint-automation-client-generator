@@ -8,7 +8,7 @@
         "generatorName": "go",
         "output": "$ANYPOINT_GENERATOR_GO_DEST/#{name}",
         "glob": "spec/*.{json,yaml,yml}",
-        "gitUserId": "mulesoft-consulting",
+        "gitUserId": "mulesoft-anypoint",
         "gitRepoId": "anypoint-client-go",
         "additionalProperties": {
           "isGoSubmodule": true,
