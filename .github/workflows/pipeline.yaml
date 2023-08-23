@@ -1,6 +1,6 @@
 name: Anypoint Clients Generator Pipeline
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push
   push:
@@ -18,18 +18,24 @@ jobs:
       matrix:
         node-version: [14.x]
     env:
-      CLIENT_GO_REPO: git@github.com:mulesoft-anypoint/anypoint-client-go.git
+      #CLIENT_GO_REPO: git@github.com:mulesoft-anypoint/anypoint-client-go.git
+      CLIENT_GO_REPO: https://github.com/mulesoft-anypoint/anypoint-client-go.git
       CLIENT_GO_BRANCH: dev
-      GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
+      #GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
+      GIT_ANYPOINT_CLIENT_GO_KEY: ${{ secrets.GIT_ANYPOINT_CLIENT_GO_KEY }}
+      GIT_PIPELINE_USER_EMAIL: pipeline@anypoint-client-generator.com
+      GIT_PIPELINE_USER_NAME: pipeline-anypoint-clients-generator
+      APP_NAME: anypoint-client-generator
+      COMMIT_MSG: Generates modules from pipeline.
 
     steps:
       - name: Set Up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: webfactory/ssh-agent@v0.5.1
-        with:
-          ssh-private-key: ${{ env.GIT_SSH_KEY }}
+      # - uses: webfactory/ssh-agent@v0.5.1
+      #   with:
+      #     ssh-private-key: ${{ env.GIT_SSH_KEY }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -39,18 +45,18 @@ jobs:
       - uses: actions/checkout@v2
       - name: Copy anypoint-client-generator project
         run: |
-          git config --global user.email "pipeline@anypoint-client-generator.com"
-          git config --global user.name "pipeline-anypoint-clients-generator"
+          git config --global user.email ${{env.GIT_PIPELINE_USER_EMAIL}}
+          git config --global user.name ${{env.GIT_PIPELINE_USER_NAME}}
           export GENERATOR_FOLDER=`pwd`
-          export GO_CLIENT_FOLDER=`pwd`/dist/anypoint-client-generator
+          export GO_CLIENT_FOLDER=`pwd`/dist/${{env.APP_NAME}}
           export ANYPOINT_GENERATOR_GO_DEST="$GO_CLIENT_FOLDER"
           npm install
-          git clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
+          git -c http.extraheader="AUTHORIZATION: bearer ${{env.GIT_ANYPOINT_CLIENT_GO_KEY}}" clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate
           cd $GO_CLIENT_FOLDER
           git add .
-          git commit -am "Generates modules from pipeline."
-          git push
+          git commit -am "${{env.COMMIT_MSG}}"
+          git -c http.extraheader="AUTHORIZATION: bearer ${{env.GIT_ANYPOINT_CLIENT_GO_KEY}}" push
 
 
 
