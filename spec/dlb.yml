@@ -1,18 +1,18 @@
 openapi: 3.0.1
 info:
   title: Dedicated Load Balancer API
-  description: Description of the DLB API 
+  description: Description of the DLB API
   version: 1.0.0
 servers:
   - url: https://anypoint.mulesoft.com/cloudhub/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/cloudhub/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/cloudhub/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 paths:
   /organizations/{orgId}/vpcs/{vpcId}/loadbalancers:
@@ -171,12 +171,12 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 400
               message:
                 type: string
                 title: the error message
-                example: A sample message here 
+                example: A sample message here
     SuccessGetDLB:
       description: Success response
       content:
@@ -219,7 +219,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/dlbExtras'
         - $ref: '#/components/schemas/dlbCore'
-    
+
     dlbCore:
       title: dlbCore
       type: object
