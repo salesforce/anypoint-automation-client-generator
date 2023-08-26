@@ -19,7 +19,7 @@ export ANYPOINT_GENERATOR_GO_DEST=`pwd`/dist
 Use the following to get the manual
 
 ```bash
-npx openapi-generator-cli help 
+npx openapi-generator-cli help
 ```
 
 Use the following command to generate using the configuration stored in `openapitools.json`
