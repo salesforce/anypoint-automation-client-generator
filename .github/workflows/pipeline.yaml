@@ -32,9 +32,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      # - uses: webfactory/ssh-agent@v0.5.1
-      #   with:
-      #     ssh-private-key: ${{ env.GIT_SSH_KEY }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
