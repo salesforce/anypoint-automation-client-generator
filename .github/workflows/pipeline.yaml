@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [18.x]
     env:
       CLIENT_GO_REPO: https://github.com/mulesoft-anypoint/anypoint-client-go.git
       CLIENT_GO_BRANCH: dev
