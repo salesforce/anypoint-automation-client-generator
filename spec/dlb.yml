@@ -267,9 +267,6 @@ components:
               privateKeyDigest:
                 type: string
                 title: privateKeyDigest
-              privateKey:
-                type: string
-                title: privateKey
               publicKeyLabel:
                 type: string
                 title: publicKeyLabel
@@ -279,9 +276,21 @@ components:
               publicKeyCN:
                 type: string
                 title: publicKeyCN
-              publicKey:
+              clientCertLabel:
                 type: string
-                title: publicKey
+                title: clientCertLabel
+              clientCertDigest:
+                type: string
+                title: clientCertDigest
+              clientCertCN:
+                type: string
+                title: clientCertCN
+              revocationListLabel:
+                type: string
+                title: revocationListLabel
+              revocationListDigest:
+                type: string
+                title: revocationListDigest
               verifyClientMode:
                 type: string
                 title: verifyClientMode
@@ -451,6 +460,9 @@ components:
           type: boolean
           title: upstreamTlsv12
           example: false
+        staticIPsDisabled:
+          type: boolean
+          title: staticIPsDisabled
         doubleStaticIps:
           type: boolean
           title: doubleStaticIps
@@ -460,6 +472,24 @@ components:
         forwardClientCertificate:
           type: boolean
           title: forwardClientCertificate
+        workers:
+          type: integer
+          title: workers
+          description: the dedicated load balancer's number of workers.
+          default: 2
+          minimum: 2
+          maximum: 8
+          enum:
+            - 2
+            - 4
+            - 6
+            - 8
+        proxyReadTimeout:
+          type: string
+          title: proxyReadTimeout
+          description: Sets the Mule application response timeout value.
+          default: "300"
+
         sslEndpoints:
           type: array
           items:
@@ -471,16 +501,36 @@ components:
               privateKey:
                 type: string
                 title: privateKey
+                example: "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQ\n-----END PRIVATE KEY-----\n"
               publicKeyLabel:
                 type: string
                 title: publicKeyLabel
               publicKey:
                 type: string
                 title: publicKey
+                example: "-----BEGIN CERTIFICATE-----\nMIIDMjCCAhoCCQCju+T7DvAhIzANBgkqhkiG9w0BAQsFADBbMQs\n-----END CERTIFICATE-----\n"
               verifyClientMode:
                 type: string
                 title: verifyClientMode
                 default: "off"
+                enum:
+                  - "off"
+                  - "on"
+                  - "optional"
+              clientCertLabel:
+                type: string
+                title: clientCertLabel
+              clientCert:
+                type: string
+                title: clientCert
+                example: "-----BEGIN CERTIFICATE----\nMIIF3TCCA8WgAwIBAgIUBFyq+\n-----END CERTIFICATE-----"
+              revocationListLabel:
+                type: string
+                title: revocationListLabel
+              revocationList:
+                type: string
+                title: revocationList
+                example: "-----BEGIN X509 CRL-----\nMIIDDzCB+AIBATANBgkqhkiG9w0BAQsFADB+MQswCQYDVQQ\n-----END X509 CRL-----\n"
               mappings:
                 type: array
                 items:
@@ -498,3 +548,13 @@ components:
                       type: string
                       title: appUri
                       example: "/"
+                    upstreamProtocol:
+                      type: string
+                      title: upstreamProtocol
+                      default: http
+                      example: https
+                      enum:
+                        - http
+                        - https
+                        - ws
+                        - wss
