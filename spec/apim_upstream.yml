@@ -1,0 +1,284 @@
+openapi: 3.0.0
+info:
+  title: API Manager Upstream API
+  description: API Manager Upstream API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+
+paths:
+  /organizations/{orgId}/environments/{envId}/apis/{envApiId}/upstreams:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envApiId
+        description: The api id specific to a given environment
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimInstanceUpstreams
+      summary: Retrieve all upstreams of a given API Manager instance
+      description: Retrieves all upstreams for a given API Manager instance in a given environment. Connected App requires the scope "View APIs Configuration"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimInstanceUpstreams'
+    post:
+      operationId: PostApimInstanceUpstream
+      summary: Creates an upstream for a given API Manager instance
+      description: Creates an upstream for a given API Manager instance in a given environment. Connected App requires the scope "Manage APIs Configuration"
+      requestBody:
+        description: 'Post API Manager Instance Upstream Body'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpstreamPostBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostApimInstanceUpstream'
+
+  /organizations/{orgId}/environments/{envId}/apis/{envApiId}/upstreams/{upstreamId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envApiId
+        description: The api id specific to a given environment
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: upstreamId
+        description: The upstream id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimInstanceUpstream
+      summary: Retrieve a specific upstream for a given API Manager instance
+      description: Retrieve a specific upstream for a given API Manager instance in a given environment. Connected App requires the scope "View APIs Configuration"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimInstanceUpstream'
+    patch:
+      operationId: PatchApimInstanceUpstream
+      summary: Update a specific upstream in a given API Manager instance
+      description: Update a specific upstream in a given API Manager instance in a given environment. Connected App requires the scope "Manage APIs Configuration"
+      requestBody:
+        description: 'Patch API Manager Instance Upstream Body'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpstreamPatchBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessPatchApimInstanceUpstream'
+    delete:
+      operationId: DeleteApimInstanceUpstream
+      summary: Delete a specific Upstream of the given API Manager Instance
+      description: Delete a specific Upstream in a API Manager Instance  in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteApimInstanceUpstream'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorsResponse"
+    NotFoundError:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              message:
+                type: string
+    SuccessGetApimInstanceUpstreams:
+      description: Collection of upstreams in a given api manager instance
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpstreamCollection'
+    SuccessPostApimInstanceUpstream:
+      description: Upstream post response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpstreamDetails'
+    SuccessGetApimInstanceUpstream:
+      description: single upstream in a given api manager instance
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpstreamDetails'
+    SuccessPatchApimInstanceUpstream:
+      description: Upstream patch response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Upstream'
+    SuccessDeleteApimInstanceUpstream:
+      description: delete upstream response
+
+  schemas:
+    ErrorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    UpstreamCollection:
+      type: object
+      properties:
+        total:
+          type: integer
+        upstreams:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpstreamDetails'
+
+    UpstreamDetails:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        id:
+          type: string
+        label:
+          type: string
+        uri:
+          type: string
+
+    Upstream:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        uri:
+          type: string
+
+    UpstreamPostBody:
+      type: object
+      properties:
+        label:
+          type: string
+        uri:
+          type: string
+
+    UpstreamPatchBody:
+      type: object
+      properties:
+        label:
+          type: string
+        uri:
+          type: string
+
+    Audit:
+      type: object
+      properties:
+        created:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+        updated:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+
+
+
+
