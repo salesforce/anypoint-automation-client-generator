@@ -32,7 +32,7 @@ paths:
         schema:
           type: string
     get:
-      operationId: GetApimInstances
+      operationId: GetEnvApimInstances
       parameters:
         - name: query
           in: query
@@ -114,18 +114,18 @@ paths:
           schema:
             type: boolean
       summary: Retrieves a collection of API Manager Instances
-      description: Retrieves collection of API Manager Instances that meets the given criteria
+      description: Retrieves collection of API Manager Instances that meets the given criteria. Connected Apps require the scope "View APIs Configuration"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '200':    # status code
-          $ref: '#/components/responses/SuccessGetApimInstances'
+          $ref: '#/components/responses/SuccessGetApimInstanceCollection'
     post:
       operationId: PostApimInstance
       summary: Creates an API Manager Instance
-      description: Creates an API Manager Instance
+      description: Creates an API Manager Instance in a given environment. Connected Apps require the scope "Manage APIs Configuration".
       requestBody:
         description: 'Post API Manager Instance Body'
         content:
@@ -140,7 +140,7 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessPostApimInstance'
 
-  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/apis/{environmentApiId}:
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/apis/{envApiId}:
     parameters:
       - in: path
         name: orgId
@@ -155,7 +155,7 @@ paths:
         schema:
           type: string
       - in: path
-        name: environmentApiId
+        name: envApiId
         description: The api manager instance id for a given environment
         required: true
         schema:
@@ -182,7 +182,7 @@ paths:
           schema:
             type: boolean
       summary: Retrieves a specific API Manager Instance
-      description: Retrieves a specific API Manager Instance for a specific environment and organization. Connected Apps require the scope View APIs Configuration
+      description: Retrieves a specific API Manager Instance for a specific environment and organization. Connected Apps require the scope "View APIs Configuration".
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -208,7 +208,7 @@ paths:
           schema:
             type: boolean
       summary: Patches a specific API Manager Instance
-      description: Patches a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope Manage APIs Configuration.
+      description: Patches a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
       requestBody:
         description: 'Patch API Manager Instance Body'
         content:
@@ -223,11 +223,11 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
         '200':    # status code
-          $ref: '#/components/responses/SuccessGetApimInstances'
+          $ref: '#/components/responses/SuccessPatchApimInstance'
     delete:
       operationId: DeleteApimInstance
-      summary: Delete a specific API Managaer Instance
-      description: Delete a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope Manage APIs Configuration.
+      summary: Delete a specific API Manager Instance
+      description: Delete a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -263,12 +263,12 @@ components:
                 type: string
               message:
                 type: string
-    SuccessGetApimInstances:
-      description: List of APIM Instances
+    SuccessGetApimInstanceCollection:
+      description: Collection of APIM Instances
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ApimInstances'
+            $ref: '#/components/schemas/ApimInstanceCollection'
     SuccessPostApimInstance:
       description: Create APIM Instance
       content:
@@ -319,7 +319,7 @@ components:
                 type: string
                 title: message
 
-    ApimInstances:
+    ApimInstanceCollection:
       type: object
       properties:
         total:
@@ -330,7 +330,7 @@ components:
             type: object
             properties:
               audit:
-                $ref: '#/components/schemas/audit'
+                $ref: '#/components/schemas/Audit'
               masterOrganizationId:
                 type: string
               organizationId:
@@ -408,9 +408,9 @@ components:
                     status:
                       type: string
                     deployment:
-                      $ref: '#/components/schemas/deployment'
+                      $ref: '#/components/schemas/Deployment'
                     routing:
-                      $ref: '#/components/schemas/routing'
+                      $ref: '#/components/schemas/Routing'
                     pinned:
                       type: boolean
                     activeContractsCount:
@@ -434,13 +434,13 @@ components:
             - mule4
             - serviceMesh
         endpoint:
-          $ref: '#/components/schemas/endpointPostBody'
+          $ref: '#/components/schemas/EndpointPostBody'
         spec:
-          $ref: '#/components/schemas/spec'
+          $ref: '#/components/schemas/Spec'
         routing:
-          $ref: '#/components/schemas/routingPostBody'
+          $ref: '#/components/schemas/RoutingPostBody'
         deployment:
-          $ref: '#/components/schemas/deploymentPostBody'
+          $ref: '#/components/schemas/DeploymentPostBody'
         instanceLabel:
           type: string
 
@@ -449,7 +449,7 @@ components:
       type: object
       properties:
         audit:
-          $ref: '#/components/schemas/audit'
+          $ref: '#/components/schemas/Audit'
         masterOrganizationId:
           type: string
         organizationId:
@@ -495,11 +495,11 @@ components:
         technology:
           type: string
         endpoint:
-          $ref: '#/components/schemas/endpoint'
+          $ref: '#/components/schemas/Endpoint'
         deployment:
-          $ref: '#/components/schemas/deployment'
+          $ref: '#/components/schemas/Deployment'
         routing:
-          $ref: '#/components/schemas/routingList'
+          $ref: '#/components/schemas/RoutingCollection'
         status:
           type: string
         autodiscoveryInstanceName:
@@ -517,22 +517,22 @@ components:
             - mule4
             - serviceMesh
         endpoint:
-          $ref: '#/components/schemas/endpointPostBody'
+          $ref: '#/components/schemas/EndpointPostBody'
         spec:
-          $ref: '#/components/schemas/spec'
+          $ref: '#/components/schemas/Spec'
         routing:
-          $ref: '#/components/schemas/routingPostBody'
+          $ref: '#/components/schemas/RoutingPostBody'
         deployment:
-          $ref: '#/components/schemas/deploymentPostBody'
+          $ref: '#/components/schemas/DeploymentPostBody'
         instanceLabel:
           type: string
 
-    endpoint:
-      title: endpoint
+    Endpoint:
+      title: Endpoint
       type: object
       properties:
         audit:
-          $ref: '#/components/schemas/audit'
+          $ref: '#/components/schemas/Audit'
         id:
           type: integer
         type:
@@ -580,8 +580,8 @@ components:
           type: string
           nullable: true
 
-    endpointPostBody:
-      title: endpointPostBody
+    EndpointPostBody:
+      title: EndpointPostBody
       type: object
       properties:
         deploymentType:
@@ -610,8 +610,8 @@ components:
             inbound:
               nullable: true
 
-    spec:
-      title: spec
+    Spec:
+      title: Spec
       type: object
       properties:
         assetId:
@@ -621,7 +621,8 @@ components:
         version:
           type: string
 
-    audit:
+    Audit:
+      title: Audit
       type: object
       properties:
         created:
@@ -636,16 +637,13 @@ components:
             date:
               type: string
               format: date-time
-          required:
-            - date
-          additionalProperties: false
 
-    deployment:
-      title: deployment
+    Deployment:
+      title: Deployment
       type: object
       properties:
         audit:
-          $ref: "#/components/schemas/audit"
+          $ref: "#/components/schemas/Audit"
         id:
           type: integer
         applicationId:
@@ -679,8 +677,8 @@ components:
         apiId:
           type: integer
 
-    deploymentPostBody:
-      title: deploymentPostBody
+    DeploymentPostBody:
+      title: DeploymentPostBody
       type: object
       properties:
         environmentId:
@@ -698,8 +696,8 @@ components:
         gatewayVersion:
           type: string
 
-    routing:
-      title: routing
+    Routing:
+      title: Routing
       type: object
       properties:
         label:
@@ -718,17 +716,17 @@ components:
               label:
                 type: string
 
-    routingList:
-      title: routingList
+    RoutingCollection:
+      title: RoutingCollection
       type: array
       items:
-        $ref: '#/components/schemas/routing'
+        $ref: '#/components/schemas/Routing'
 
-    routingPostBody:
-      title: routingPostBody
+    RoutingPostBody:
+      title: RoutingPostBody
       type: array
       items:
-        title: routingPostBodyItem
+        title: RoutingPostBodyItem
         properties:
           label:
             type: string
