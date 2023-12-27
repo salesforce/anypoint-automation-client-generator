@@ -236,6 +236,20 @@ components:
           type: string
         uri:
           type: string
+        tlsContext:
+          type: object
+          nullable: true
+          properties:
+            audit:
+              $ref: "#/components/schemas/Audit"
+            secretGroupId:
+              type: string
+            tlsContextId:
+              type: string
+            name:
+              type: string
+            authorized:
+              type: boolean
 
     Upstream:
       type: object
@@ -246,6 +260,15 @@ components:
           type: string
         uri:
           type: string
+        tlsContext:
+          type: object
+          properties:
+            secretGroupId:
+              type: string
+            tlsContextId:
+              type: string
+            audit:
+              $ref: '#/components/schemas/Audit'
 
     UpstreamPostBody:
       type: object
@@ -254,6 +277,13 @@ components:
           type: string
         uri:
           type: string
+        tlsContext:
+          type: object
+          properties:
+            secretGroupId:
+              type: string
+            tlsContextId:
+              type: string
 
     UpstreamPatchBody:
       type: object
@@ -262,6 +292,13 @@ components:
           type: string
         uri:
           type: string
+        tlsContext:
+          type: object
+          properties:
+            secretGroupId:
+              type: string
+            tlsContextId:
+              type: string
 
     Audit:
       type: object
