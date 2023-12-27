@@ -579,6 +579,26 @@ components:
         console:
           type: string
           nullable: true
+        tlsContext:
+          type: object
+          properties:
+            audit:
+              $ref: '#/components/schemas/Audit'
+            inbound:
+              nullable: true
+              type: object
+              properties:
+                secretGroupId:
+                  type: string
+                tlsContextId:
+                  type: string
+                name:
+                  type: string
+                authorized:
+                  type: boolean
+            outbound:
+              type: object
+              nullable: true
 
     EndpointPostBody:
       title: EndpointPostBody
@@ -608,7 +628,15 @@ components:
           type: object
           properties:
             inbound:
+              type: object
               nullable: true
+              properties:
+                tlsContextId:
+                  type: string
+                secretGroupId:
+                  type: string
+                name:
+                  type: string
 
     Spec:
       title: Spec
