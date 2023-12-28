@@ -730,6 +730,17 @@ components:
       properties:
         label:
           type: string
+        rules:
+          type: object
+          properties:
+            methods:
+              type: string
+            host:
+              type: string
+            path:
+              type: string
+            headers:
+              type: object
         upstreams:
           type: array
           items:
@@ -758,7 +769,19 @@ components:
         properties:
           label:
             type: string
+          rules:
+            type: object
+            properties:
+              methods:
+                type: string
+              host:
+                type: string
+              path:
+                type: string
+              headers:
+                type: object
           upstreams:
+            type: object
             properties:
               weight:
                 type: integer
