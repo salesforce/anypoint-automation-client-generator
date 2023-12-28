@@ -571,8 +571,6 @@ components:
         wsdlConfig:
           type: string
           nullable: true
-        tlsContexts:
-          type: object
         muleVersion4OrAbove:
           type: boolean
           nullable: true
@@ -584,7 +582,7 @@ components:
         console:
           type: string
           nullable: true
-        tlsContext:
+        tlsContexts:
           type: object
           properties:
             audit:
@@ -632,6 +630,7 @@ components:
           nullable: true
         tlsContexts:
           type: object
+          nullable: true
           properties:
             inbound:
               type: object
