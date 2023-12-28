@@ -410,7 +410,7 @@ components:
                     deployment:
                       $ref: '#/components/schemas/Deployment'
                     routing:
-                      $ref: '#/components/schemas/Routing'
+                      $ref: '#/components/schemas/RoutingCollection'
                     pinned:
                       type: boolean
                     activeContractsCount:
