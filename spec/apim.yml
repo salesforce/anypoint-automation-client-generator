@@ -537,12 +537,16 @@ components:
           type: integer
         type:
           type: string
+          nullable: true
         uri:
           type: string
+          nullable: true
         apiGatewayVersion:
           type: string
+          nullable: true
         proxyUri:
           type: string
+          nullable: true
         proxyRegistrationUri:
           type: string
           nullable: true
@@ -576,6 +580,7 @@ components:
           type: integer
         validation:
           type: string
+          nullable: true
         console:
           type: string
           nullable: true
@@ -603,6 +608,7 @@ components:
     EndpointPostBody:
       title: EndpointPostBody
       type: object
+      nullable: true
       properties:
         deploymentType:
           type: string
@@ -669,6 +675,7 @@ components:
     Deployment:
       title: Deployment
       type: object
+      nullable: true
       properties:
         audit:
           $ref: "#/components/schemas/Audit"
@@ -708,6 +715,7 @@ components:
     DeploymentPostBody:
       title: DeploymentPostBody
       type: object
+      nullable: true
       properties:
         environmentId:
           type: string
@@ -727,6 +735,7 @@ components:
     Routing:
       title: Routing
       type: object
+      nullable: true
       properties:
         label:
           type: string
@@ -765,7 +774,8 @@ components:
       title: RoutingPostBody
       type: array
       items:
-        title: RoutingPostBodyItem
+        type: object
+        nullable: true
         properties:
           label:
             type: string
