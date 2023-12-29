@@ -726,7 +726,7 @@ components:
         expectedStatus:
           type: string
         overwrite:
-          type: string
+          type: boolean
         targetId:
           type: string
         targetName:
