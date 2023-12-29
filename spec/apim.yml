@@ -622,6 +622,9 @@ components:
         proxyUri:
           type: string
           nullable: true
+        proxyRegistrationUri:
+          type: string
+          nullable: true
         referencesUserDomain:
           type: string
           nullable: true
