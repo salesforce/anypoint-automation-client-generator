@@ -274,7 +274,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ApimInstancePostBody'
+            $ref: '#/components/schemas/ApimInstancePostResponse'
     SuccessGetApimInstanceDetails:
       description: API Instance
       content:
@@ -286,7 +286,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ApimInstancePatchBody'
+            $ref: '#/components/schemas/ApimInstancePatchResponse'
     SuccessDeleteApimInstance:
       description: API Instance Delete
 
@@ -444,6 +444,48 @@ components:
         instanceLabel:
           type: string
 
+    ApimInstancePostResponse:
+      type: object
+      properties:
+        environmentId:
+          type: string
+          format: uuid
+        instanceLabel:
+          type: string
+        providerId:
+          type: string
+          nullable: true
+        technology:
+          type: string
+        assetVersion:
+          type: string
+        productVersion:
+          type: string
+        order:
+          type: integer
+        stage:
+          type: string
+        audit:
+          $ref: '#/components/schemas/Audit'
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        groupId:
+          type: string
+        assetId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
+        autodiscoveryInstanceName:
+          type: string
+
     ApimInstanceDetails:
       title: ApimInstanceDetails
       type: object
@@ -504,6 +546,36 @@ components:
           type: string
         autodiscoveryInstanceName:
           type: string
+
+
+    ApimInstancePatchResponse:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        instanceLabel:
+          type: string
+        providerId:
+          type: string
+          nullable: true
+        endpointUri:
+          type: string
+        environmentId:
+          type: string
+        technology:
+          type: string
+        routing:
+          $ref: "#/components/schemas/RoutingCollection"
+        endpoint:
+          $ref: "#/components/schemas/Endpoint"
+        deployment:
+          $ref: "#/components/schemas/Deployment"
 
     ApimInstancePatchBody:
       title: ApimInstancePatchBody
