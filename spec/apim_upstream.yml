@@ -279,6 +279,7 @@ components:
           type: string
         tlsContext:
           type: object
+          nullable: true
           properties:
             secretGroupId:
               type: string
@@ -294,6 +295,7 @@ components:
           type: string
         tlsContext:
           type: object
+          nullable: true
           properties:
             secretGroupId:
               type: string
