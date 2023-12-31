@@ -847,6 +847,7 @@ components:
     RoutingPostBody:
       title: RoutingPostBody
       type: array
+      nullable: true
       items:
         type: object
         nullable: true
