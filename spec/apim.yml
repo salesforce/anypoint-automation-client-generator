@@ -16,8 +16,7 @@ security:
   - bearerAuth: []
 
 paths:
-
-  /organizations/:orgId/environments/:envId/apis:
+  /organizations/{orgId}/environments/{envId}/apis:
     parameters:
       - in: path
         name: orgId
@@ -497,7 +496,7 @@ components:
         organizationId:
           type: string
         id:
-          type: string
+          type: integer
         instanceLabel:
           type: string
         groupId:
@@ -546,7 +545,6 @@ components:
           type: string
         autodiscoveryInstanceName:
           type: string
-
 
     ApimInstancePatchResponse:
       type: object
