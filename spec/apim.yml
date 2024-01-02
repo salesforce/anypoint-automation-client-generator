@@ -350,20 +350,7 @@ components:
                   type: object
                   properties:
                     audit:
-                      type: object
-                      properties:
-                        created:
-                          type: object
-                          properties:
-                            date:
-                              type: string
-                              format: date-time
-                        updated:
-                          type: object
-                          properties:
-                            date:
-                              type: string
-                              format: date-time
+                      $ref: "#/components/schemas/Audit"
                     masterOrganizationId:
                       type: string
                     organizationId:
