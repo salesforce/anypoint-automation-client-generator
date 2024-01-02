@@ -140,7 +140,7 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessPostApimInstance'
 
-  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/apis/{envApiId}:
+  /organizations/{orgId}/environments/{envId}/apis/{envApiId}:
     parameters:
       - in: path
         name: orgId
