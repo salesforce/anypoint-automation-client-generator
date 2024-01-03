@@ -429,6 +429,7 @@ components:
           $ref: '#/components/schemas/DeploymentPostBody'
         instanceLabel:
           type: string
+          nullable: true
 
     ApimInstancePostResponse:
       type: object
