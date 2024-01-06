@@ -566,24 +566,56 @@ components:
     ApimInstancePatchBody:
       title: ApimInstancePatchBody
       type: object
-      properties:
-        technology:
-          type: string
-          enum:
-            - flexGateway
-            - mule3
-            - mule4
-            - serviceMesh
-        endpoint:
-          $ref: '#/components/schemas/EndpointPostBody'
-        spec:
-          $ref: '#/components/schemas/Spec'
-        routing:
-          $ref: '#/components/schemas/RoutingPostBody'
-        deployment:
-          $ref: '#/components/schemas/DeploymentPostBody'
-        instanceLabel:
-          type: string
+      example: >
+        {
+          "technology": "flexGateway",
+          "providerId": null,
+          "endpoint": {
+              "deploymentType": "HY",
+              "muleVersion4OrAbove": null,
+              "type": "raml",
+              "isCloudHub": null,
+              "proxyUri": "https://0.0.0.0:8082/",
+              "referencesUserDomain": null,
+              "responseTimeout": null,
+              "tlsContexts": null
+          },
+          "spec": {
+              "assetId": "flex-backend-app-test",
+              "groupId": "aa1f55d6-213d-4f60-845c-207286484cd1",
+              "version": "1.0.0"
+          },
+          "instanceLabel": "instance Label",
+          "routing": [
+              {
+                  "upstreams": [
+                      {
+                          "weight": 100,
+                          "id": "dc1e2a8b-36b2-402f-8200-d587ef8c5282"
+                      }
+                  ],
+                  "label": "Route 01",
+                  "rules": {
+                      "methods": "GET|PUT|DELETE|OPTIONS|POST|PATCH|HEAD|TRACE|CONNECT",
+                      "host": "myhost2.com",
+                      "path": "/api/(.*)",
+                      "headers": {
+                          "x-correlation-id": "1212",
+                          "x-example": "hello"
+                      }
+                  }
+              }
+          ],
+          "deployment": {
+              "environmentId": "7074fcdd-9b23-4ab3-97c8-5db5f4adf17d",
+              "type": "HY",
+              "expectedStatus": "deployed",
+              "overwrite": false,
+              "targetId": "c33dac89-4ca6-4951-9ad5-19ace129029e",
+              "targetName": "sbo-gateway",
+              "gatewayVersion": "1.0.0"
+          }
+        }
 
     Endpoint:
       title: Endpoint
