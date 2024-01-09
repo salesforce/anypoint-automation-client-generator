@@ -2,20 +2,20 @@ openapi: 3.0.0
 info:
   title: Flex Gateway API
   description: Description of the Flex Gateway API
-  version: 1.0.0
+  version: 1.1.0
 servers:
-  - url: https://anypoint.mulesoft.com/apimanager/xapi/v1
+  - url: https://anypoint.mulesoft.com
     description: Anypoint Cloudhub
-  - url: https://eu1.anypoint.mulesoft.com/apimanager/xapi/v1
+  - url: https://eu1.anypoint.mulesoft.com
     description: Anypoint Cloudhub EU
-  - url: https://gov.anypoint.mulesoft.com/apimanager/xapi/v1
+  - url: https://gov.anypoint.mulesoft.com
     description: Anypoint Cloudhub GOV
 
 security:
   - bearerAuth: []
 
 paths:
-  /organizations/{orgId}/environments/{envId}/flex-gateway-targets:
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/flex-gateway-targets:
     parameters:
       - in: path
         name: orgId
@@ -39,7 +39,7 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetFlexGatewayTargets'
 
-  /organizations/{orgId}/environments/{envId}/flex-gateway-targets/{flexGatewayTargetId}:
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/flex-gateway-targets/{flexGatewayTargetId}:
     parameters:
       - in: path
         name: orgId
@@ -69,7 +69,7 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetFlexGatewayTargetDetails'
 
-  /organizations/{orgId}/environments/{envId}/flex-gateway-targets/{flexGatewayTargetId}/apis:
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/flex-gateway-targets/{flexGatewayTargetId}/apis:
     parameters:
       - in: path
         name: orgId
@@ -99,7 +99,29 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetFlexGatewayTargetApis'
 
-
+  /standalone/api/v1/organizations/{orgId}/environments/{envId}/gatewaytokens:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: GetFlexGatewayRegistrationToken
+      summary: Retrieves the flex gateway registration token.
+      description: Retrieves the flex gateway registration token.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFlexGatewayRegistrationToken'
 
 components:
   securitySchemes:
@@ -111,27 +133,31 @@ components:
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
-
     SuccessGetFlexGatewayTargets:
       description: List of flex gateway targets
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/FlexGatewayTargets'
-
     SuccessGetFlexGatewayTargetDetails:
       description: flex gateway target details
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/FlexGatewayTargetDetails'
-
     SuccessGetFlexGatewayTargetApis:
       description: flex gateway target Apis
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/FlexGatewayTargetApis'
+    SuccessGetFlexGatewayRegistrationToken:
+      description: flex gateway registration token response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FlexGatewayRegistrationToken"
+
 
   schemas:
     FlexGatewayTargets:
@@ -226,3 +252,10 @@ components:
                 type: string
         targetAllowsPortSharing:
           type: boolean
+
+    FlexGatewayRegistrationToken:
+      type: object
+      properties:
+        registrationToken:
+          type: string
+
