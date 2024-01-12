@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  title: Flex Gateway API
+  description: Description of the Flex Gateway API
+  version: 1.1.0
+servers:
+  - url: https://anypoint.mulesoft.com
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/flex-gateway-targets:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFlexGatewayTargets
+      summary: Retrieves all flex gateways
+      description: Retrieves all flex gateway target within an organization and environment
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFlexGatewayTargets'
+
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/flex-gateway-targets/{flexGatewayTargetId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: flexGatewayTargetId
+        description: The flex gateway target Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFlexGatewayTargetById
+      summary: Retrieves a particular flex gateway by Id
+      description: Retrieves a flex gateway target using the given id within the given organization and environment
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFlexGatewayTargetDetails'
+
+  /apimanager/xapi/v1/organizations/{orgId}/environments/{envId}/flex-gateway-targets/{flexGatewayTargetId}/apis:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: flexGatewayTargetId
+        description: The flex gateway target Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFlexGatewayTargetApis
+      summary: Retrieves all APIs within a particular flex gateway target
+      description: Retrieves all APIs within a particular flex gateway target within a organization and environment
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFlexGatewayTargetApis'
+
+  /standalone/api/v1/organizations/{orgId}/environments/{envId}/gatewaytokens:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: GetFlexGatewayRegistrationToken
+      summary: Retrieves the flex gateway registration token.
+      description: Retrieves the flex gateway registration token.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFlexGatewayRegistrationToken'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    SuccessGetFlexGatewayTargets:
+      description: List of flex gateway targets
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FlexGatewayTargets'
+    SuccessGetFlexGatewayTargetDetails:
+      description: flex gateway target details
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FlexGatewayTargetDetails'
+    SuccessGetFlexGatewayTargetApis:
+      description: flex gateway target Apis
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FlexGatewayTargetApis'
+    SuccessGetFlexGatewayRegistrationToken:
+      description: flex gateway registration token response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FlexGatewayRegistrationToken"
+
+
+  schemas:
+    FlexGatewayTargets:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlexGatewayTargetSummary'
+
+    FlexGatewayTargetSummary:
+      title: FlexGatewayTargetSummary
+      type: object
+      properties:
+        organizationId:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        replicas:
+          type: object
+          properties:
+            CONNECTED:
+              type: integer
+            DISCONNECTED:
+              type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        lastUpdate:
+          type: string
+          format: date-time
+
+    FlexGatewayTargetDetails:
+      title: FlexGatewayTargetDetails
+      type: object
+      properties:
+        organizationId:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        replicas:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - CONNECTED
+                  - DISCONNECTED
+              count:
+                type: integer
+              certificateExpirationDates:
+                type: array
+                items:
+                  type: string
+                  format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        lastUpdate:
+          type: string
+          format: date-time
+        versions:
+          type: array
+          items:
+            type: string
+        version:
+          type: string
+
+    FlexGatewayTargetApis:
+      title: FlexGatewayTargetApis
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              port:
+                type: string
+              path:
+                type: string
+        targetAllowsPortSharing:
+          type: boolean
+
+    FlexGatewayRegistrationToken:
+      type: object
+      properties:
+        registrationToken:
+          type: string
+

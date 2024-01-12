@@ -1,0 +1,898 @@
+openapi: 3.0.0
+info:
+  title: API Manager API
+  description: API Manager API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/apimanager/api/v1/
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /organizations/{orgId}/environments/{envId}/apis:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetEnvApimInstances
+      parameters:
+        - name: query
+          in: query
+          description: A string that will be checked for a partial or similar matches of the name, description, label and tags
+          required: false
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          description: A string that will be checked for an exact match of the groupId
+          required: false
+          schema:
+            type: string
+        - name: assetId
+          in: query
+          description: A string that will be checked for an exact match of the assetId
+          required: false
+          schema:
+            type: string
+        - name: assetVersion
+          in: query
+          description: A string that will be checked for an exact match of the assetVersion
+          required: false
+          schema:
+            type: string
+        - name: instanceLabel
+          in: query
+          description: A string that will be checked for an exact match of the instanceLabel
+          required: false
+          schema:
+            type: string
+        - name: productVersion
+          in: query
+          description: A string that will be checked for an exact match of the productVersion
+          required: false
+          schema:
+            type: string
+        - name: autodiscoveryInstanceName
+          in: query
+          description: A string that will be checked for an exact match of the autodiscoveryInstanceName
+          required: false
+          schema:
+            type: string
+        - name: filters
+          in: query
+          description: Comma-separated list of filters, which can be "active" and/or "pinned"
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: limit
+          in: query
+          description: Maximum number of rolegroups to retrieve per request.
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The number of records to omit from the response.
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: Default value is name
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - name
+              - createdDate
+              - updatedDate
+        - name: ascending
+          in: query
+          description: To activate ascending sorting
+          required: false
+          schema:
+            type: boolean
+      summary: Retrieves a collection of API Manager Instances
+      description: Retrieves collection of API Manager Instances that meets the given criteria. Connected Apps require the scope "View APIs Configuration"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimInstanceCollection'
+    post:
+      operationId: PostApimInstance
+      summary: Creates an API Manager Instance
+      description: Creates an API Manager Instance in a given environment. Connected Apps require the scope "Manage APIs Configuration".
+      requestBody:
+        description: 'Post API Manager Instance Body'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApimInstancePostBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostApimInstance'
+
+  /organizations/{orgId}/environments/{envId}/apis/{envApiId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envApiId
+        description: The api manager instance id for a given environment
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimInstanceDetails
+      parameters:
+        - in: query
+          name: includeProxyTemplate
+          description: Include the configured proxyTemplate to its associated endpoint
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: includeValidation
+          description: Include the configured validation to its associated endpoint
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: includeTlsContexts
+          description: Include the configured TLS contexts
+          required: false
+          schema:
+            type: boolean
+      summary: Retrieves a specific API Manager Instance
+      description: Retrieves a specific API Manager Instance for a specific environment and organization. Connected Apps require the scope "View APIs Configuration".
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimInstanceDetails'
+    patch:
+      operationId: PatchApimInstance
+      parameters:
+        - in: query
+          name: force
+          description: Allows patching the API autodiscoveryInstanceName. You may want to change the 'api.version' configuration on all Mule 2 & Mule 3 applications tracking this API.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: updateApisInSamePort
+          description: For APIs deployed to Flex, if endpoint proxyUri or inbound TLS Contexts are being updated, apis in the same port are also updated
+          required: false
+          schema:
+            type: boolean
+      summary: Patches a specific API Manager Instance
+      description: Patches a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
+      requestBody:
+        description: 'Patch API Manager Instance Body'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApimInstancePatchBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessPatchApimInstance'
+    delete:
+      operationId: DeleteApimInstance
+      summary: Delete a specific API Manager Instance
+      description: Delete a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteApimInstance'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorsResponse"
+    NotFoundError:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              message:
+                type: string
+    SuccessGetApimInstanceCollection:
+      description: Collection of APIM Instances
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApimInstanceCollection'
+    SuccessPostApimInstance:
+      description: Create APIM Instance
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApimInstancePostResponse'
+    SuccessGetApimInstanceDetails:
+      description: API Instance
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApimInstanceDetails'
+    SuccessPatchApimInstance:
+      description: API Instance Patch
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApimInstancePatchResponse'
+    SuccessDeleteApimInstance:
+      description: API Instance Delete
+
+  schemas:
+    errorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    ApimInstanceCollection:
+      type: object
+      properties:
+        total:
+          type: integer
+        assets:
+          type: array
+          items:
+            type: object
+            properties:
+              audit:
+                $ref: '#/components/schemas/Audit'
+              masterOrganizationId:
+                type: string
+              organizationId:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              exchangeAssetName:
+                type: string
+              groupId:
+                type: string
+              assetId:
+                type: string
+              apis:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    audit:
+                      $ref: "#/components/schemas/Audit"
+                    masterOrganizationId:
+                      type: string
+                    organizationId:
+                      type: string
+                    id:
+                      type: integer
+                    instanceLabel:
+                      type: string
+                    groupId:
+                      type: string
+                    assetId:
+                      type: string
+                    assetVersion:
+                      type: string
+                    productVersion:
+                      type: string
+                    description:
+                      type: string
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    order:
+                      type: integer
+                    providerId:
+                      type: string
+                    deprecated:
+                      type: boolean
+                    lastActiveDate:
+                      type: string
+                    endpointUri:
+                      type: string
+                    environmentId:
+                      type: string
+                    isPublic:
+                      type: boolean
+                    stage:
+                      type: string
+                    technology:
+                      type: string
+                    status:
+                      type: string
+                    deployment:
+                      $ref: '#/components/schemas/Deployment'
+                    routing:
+                      $ref: '#/components/schemas/RoutingCollection'
+                    pinned:
+                      type: boolean
+                    activeContractsCount:
+                      type: integer
+                    autodiscoveryInstanceName:
+                      type: string
+              totalApis:
+                type: integer
+              autodiscoveryApiName:
+                type: string
+
+    ApimInstancePostBody:
+      title: ApimInstancePostBody
+      type: object
+      properties:
+        technology:
+          type: string
+          enum:
+            - flexGateway
+            - mule3
+            - mule4
+            - serviceMesh
+        endpoint:
+          $ref: '#/components/schemas/EndpointPostBody'
+        spec:
+          $ref: '#/components/schemas/Spec'
+        routing:
+          $ref: '#/components/schemas/RoutingPostBody'
+        deployment:
+          $ref: '#/components/schemas/DeploymentPostBody'
+        instanceLabel:
+          type: string
+          nullable: true
+
+    ApimInstancePostResponse:
+      type: object
+      properties:
+        environmentId:
+          type: string
+          format: uuid
+        instanceLabel:
+          type: string
+        providerId:
+          type: string
+          nullable: true
+        technology:
+          type: string
+        assetVersion:
+          type: string
+        productVersion:
+          type: string
+        order:
+          type: integer
+        stage:
+          type: string
+        audit:
+          $ref: '#/components/schemas/Audit'
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        groupId:
+          type: string
+        assetId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
+        autodiscoveryInstanceName:
+          type: string
+
+    ApimInstanceDetails:
+      title: ApimInstanceDetails
+      type: object
+      properties:
+        audit:
+          $ref: '#/components/schemas/Audit'
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        instanceLabel:
+          type: string
+        groupId:
+          type: string
+        assetId:
+          type: string
+        assetVersion:
+          type: string
+        productVersion:
+          type: string
+        description:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        order:
+          type: integer
+        providerId:
+          type: string
+          nullable: true
+        deprecated:
+          type: boolean
+        lastActiveDate:
+          type: string
+          format: date-time
+          nullable: true
+        endpointUri:
+          type: string
+        environmentId:
+          type: string
+        isPublic:
+          type: boolean
+        stage:
+          type: string
+        technology:
+          type: string
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
+        deployment:
+          $ref: '#/components/schemas/Deployment'
+        routing:
+          $ref: '#/components/schemas/RoutingCollection'
+        status:
+          type: string
+        autodiscoveryInstanceName:
+          type: string
+
+    ApimInstancePatchResponse:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        instanceLabel:
+          type: string
+        providerId:
+          type: string
+          nullable: true
+        endpointUri:
+          type: string
+        environmentId:
+          type: string
+        technology:
+          type: string
+        routing:
+          $ref: "#/components/schemas/RoutingCollection"
+        endpoint:
+          $ref: "#/components/schemas/Endpoint"
+        deployment:
+          $ref: "#/components/schemas/Deployment"
+
+    ApimInstancePatchBody:
+      title: ApimInstancePatchBody
+      type: object
+      example: >
+        {
+          "technology": "flexGateway",
+          "providerId": null,
+          "endpoint": {
+              "deploymentType": "HY",
+              "muleVersion4OrAbove": null,
+              "type": "raml",
+              "isCloudHub": null,
+              "proxyUri": "https://0.0.0.0:8082/",
+              "referencesUserDomain": null,
+              "responseTimeout": null,
+              "tlsContexts": null
+          },
+          "spec": {
+              "assetId": "flex-backend-app-test",
+              "groupId": "aa1f55d6-213d-4f60-845c-207286484cd1",
+              "version": "1.0.0"
+          },
+          "instanceLabel": "instance Label",
+          "routing": [
+              {
+                  "upstreams": [
+                      {
+                          "weight": 100,
+                          "id": "dc1e2a8b-36b2-402f-8200-d587ef8c5282"
+                      }
+                  ],
+                  "label": "Route 01",
+                  "rules": {
+                      "methods": "GET|PUT|DELETE|OPTIONS|POST|PATCH|HEAD|TRACE|CONNECT",
+                      "host": "myhost2.com",
+                      "path": "/api/(.*)",
+                      "headers": {
+                          "x-correlation-id": "1212",
+                          "x-example": "hello"
+                      }
+                  }
+              }
+          ],
+          "deployment": {
+              "environmentId": "7074fcdd-9b23-4ab3-97c8-5db5f4adf17d",
+              "type": "HY",
+              "expectedStatus": "deployed",
+              "overwrite": false,
+              "targetId": "c33dac89-4ca6-4951-9ad5-19ace129029e",
+              "targetName": "sbo-gateway",
+              "gatewayVersion": "1.0.0"
+          }
+        }
+
+    Endpoint:
+      title: Endpoint
+      type: object
+      properties:
+        audit:
+          $ref: '#/components/schemas/Audit'
+        id:
+          type: integer
+        type:
+          type: string
+          nullable: true
+        uri:
+          type: string
+          nullable: true
+        apiGatewayVersion:
+          type: string
+          nullable: true
+        proxyUri:
+          type: string
+          nullable: true
+        proxyRegistrationUri:
+          type: string
+          nullable: true
+        lastActiveDate:
+          type: string
+          format: date-time
+          nullable: true
+        isCloudHub:
+          type: string
+          nullable: true
+        deploymentType:
+          type: string
+        policiesVersion:
+          type: string
+          nullable: true
+        referencesUserDomain:
+          type: string
+          nullable: true
+        responseTimeout:
+          type: string
+          nullable: true
+        wsdlConfig:
+          type: string
+          nullable: true
+        muleVersion4OrAbove:
+          type: boolean
+          nullable: true
+        apiVersionId:
+          type: integer
+        validation:
+          type: string
+          nullable: true
+        console:
+          type: string
+          nullable: true
+        tlsContexts:
+          type: object
+          properties:
+            audit:
+              $ref: '#/components/schemas/Audit'
+            inbound:
+              nullable: true
+              type: object
+              properties:
+                secretGroupId:
+                  type: string
+                tlsContextId:
+                  type: string
+                name:
+                  type: string
+                authorized:
+                  type: boolean
+            outbound:
+              type: object
+              nullable: true
+
+    EndpointPostBody:
+      title: EndpointPostBody
+      type: object
+      nullable: true
+      properties:
+        deploymentType:
+          type: string
+        muleVersion4OrAbove:
+          type: boolean
+        uri:
+          type: string
+        type:
+          type: string
+        isCloudHub:
+          type: string
+          nullable: true
+        proxyUri:
+          type: string
+          nullable: true
+        proxyRegistrationUri:
+          type: string
+          nullable: true
+        referencesUserDomain:
+          type: string
+          nullable: true
+        responseTimeout:
+          type: string
+          nullable: true
+        tlsContexts:
+          type: object
+          nullable: true
+          properties:
+            inbound:
+              type: object
+              nullable: true
+              properties:
+                tlsContextId:
+                  type: string
+                secretGroupId:
+                  type: string
+                name:
+                  type: string
+
+    Spec:
+      title: Spec
+      type: object
+      properties:
+        assetId:
+          type: string
+        groupId:
+          type: string
+        version:
+          type: string
+
+    Audit:
+      title: Audit
+      type: object
+      properties:
+        created:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+        updated:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+
+    Deployment:
+      title: Deployment
+      type: object
+      nullable: true
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        id:
+          type: integer
+        applicationId:
+          type: string
+        applicationName:
+          type: string
+          nullable: true
+        gatewayVersion:
+          type: string
+          nullable: true
+        environmentName:
+          type: string
+          nullable: true
+        environmentId:
+          type: string
+          nullable: true
+        targetId:
+          type: string
+        targetName:
+          type: string
+        deploymentId:
+          type: string
+          nullable: true
+        updatedDate:
+          type: string
+          format: date-time
+        type:
+          type: string
+        expectedStatus:
+          type: string
+        apiId:
+          type: integer
+
+    DeploymentPostBody:
+      title: DeploymentPostBody
+      type: object
+      nullable: true
+      properties:
+        environmentId:
+          type: string
+        type:
+          type: string
+        expectedStatus:
+          type: string
+        overwrite:
+          type: boolean
+        targetId:
+          type: string
+        targetName:
+          type: string
+        gatewayVersion:
+          type: string
+
+    Routing:
+      title: Routing
+      type: object
+      nullable: true
+      properties:
+        label:
+          type: string
+        rules:
+          type: object
+          properties:
+            methods:
+              type: string
+            host:
+              type: string
+            path:
+              type: string
+            headers:
+              type: object
+        upstreams:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              weight:
+                type: integer
+              uri:
+                type: string
+              label:
+                type: string
+
+    RoutingCollection:
+      title: RoutingCollection
+      type: array
+      items:
+        $ref: '#/components/schemas/Routing'
+
+    RoutingPostBody:
+      title: RoutingPostBody
+      type: array
+      nullable: true
+      items:
+        type: object
+        nullable: true
+        properties:
+          label:
+            type: string
+          rules:
+            type: object
+            properties:
+              methods:
+                type: string
+              host:
+                type: string
+              path:
+                type: string
+              headers:
+                type: object
+          upstreams:
+            type: object
+            properties:
+              weight:
+                type: integer
+              uri:
+                type: string
+              label:
+                type: string
+
+
+
+
