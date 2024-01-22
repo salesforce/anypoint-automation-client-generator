@@ -43,7 +43,7 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetOrgAutomatedPolicies'
 
-  /apimanager/api/v1/organizations/{orgId}/custom-policy-templates:
+  /api/v1/organizations/{orgId}/custom-policy-templates:
     parameters:
       - in: path
         name: orgId
@@ -94,7 +94,7 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetOrgCustomPolicyTemplates'
 
-  /apimanager/xapi/v1/organizations/{orgId}/exchange-policy-templates:
+  /xapi/v1/organizations/{orgId}/exchange-policy-templates:
     parameters:
       - in: path
         name: orgId
@@ -151,7 +151,7 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetOrgExchangePolicyTemplates'
 
-  /apimanager/xapi/v1/organizations/{orgId}/exchange-policy-templates/{groupId}/{assetId}/{assetVersion}:
+  /xapi/v1/organizations/{orgId}/exchange-policy-templates/{groupId}/{assetId}/{assetVersion}:
     parameters:
       - in: path
         name: orgId
@@ -202,7 +202,7 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetOrgExchangePolicyTemplateDetails'
 
-  /apimanager/api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies:
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies:
     parameters:
       - in: path
         name: orgId
@@ -251,7 +251,7 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessPostApimPolicy'
 
-  /apimanager/api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/{apiPolicyId}:
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/{apiPolicyId}:
     parameters:
       - in: path
         name: orgId
