@@ -314,7 +314,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '200':    # status code
+        '204':    # status code
           $ref: '#/components/responses/SuccessDeleteApimPolicy'
 
 components:
