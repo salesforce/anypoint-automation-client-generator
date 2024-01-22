@@ -1,0 +1,788 @@
+openapi: 3.0.0
+info:
+  title: API Manager Policy API
+  description: API Manager Policy API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/apimanager/
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/apimanager/
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/apimanager/
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/organizations/{orgId}/automated-policies:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetOrgAutomatedPolicies
+      parameters:
+        - name: environmentId
+          in: query
+          description: A environment id
+          required: false
+          schema:
+            type: string
+      summary: Retrieve all automated policies of a given organization
+      description: Retrieves all automated policies of a given organization and optionally environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetOrgAutomatedPolicies'
+
+  /apimanager/api/v1/organizations/{orgId}/custom-policy-templates:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetOrgCustomPolicyTemplates
+      parameters:
+        - name: query
+          in: query
+          description: Search criteria.
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Skip over a number of elements by specifying an offset value for the query.
+          required: false
+          schema:
+            type: integer
+        - name: ascending
+          in: query
+          description: Order for sorting.
+          required: false
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          description: Property to sort by.
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Limit the number of elements on the response.
+          required: false
+          schema:
+            type: integer
+      summary: Retrieve all or part of custom policy templates of a given organization
+      description: Retrieves all or part of custom policy templates of a given organization.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetOrgCustomPolicyTemplates'
+
+  /apimanager/xapi/v1/organizations/{orgId}/exchange-policy-templates:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetOrgExchangePolicyTemplates
+      parameters:
+        - name: environmentId
+          in: query
+          description: The environment id.
+          required: false
+          schema:
+            type: string
+        - name: splitModel
+          in: query
+          description: Whether to include asset split model.
+          required: false
+          schema:
+            type: boolean
+        - name: latest
+          in: query
+          description: include only latest versions.
+          required: false
+          schema:
+            type: boolean
+        - name: apiInstanceId
+          in: query
+          description: include only templates used for api instance id.
+          required: false
+          schema:
+            type: string
+        - name: includeConfiguration
+          in: query
+          description: whether to include configuration.
+          required: false
+          schema:
+            type: boolean
+        - name: automatedOnly
+          in: query
+          description: whether to include automated policies only.
+          required: false
+          schema:
+            type: boolean
+      summary: Retrieve all or part of exchange policy templates of a given organization
+      description: Retrieves all or part of exchange policy templates of a given organization.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetOrgExchangePolicyTemplates'
+
+  /apimanager/xapi/v1/organizations/{orgId}/exchange-policy-templates/{groupId}/{assetId}/{assetVersion}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: groupId
+        description: The group Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: assetId
+        description: The asset Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: assetVersion
+        description: The asset version
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetOrgExchangePolicyTemplateDetails
+      parameters:
+        - name: includeAllVersions
+          in: query
+          description: Whether to include all versions of the asset.
+          required: false
+          schema:
+            type: string
+        - name: splitModel
+          in: query
+          description: Whether to include asset split model.
+          required: false
+          schema:
+            type: boolean
+      summary: Retrieve details of exchange policy template of a given organization
+      description: Retrieve details of exchange policy template of a given organization.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetOrgExchangePolicyTemplateDetails'
+
+  /apimanager/api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimPolicies
+      summary: Retrieve all of api manager instance policies.
+      description: Retrieve all of api manager instance policies in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimPolicies'
+    post:
+      operationId: PostApimPolicy
+      summary: Create an api manager instance policy.
+      description: Create an api manager instance policy in a given organization and environment.
+      requestBody:
+        description: policy content
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApimPolicyBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostApimPolicy'
+
+  /apimanager/api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/{apiPolicyId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiPolicyId
+        description: The api manager instance policy Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimPolicy
+      summary: Retrieve a specific api manager instance policy.
+      description: Retrieve a specific api manager instance policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimPolicy'
+    patch:
+      operationId: PatchApimPolicy
+      summary: Update a specific api manager instance policy.
+      description: Update a specific api manager instance policy in a given organization and environment.
+      requestBody:
+        description: policy content
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApimPolicyBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessPatchApimPolicy'
+    delete:
+      operationId: DeleteApimPolicy
+      summary: Delete a specific api manager instance policy.
+      description: Delete a specific api manager instance policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessDeleteApimPolicy'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorsResponse"
+    NotFoundError:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              message:
+                type: string
+    SuccessGetOrgAutomatedPolicies:
+      description: collection of automated policies
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AutomatedPolicyCollection"
+    SuccessGetOrgCustomPolicyTemplates:
+      description: list of custom policy templates
+      # TODO: finish schema
+    SuccessGetOrgExchangePolicyTemplates:
+      description: list of exchange policy templates
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ExchangePolicyTemplateCollection"
+    SuccessGetOrgExchangePolicyTemplateDetails:
+      description: exchange policy template details
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ExchangePolicyTemplateDetails"
+    SuccessGetApimPolicies:
+      description: list api manager policies
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicyCollection"
+    SuccessPostApimPolicy:
+      description: create api manager policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessGetApimPolicy:
+      description: get specific api manager policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessPatchApimPolicy:
+      description: patch specific api manager policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessDeleteApimPolicy:
+      description: delete specific api manager policy
+
+  schemas:
+    ErrorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    AutomatedPolicyCollection:
+      type: object
+      properties:
+        automatedPolicies:
+          type: array
+          items:
+            $ref: "#/components/schemas/AutomatedPolicy"
+        total:
+          type: integer
+
+    AutomatedPolicy:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        id:
+          type: integer
+        ruleOfApplication:
+          type: object
+          properties:
+            environmentId:
+              type: string
+            organizationId:
+              type: string
+        groupId:
+          type: string
+        assetId:
+          type: string
+        assetVersion:
+          type: string
+        configurationData:
+          type: object
+        pointcutData:
+          nullable: true
+        order:
+          type: integer
+        disabled:
+          type: boolean
+        implementationAssets:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImplementationAsset"
+
+    ExchangePolicyTemplateCollection:
+      type: array
+      items:
+        $ref: "#/components/schemas/ExchangePolicyTemplate"
+
+    ExchangePolicyTemplate:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        id:
+          type: integer
+        groupId:
+          type: string
+        assetId:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        isOOTB:
+          type: boolean
+        stage:
+          type: string
+        status:
+          type: string
+        yamlMd5:
+          type: string
+        jarMd5:
+          type: string
+        orgId:
+          type: string
+        minMuleVersion:
+          type: string
+        supportedPoliciesVersions:
+          type: string
+        category:
+          type: string
+        violationCategory:
+          type: string
+        resourceLevelSupported:
+          type: boolean
+        encryptionSupported:
+          type: boolean
+        standalone:
+          type: boolean
+        requiredCharacteristics:
+          type: array
+          items:
+            type: string
+        identityManagement:
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+        providedCharacteristics:
+          type: array
+          items:
+            type: string
+        ramlSnippet:
+          type: string
+        ramlV1Snippet:
+          type: string
+        oasV2Snippet:
+          type: string
+        oasV3Snippet:
+          type: string
+        applicable:
+          type: boolean
+        configuration:
+          type: array
+          items:
+            $ref: "#/components/schemas/PolicyConfiguration"
+
+    ExchangePolicyTemplateDetails:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        id:
+          type: integer
+        groupId:
+          type: string
+        assetId:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        isOOTB:
+          type: boolean
+        stage:
+          type: string
+        status:
+          type: string
+        yamlMd5:
+          type: string
+        jarMd5:
+          nullable: true
+          type: string
+        orgId:
+          type: string
+        minMuleVersion:
+          nullable: true
+          type: string
+        schemaId:
+          type: string
+        configuration:
+          type: object
+          properties:
+            title:
+              type: string
+            type:
+              type: string
+            description:
+              type: string
+            properties:
+              type: object
+            required:
+              type: array
+              items:
+                type: string
+            unevaluatedProperties:
+              type: boolean
+            '@context':
+              type: object
+              properties:
+                config:
+                  type: string
+            '$id':
+              type: string
+            '$schema':
+              type: string
+        category:
+          type: string
+        providedCharacteristics:
+          type: array
+          items:
+            type: string
+        requiredCharacteristics:
+          type: array
+          items:
+            type: string
+        interfaceScope:
+          type: array
+          items:
+            type: string
+        violationCategory:
+          type: string
+        interfaceTransformation:
+          type: array
+          items:
+            type: string
+        allVersions:
+          type: array
+          items:
+            type: object
+            properties:
+              groupId:
+                type: string
+              assetId:
+                type: string
+              version:
+                type: string
+        splitAssetModel:
+          type: boolean
+        supportedJavaVersions:
+          type: array
+          items:
+            nullable: true
+            type: string
+
+    ApimPolicyCollection:
+      type: array
+      items:
+        $ref: "#/components/schemas/ApimPolicy"
+
+    ApimPolicy:
+      type: object
+      properties:
+        audit:
+          $ref: "#/components/schemas/Audit"
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        policyTemplateId:
+          type: string
+        configurationData:
+          type: object
+        order:
+          type: integer
+        disabled:
+          type: boolean
+        pointcutData:
+          nullable: true
+          type: string
+        groupId:
+          type: string
+        assetId:
+          type: string
+        assetVersion:
+          type: string
+        type:
+          type: string
+        apiId:
+          type: integer
+
+    ApimPolicyBody:
+      type: object
+      properties:
+        configurationData:
+          type: object
+        apiVersionId:
+          type: integer
+        pointcutData:
+          nullable: true
+          type: string
+        policyTemplateId:
+          type: integer
+        groupId:
+          type: string
+        assetId:
+          type: string
+        assetVersion:
+          type: string
+
+    PolicyConfiguration:
+      type: object
+      properties:
+        propertyName:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              value:
+                oneOf:
+                  - type: string
+                  - type: boolean
+                  - type: integer
+        optional:
+          type: boolean
+        defaultValue:
+          oneOf:
+            - type: string
+            - type: boolean
+            - type: integer
+        sensitive:
+          type: boolean
+        allowMultiple:
+          type: boolean
+        configuration:
+          type: array
+          items:
+            type: object
+            properties:
+              propertyName:
+                type: string
+              type:
+                type: string
+
+    ImplementationAsset:
+      type: object
+      properties:
+        name:
+          type: string
+        assetId:
+          type: string
+        groupId:
+          type: string
+        version:
+          type: string
+        technology:
+          type: string
+        releaseNotes:
+          type: string
+        organizationId:
+          type: string
+        minRuntimeVersion:
+          type: string
+
+    Audit:
+      type: object
+      properties:
+        created:
+          type: object
+          properties:
+            date:
+              type: string
+        updated:
+          type: object
+          properties:
+            date:
+              type: string
+
+
+
+
+
+
