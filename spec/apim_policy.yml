@@ -317,6 +317,82 @@ paths:
         '204':    # status code
           $ref: '#/components/responses/SuccessDeleteApimPolicy'
 
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/{apiPolicyId}/disable:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiPolicyId
+        description: The api manager instance policy Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: DisableApimPolicy
+      summary: Disable a specific api manager instance policy.
+      description: Disable a specific api manager instance policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessDisableApimPolicy'
+
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/{apiPolicyId}/enable:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiPolicyId
+        description: The api manager instance policy Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: EnableApimPolicy
+      summary: Enable a specific api manager instance policy.
+      description: Enable a specific api manager instance policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessEnableApimPolicy'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -391,6 +467,18 @@ components:
             $ref: "#/components/schemas/ApimPolicy"
     SuccessDeleteApimPolicy:
       description: delete specific api manager policy
+    SuccessDisableApimPolicy:
+      description: disable specific api manager policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessEnableApimPolicy:
+      description: enable specific api manager policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
 
   schemas:
     ErrorsResponse:
