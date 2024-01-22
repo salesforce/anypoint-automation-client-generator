@@ -689,19 +689,14 @@ components:
       properties:
         configurationData:
           type: object
-        apiVersionId:
-          type: integer
-        pointcutData:
-          nullable: true
-          type: string
-        policyTemplateId:
-          type: integer
         groupId:
           type: string
         assetId:
           type: string
         assetVersion:
           type: string
+        order:
+          type: integer
 
     PolicyConfiguration:
       type: object
