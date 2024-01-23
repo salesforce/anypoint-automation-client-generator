@@ -226,6 +226,13 @@ paths:
       operationId: GetApimPolicies
       summary: Retrieve all of api manager instance policies.
       description: Retrieve all of api manager instance policies in a given organization and environment.
+      parameters:
+        - in: query
+          name: fullInfo
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -440,7 +447,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ExchangePolicyTemplateDetails"
+            $ref: "#/components/schemas/ExchangePolicyTemplate"
     SuccessGetApimPolicies:
       description: list api manager policies
       content:
@@ -542,7 +549,7 @@ components:
         configurationData:
           type: object
         pointcutData:
-          nullable: true
+          $ref: "#/components/schemas/PointcutData"
         order:
           type: integer
         disabled:
@@ -629,90 +636,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PolicyConfiguration"
-
-    ExchangePolicyTemplateDetails:
-      type: object
-      properties:
-        audit:
-          $ref: "#/components/schemas/Audit"
-        id:
-          type: integer
-        groupId:
-          type: string
-        assetId:
-          type: string
-        version:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        type:
-          type: string
-        isOOTB:
-          type: boolean
-        stage:
-          type: string
-        status:
-          type: string
-        yamlMd5:
-          type: string
-        jarMd5:
-          nullable: true
-          type: string
-        orgId:
-          type: string
-        minMuleVersion:
-          nullable: true
-          type: string
-        schemaId:
-          type: string
-        configuration:
-          type: object
-          properties:
-            title:
-              type: string
-            type:
-              type: string
-            description:
-              type: string
-            properties:
-              type: object
-            required:
-              type: array
-              items:
-                type: string
-            unevaluatedProperties:
-              type: boolean
-            '@context':
-              type: object
-              properties:
-                config:
-                  type: string
-            '$id':
-              type: string
-            '$schema':
-              type: string
-        category:
-          type: string
-        providedCharacteristics:
-          type: array
-          items:
-            type: string
-        requiredCharacteristics:
-          type: array
-          items:
-            type: string
-        interfaceScope:
-          type: array
-          items:
-            type: string
-        violationCategory:
-          type: string
-        interfaceTransformation:
-          type: array
-          items:
-            type: string
         allVersions:
           type: array
           items:
@@ -724,18 +647,20 @@ components:
                 type: string
               version:
                 type: string
-        splitAssetModel:
-          type: boolean
-        supportedJavaVersions:
-          type: array
-          items:
-            nullable: true
-            type: string
 
     ApimPolicyCollection:
-      type: array
-      items:
-        $ref: "#/components/schemas/ApimPolicy"
+      oneOf:
+        - type: array
+          title: "ApimPolicyCollecion"
+          items:
+            $ref: "#/components/schemas/ApimPolicy"
+        - type: object
+          title: "ApimPolicyFullCollecion"
+          properties:
+            policies:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApimPolicyFull"
 
     ApimPolicy:
       type: object
@@ -757,8 +682,7 @@ components:
         disabled:
           type: boolean
         pointcutData:
-          nullable: true
-          type: string
+          $ref: "#/components/schemas/PointcutData"
         groupId:
           type: string
         assetId:
@@ -769,6 +693,33 @@ components:
           type: string
         apiId:
           type: integer
+
+    ApimPolicyFull:
+      type: object
+      properties:
+        policyTemplateId:
+          type: string
+        type:
+          type: string
+        policyId:
+          type: integer
+        version:
+          type: integer
+        order:
+          type: integer
+        pointcutData:
+          $ref: "#/components/schemas/PointcutData"
+        configuration:
+          type: object
+        template:
+          type: object
+          properties:
+            groupId:
+              type: string
+            assetId:
+              type: string
+            assetVersion:
+              type: string
 
     ApimPolicyBody:
       type: object
@@ -783,6 +734,19 @@ components:
           type: string
         order:
           type: integer
+        pointcutData:
+          $ref: "#/components/schemas/PointcutData"
+
+    PointcutData:
+      nullable: true
+      type: array
+      items:
+        type: object
+        properties:
+          methodRegex:
+            type: string
+          uriTemplateRegex:
+            type: string
 
     PolicyConfiguration:
       type: object
@@ -799,21 +763,8 @@ components:
           type: array
           items:
             type: object
-            properties:
-              name:
-                type: string
-              value:
-                oneOf:
-                  - type: string
-                  - type: boolean
-                  - type: integer
         optional:
           type: boolean
-        defaultValue:
-          oneOf:
-            - type: string
-            - type: boolean
-            - type: integer
         sensitive:
           type: boolean
         allowMultiple:
