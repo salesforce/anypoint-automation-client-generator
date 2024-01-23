@@ -185,7 +185,7 @@ paths:
           description: Whether to include all versions of the asset.
           required: false
           schema:
-            type: string
+            type: boolean
         - name: splitModel
           in: query
           description: Whether to include asset split model.
