@@ -742,6 +742,7 @@ components:
       type: array
       items:
         type: object
+        title: PointcutDataItem
         properties:
           methodRegex:
             type: string
