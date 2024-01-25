@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: API Manager Policy API
   description: API Manager Policy API
@@ -304,7 +304,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ApimPolicyBody"
+              $ref: "#/components/schemas/ApimPolicyPatchBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -737,8 +737,15 @@ components:
         pointcutData:
           $ref: "#/components/schemas/PointcutData"
 
+    ApimPolicyPatchBody:
+      type: object
+      description: >
+        is the same as ApimPolicyBody, but since we had some issue generating a struct that puts nil to pointcutData.
+        We chose to leave this unspecified for an optimum coverage.
+
     PointcutData:
       nullable: true
+      title: PointcutDataArray
       type: array
       items:
         type: object
