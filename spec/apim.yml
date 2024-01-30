@@ -5,18 +5,18 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://anypoint.mulesoft.com/apimanager/api/v1/
+  - url: https://anypoint.mulesoft.com/apimanager
     description: Anypoint Cloudhub
-  - url: https://eu1.anypoint.mulesoft.com/apimanager/api/v1/
+  - url: https://eu1.anypoint.mulesoft.com/apimanager
     description: Anypoint Cloudhub EU
-  - url: https://gov.anypoint.mulesoft.com/apimanager/api/v1/
+  - url: https://gov.anypoint.mulesoft.com/apimanager
     description: Anypoint Cloudhub GOV
 
 security:
   - bearerAuth: []
 
 paths:
-  /organizations/{orgId}/environments/{envId}/apis:
+  /api/v1/organizations/{orgId}/environments/{envId}/apis:
     parameters:
       - in: path
         name: orgId
@@ -121,25 +121,8 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '200':    # status code
           $ref: '#/components/responses/SuccessGetApimInstanceCollection'
-    post:
-      operationId: PostApimInstance
-      summary: Creates an API Manager Instance
-      description: Creates an API Manager Instance in a given environment. Connected Apps require the scope "Manage APIs Configuration".
-      requestBody:
-        description: 'Post API Manager Instance Body'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApimInstancePostBody'
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '201':    # status code
-          $ref: '#/components/responses/SuccessPostApimInstance'
 
-  /organizations/{orgId}/environments/{envId}/apis/{envApiId}:
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{envApiId}:
     parameters:
       - in: path
         name: orgId
@@ -191,6 +174,70 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '200':    # status code
           $ref: '#/components/responses/SuccessGetApimInstanceDetails'
+    delete:
+      operationId: DeleteApimInstance
+      summary: Delete a specific API Manager Instance
+      description: Delete a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteApimInstance'
+
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: PostApimInstance
+      summary: Creates an API Manager Instance
+      description: Creates an API Manager Instance in a given environment. Connected Apps require the scope "Manage APIs Configuration".
+      requestBody:
+        description: 'Post API Manager Instance Body'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApimInstancePostBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostApimInstance'
+
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{envApiId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envApiId
+        description: The api manager instance id for a given environment
+        required: true
+        schema:
+          type: string
     patch:
       operationId: PatchApimInstance
       parameters:
@@ -223,17 +270,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '200':    # status code
           $ref: '#/components/responses/SuccessPatchApimInstance'
-    delete:
-      operationId: DeleteApimInstance
-      summary: Delete a specific API Manager Instance
-      description: Delete a specific API Manager Instance in a specific environment and organization. Connected Apps require the scope "Manage APIs Configuration".
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '204':
-          $ref: '#/components/responses/SuccessDeleteApimInstance'
 
 components:
   securitySchemes:
@@ -511,7 +547,6 @@ components:
           type: boolean
         lastActiveDate:
           type: string
-          format: date-time
           nullable: true
         endpointUri:
           type: string
@@ -642,7 +677,6 @@ components:
           nullable: true
         lastActiveDate:
           type: string
-          format: date-time
           nullable: true
         isCloudHub:
           type: string
@@ -756,13 +790,11 @@ components:
           properties:
             date:
               type: string
-              format: date-time
         updated:
           type: object
           properties:
             date:
               type: string
-              format: date-time
 
     Deployment:
       title: Deployment
@@ -796,7 +828,6 @@ components:
           nullable: true
         updatedDate:
           type: string
-          format: date-time
         type:
           type: string
         expectedStatus:
