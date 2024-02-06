@@ -2,13 +2,13 @@
   "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
-    "version": "5.1.0",
+    "version": "6.6.0",
     "generators": {
       "golang": {
         "generatorName": "go",
         "output": "$ANYPOINT_GENERATOR_GO_DEST/#{name}",
         "glob": "spec/*.{json,yaml,yml}",
-        "gitUserId": "mulesoft-consulting",
+        "gitUserId": "mulesoft-anypoint",
         "gitRepoId": "anypoint-client-go",
         "additionalProperties": {
           "isGoSubmodule": true,

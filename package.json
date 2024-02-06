@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "@souf",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.4.18"
+    "@openapitools/openapi-generator-cli": "^2.7.0"
   }
 }

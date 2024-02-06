@@ -1,6 +1,6 @@
-name: Cloudhub Client Generator Pipeline
+name: Anypoint Clients Generator Pipeline
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push
   push:
@@ -16,20 +16,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [18.x]
     env:
-      CLIENT_GO_REPO: git@github.com:mulesoft-consulting/cloudhub-client-go.git
+      CLIENT_GO_REPO: https://github.com/mulesoft-anypoint/anypoint-client-go.git
       CLIENT_GO_BRANCH: dev
-      GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
+      #should be the base64 of base64(x-access-token:<accessToken>). more info here https://milangatyas.com/Blog/Detail/11/github-git-repository-authentication-for-auto
+      GIT_AUTH_HEADER_B64: ${{ secrets.GIT_AUTH_HEADER_B64 }}
+      GIT_PIPELINE_USER_EMAIL: pipeline@anypoint-client-generator.com
+      GIT_PIPELINE_USER_NAME: pipeline-anypoint-clients-generator
+      APP_NAME: anypoint-client-generator
+      COMMIT_MSG: Generates modules from pipeline.
 
     steps:
       - name: Set Up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: webfactory/ssh-agent@v0.5.1
-        with:
-          ssh-private-key: ${{ env.GIT_SSH_KEY }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -37,20 +39,21 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Copy Cloudhub-client-generator project
+      - name: Copy anypoint-client-generator project
         run: |
-          git config --global user.email "pipeline@cloudhub-client-generator.com"
-          git config --global user.name "pipeline-cloudhub-clients-generator"
+          git config --global http.version HTTP/1.1
+          git config --global user.email ${{env.GIT_PIPELINE_USER_EMAIL}}
+          git config --global user.name ${{env.GIT_PIPELINE_USER_NAME}}
           export GENERATOR_FOLDER=`pwd`
-          export GO_CLIENT_FOLDER=`pwd`/dist/cloudhub-client-generator
+          export GO_CLIENT_FOLDER=`pwd`/dist/${{env.APP_NAME}}
           export ANYPOINT_GENERATOR_GO_DEST="$GO_CLIENT_FOLDER"
-          npm install 
-          git clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
+          npm install
+          git -c http.extraheader="AUTHORIZATION: basic ${{env.GIT_AUTH_HEADER_B64}}" clone --branch ${{env.CLIENT_GO_BRANCH}} ${{env.CLIENT_GO_REPO}} $GO_CLIENT_FOLDER
           npx openapi-generator-cli generate
           cd $GO_CLIENT_FOLDER
           git add .
-          git commit -am "Generates modules from pipeline."
-          git push
+          git commit -am "${{env.COMMIT_MSG}}"
+          git -c http.extraheader="AUTHORIZATION: basic ${{env.GIT_AUTH_HEADER_B64}}" push
 
 
 
