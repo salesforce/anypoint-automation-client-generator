@@ -56,6 +56,30 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessListConnApps'
 
+  /connectedApplications/{connAppId}:
+    parameters:
+      - name: connAppId
+        in: path
+        description: The ID of the connected app
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetConnectedAppByIdOnly
+      description: Get a single connected application with connected app id and without organization id
+      parameters:
+        - in: query
+          name: includeUsage
+          description: flag to indicate whether to return usage statistics
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessGetConnApps'
+
   /organizations/{orgId}/connectedApplications:
     parameters:
       - name: orgId
@@ -79,7 +103,6 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '201':
           $ref: '#/components/responses/SuccessPostConnApps'
-
 
   /organizations/{orgId}/connectedApplications/{connAppId}:
     parameters:
