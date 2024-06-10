@@ -350,6 +350,11 @@ components:
         - $ref: '#/components/schemas/connectedAppCore'
         - type: object
           properties:
+            org_id:
+              type: string
+              description: the organization where the connected app is created
+              title: org_id
+              example: bb1f55d6-563z-4f60-845c-207286484re1
             client_id:
               type: string
               description: connected app client id
