@@ -270,7 +270,8 @@ components:
           title: "Available Upgrade Version"
         createdAt:
           type: "integer"
-          title: "Created At"
+          format: int64
+          title: "CreatedAt"
         nodes:
           type: "array"
           title: "Nodes"
@@ -287,6 +288,7 @@ components:
           title: "Namespace"
         licenseExpiryDate:
           type: "integer"
+          format: int64
           title: "License Expiry Date"
         isManaged:
           type: "boolean"
