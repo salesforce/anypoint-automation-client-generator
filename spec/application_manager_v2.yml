@@ -101,8 +101,8 @@ paths:
 
   /organizations/{orgId}/environments/{envId}/deployments/{deploymentId}:
     patch:
-      summary: List deployments
-      description: Deploys a new application with the provided data.
+      summary: Patch a deployment
+      description: Updates an existing deployment with the provided details.
       parameters:
         - name: orgId
           in: path
