@@ -3,19 +3,19 @@
 openapi: 3.0.0
 info:
   title: Deployment
-  description: Description of the AMC Application Manager 
+  description: Description of the AMC Application Manager
   version: 1.0.0
 
 servers:
   - url: https://anypoint.mulesoft.com/application-manager/api/v2
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/application-manager/api/v2
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/application-manager/api/v2
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 paths:
   /organizations/{orgId}/environments/{envId}/deployments:
@@ -66,10 +66,10 @@ paths:
               $ref: "#/components/schemas/deployment"
 
       responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '200':
-          $ref: '#/components/responses/GetDeployment'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "200":
+          $ref: "#/components/responses/GetDeployment"
     post:
       summary: List deployments
       description: Deploys a new application with the provided data.
@@ -92,12 +92,12 @@ paths:
             schema:
               $ref: "#/components/schemas/deployment"
       responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/DeploymentNotFoundError'
-        '200':
-          $ref: '#/components/responses/PostDeployment'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
+        "200":
+          $ref: "#/components/responses/PostDeployment"
 
   /organizations/{orgId}/environments/{envId}/deployments/{deploymentId}:
     patch:
@@ -123,14 +123,43 @@ paths:
           schema:
             type: string
       responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '202':
-          $ref: '#/components/responses/PostDeployment'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "202":
+          $ref: "#/components/responses/PostDeployment"
+    delete:
+      summary: Delete deployment
+      description: Deletes the specified deploymentId.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: envId
+          in: path
+          description: The ID of the environment in GUID format
+          required: true
+          schema:
+            type: string
+        - name: deploymentId
+          in: path
+          description: The ID of the deployment in GUID format.
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "204":
+          $ref: "#/components/responses/DeleteDeployment"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
 
 components:
   securitySchemes:
-    bearerAuth:            # arbitrary name for the security scheme
+    bearerAuth: # arbitrary name for the security scheme
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -140,25 +169,26 @@ components:
       description: Access token is missing or invalid
     DeploymentNotFoundError:
       description: Deployment not found
+    DeleteDeployment:
+      description: Deployment deleted
     PostDeployment:
       description: POST - Deployment Detail Response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/deployment'
+            $ref: "#/components/schemas/deployment"
     GetDeployment:
       description: GET - Deployment Detail Response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeploymentResponsePaged'
+            $ref: "#/components/schemas/DeploymentResponsePaged"
     PatchDeployment:
       description: GET - Deployment Detail Response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeploymentResponsePaged'
-
+            $ref: "#/components/schemas/DeploymentResponsePaged"
 
   schemas:
     deployment:
@@ -178,11 +208,11 @@ components:
           type: string
           title: lastModifiedDate
         status:
-          $ref : '#/components/schemas/state'
+          $ref: "#/components/schemas/state"
         application:
-          $ref: '#/components/schemas/application'
+          $ref: "#/components/schemas/application"
         target:
-          $ref: '#/components/schemas/target'
+          $ref: "#/components/schemas/target"
 
     target:
       title: application
@@ -200,13 +230,13 @@ components:
       type: object
       properties:
         status:
-          $ref : '#/components/schemas/state'
+          $ref: "#/components/schemas/state"
         desiredState:
           nullable: true
-          $ref : '#/components/schemas/state'
+          $ref: "#/components/schemas/state"
         ref:
           nullable: true
-          $ref : '#/components/schemas/ref'
+          $ref: "#/components/schemas/ref"
         configuration:
           type: object
         vCores:
@@ -215,37 +245,37 @@ components:
           type: object
           properties:
             services:
-              $ref: '#/components/schemas/services'
+              $ref: "#/components/schemas/services"
         desiredVersion:
           type: string
         replicas:
           type: array
           nullable: true
           items:
-            $ref: '#/components/schemas/replicas'
+            $ref: "#/components/schemas/replicas"
         lastSuccessfulVersion:
           nullable: true
           type: string
-    
+
     replicas:
       type: object
       properties:
         id:
           type: string
-        state: 
+        state:
           type: string
-        deploymentLocation: 
+        deploymentLocation:
           type: string
-        currentDeploymentVersion: 
+        currentDeploymentVersion:
           type: string
-        reason: 
+        reason:
           type: string
-    
+
     services:
       type: object
       properties:
         objectStoreV2:
-          $ref: '#/components/schemas/objectStoreV2'
+          $ref: "#/components/schemas/objectStoreV2"
 
     objectStoreV2:
       type: object
@@ -264,10 +294,10 @@ components:
           type: string
         packaging:
           type: string
-        
+
     state:
       type: string
-      enum: 
+      enum:
         - PARTIALLY_STARTED
         - DEPLOYMENT_FAILED
         - STARTING
@@ -299,7 +329,7 @@ components:
           type: array
           title: items
           items:
-            $ref: '#/components/schemas/deployment'
+            $ref: "#/components/schemas/deployment"
 
     DeploymentRequest2:
-      $ref: '#/components/schemas/deployment'
+      $ref: "#/components/schemas/deployment"
