@@ -127,6 +127,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "202":
           $ref: "#/components/responses/PostDeployment"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
     delete:
       summary: Delete deployment
       description: Deletes the specified deploymentId.
