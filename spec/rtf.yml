@@ -18,6 +18,26 @@ security:
 
 
 paths:
+  /organizations/{orgId}/helmrepoproperties:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFabricsHelmRepoProps
+      summary: Retrieves Helm repo properties for a Runtime Fabrics Instance by id.
+      description: Retrieves Helm repo properties for a specific Runtime Fabrics Instance by id.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFabricsHelmRepoProps'
+
   /organizations/{orgId}/fabrics:
     parameters:
       - in: path
@@ -93,7 +113,6 @@ paths:
         '204':    # status code
           $ref: '#/components/responses/SuccessDeleteFabrics'
 
-
   /organizations/{orgId}/fabrics/{fabricsId}/associations:
     parameters:
       - in: path
@@ -139,6 +158,32 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPostFabricsAssociations'
+
+  /organizations/{orgId}/fabrics/{fabricsId}/health:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: fabricsId
+        description: The Runtime Fabrics Instance id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFabricsHealth
+      summary: Retrieves health for a Runtime Fabrics Instance by id.
+      description: Retrieves health for a specific Runtime Fabrics Instance by id.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFabricsHealth'
 
 
 components:
@@ -200,6 +245,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FabricsAssociations"
+    SuccessGetFabricsHelmRepoProps:
+      description: get Fabrics Helm Repo Props
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsHelmRepoProps"
+    SuccessGetFabricsHealth:
+      description: get Fabrics Health
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsHealth"
 
   schemas:
     errorsResponse:
@@ -272,11 +329,18 @@ components:
           type: "integer"
           format: int64
           title: "CreatedAt"
+        upgrade:
+          type: "object"
+          properties:
+            status:
+              type: "string"
         nodes:
           type: "array"
           title: "Nodes"
           items:
             $ref: "#/components/schemas/FabricsNode"
+        activationData:
+          type: "string"
         secondsSinceHeartbeat:
           type: "integer"
           title: "Seconds Since Heartbeat"
@@ -446,4 +510,77 @@ components:
             type: string
           environmentId:
             type: string
+          name:
+            type: string
+          deploymentStatus:
+            type: string
+          errorMessage:
+            type: string
+
+    FabricsHelmRepoProps:
+      type: object
+      properties:
+        RTF_IMAGE_REGISTRY_ENDPOINT:
+          type: string
+          description: the fabrics image registry endpoint
+        RTF_IMAGE_REGISTRY_USER:
+          type: string
+          description: the username to access the fabrics registry
+        RTF_IMAGE_REGISTRY_PASSWORD:
+          type: string
+          description: the password to access the fabrics registry
+
+    FabricsHealth:
+      type: object
+      properties:
+        clusterMonitoring:
+          description: The ability to monitor and report the status of the Runtime Fabric cluster.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        manageDeployments:
+          description: The ability to create, update, or delete application deployments in this Runtime Fabric.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        loadBalancing:
+          description: The ability to accept inbound requests and load-balance across different replicas of application instances.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        anypointMonitoring:
+          description: The ability to see metrics and logs in Anypoint Monitoring.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        externalLogForwarding:
+          description: The ability to forward application logs to an external provider.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        appliance:
+          description: Detailed status of the appliance, when applicable.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        infrastructure:
+          description: Detailed status of the infrastructure supporting the Runtime Fabric cluster.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        persistentGateway:
+          description: Detailed status of the persistent gateway for Runtime Fabric cluster.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+
+    FabricsHealthStatus:
+      type: object
+      properties:
+        healthy:
+          type: boolean
+          description: True is the component is healthy.
+        updatedAt:
+          type: integer
+          format: int64
+        probes:
+          type: string
+          description: Probes collected for this health check. Only applicable for Appliance probes.
+        failedProbes:
+          type: array
+          description: Probe failures attributing to the result of this health check.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              reason:
+                type: string
+              lastTransitionAt:
+                type: integer
+
 
