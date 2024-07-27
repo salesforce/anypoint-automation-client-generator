@@ -1,0 +1,337 @@
+#Sourced from : https://anypoint.mulesoft.com/exchange/portals/anypoint-platform/f1e97bc6-315a-4490-82a7-23abe036327a.anypoint-platform/amc-application-manager/minor/4.0/console/summary/
+
+openapi: 3.0.0
+info:
+  title: Deployment
+  description: Description of the AMC Application Manager
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/application-manager/api/v2
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/application-manager/api/v2
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/application-manager/api/v2
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /organizations/{orgId}/environments/{envId}/deployments:
+    get:
+      summary: List deployments
+      description: Retrieves a list of deployments for the specified query. If the query returns no results, then an empty list is returned.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: envId
+          in: path
+          description: The ID of the environment in GUID format
+          required: true
+          schema:
+            type: string
+        - name: provider
+          in: query
+          description: The provider of the target the deployments are deployed to.
+          required: false
+          schema:
+            type: string
+        - name: targetId
+          in: query
+          description: The id of the target the deployments are deployed to.
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Offset used to retrieve the results.
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum records to retrieve.
+          required: false
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/deployment"
+
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "200":
+          $ref: "#/components/responses/GetDeployment"
+    post:
+      summary: List deployments
+      description: Deploys a new application with the provided data.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: envId
+          in: path
+          description: The ID of the environment in GUID format
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/deployment"
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
+        "200":
+          $ref: "#/components/responses/PostDeployment"
+
+  /organizations/{orgId}/environments/{envId}/deployments/{deploymentId}:
+    patch:
+      summary: Patch a deployment
+      description: Updates an existing deployment with the provided details.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: envId
+          in: path
+          description: The ID of the environment in GUID format
+          required: true
+          schema:
+            type: string
+        - name: deploymentId
+          in: path
+          description: The ID of the deployment in GUID format.
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "202":
+          $ref: "#/components/responses/PostDeployment"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
+    delete:
+      summary: Delete deployment
+      description: Deletes the specified deploymentId.
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: envId
+          in: path
+          description: The ID of the environment in GUID format
+          required: true
+          schema:
+            type: string
+        - name: deploymentId
+          in: path
+          description: The ID of the deployment in GUID format.
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "204":
+          $ref: "#/components/responses/DeleteDeployment"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
+
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    DeploymentNotFoundError:
+      description: Deployment not found
+    DeleteDeployment:
+      description: Deployment deleted
+    PostDeployment:
+      description: POST - Deployment Detail Response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/deployment"
+    GetDeployment:
+      description: GET - Deployment Detail Response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentResponsePaged"
+    PatchDeployment:
+      description: GET - Deployment Detail Response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentResponsePaged"
+
+  schemas:
+    deployment:
+      title: deployment
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        name:
+          type: string
+          title: name
+        creationDate:
+          type: string
+          title: creationDate
+        lastModifiedDate:
+          type: string
+          title: lastModifiedDate
+        status:
+          $ref: "#/components/schemas/state"
+        application:
+          $ref: "#/components/schemas/application"
+        target:
+          $ref: "#/components/schemas/target"
+
+    target:
+      title: application
+      type: object
+      properties:
+        provider:
+          type: string
+          title: provider
+        targetId:
+          type: string
+          title: targetId
+
+    application:
+      title: application
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/state"
+        desiredState:
+          nullable: true
+          $ref: "#/components/schemas/state"
+        ref:
+          nullable: true
+          $ref: "#/components/schemas/ref"
+        configuration:
+          type: object
+        vCores:
+          type: integer
+        integrations:
+          type: object
+          properties:
+            services:
+              $ref: "#/components/schemas/services"
+        desiredVersion:
+          type: string
+        replicas:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/replicas"
+        lastSuccessfulVersion:
+          nullable: true
+          type: string
+
+    replicas:
+      type: object
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+        deploymentLocation:
+          type: string
+        currentDeploymentVersion:
+          type: string
+        reason:
+          type: string
+
+    services:
+      type: object
+      properties:
+        objectStoreV2:
+          $ref: "#/components/schemas/objectStoreV2"
+
+    objectStoreV2:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+
+    ref:
+      type: object
+      properties:
+        groupId:
+          type: string
+        artifactId:
+          type: string
+        version:
+          type: string
+        packaging:
+          type: string
+
+    state:
+      type: string
+      enum:
+        - PARTIALLY_STARTED
+        - DEPLOYMENT_FAILED
+        - STARTING
+        - STARTED
+        - STOPPING
+        - STOPPED
+        - UNDEPLOYING
+        - UNDEPLOYED
+        - UPDATED
+        - APPLIED
+        - APPLYING
+        - FAILED
+        - DELETED
+
+    status:
+      type: string
+      enum:
+        - RUNNING
+        - NOT_RUNNING
+
+    DeploymentResponsePaged:
+      title: DeploymentResponsePaged
+      type: object
+      properties:
+        total:
+          type: integer
+          title: total
+        items:
+          type: array
+          title: items
+          items:
+            $ref: "#/components/schemas/deployment"
+
+    DeploymentRequest2:
+      $ref: "#/components/schemas/deployment"
