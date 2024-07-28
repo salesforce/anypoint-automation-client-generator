@@ -19,22 +19,24 @@ security:
 
 paths:
   /organizations/{orgId}/environments/{envId}/deployments:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: envId
+        in: path
+        description: The ID of the environment in GUID format
+        required: true
+        schema:
+          type: string
     get:
+      operationId: GetAllDeployments
       summary: List deployments
       description: Retrieves a list of deployments for the specified query. If the query returns no results, then an empty list is returned.
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: envId
-          in: path
-          description: The ID of the environment in GUID format
-          required: true
-          schema:
-            type: string
         - name: provider
           in: query
           description: The provider of the target the deployments are deployed to.
@@ -59,38 +61,20 @@ paths:
           required: false
           schema:
             type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/deployment"
-
       responses:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "200":
-          $ref: "#/components/responses/GetDeployment"
+          $ref: "#/components/responses/GetAllDeployments"
     post:
-      summary: List deployments
+      operationId: PostDeployment
+      summary: Create deployment
       description: Deploys a new application with the provided data.
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: envId
-          in: path
-          description: The ID of the environment in GUID format
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/deployment"
+              $ref: "#/components/schemas/DeploymentRequestBody"
       responses:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -100,28 +84,40 @@ paths:
           $ref: "#/components/responses/PostDeployment"
 
   /organizations/{orgId}/environments/{envId}/deployments/{deploymentId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: envId
+        in: path
+        description: The ID of the environment in GUID format
+        required: true
+        schema:
+          type: string
+      - name: deploymentId
+        in: path
+        description: The ID of the deployment in GUID format.
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetDeploymentById
+      summary: Get a deploymnt
+      description: Retrieves a specific deployment by in a given org, environment and with a specific id.
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/DeploymentNotFoundError"
+        "200":
+          $ref: "#/components/responses/GetDeployment"
     patch:
+      operationId: PatchDeployment
       summary: Patch a deployment
       description: Updates an existing deployment with the provided details.
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: envId
-          in: path
-          description: The ID of the environment in GUID format
-          required: true
-          schema:
-            type: string
-        - name: deploymentId
-          in: path
-          description: The ID of the deployment in GUID format.
-          required: true
-          schema:
-            type: string
       responses:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -130,27 +126,9 @@ paths:
         "404":
           $ref: "#/components/responses/DeploymentNotFoundError"
     delete:
+      operationId: DeleteDeployment
       summary: Delete deployment
       description: Deletes the specified deploymentId.
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: envId
-          in: path
-          description: The ID of the environment in GUID format
-          required: true
-          schema:
-            type: string
-        - name: deploymentId
-          in: path
-          description: The ID of the deployment in GUID format.
-          required: true
-          schema:
-            type: string
       responses:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -178,13 +156,20 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/deployment"
-    GetDeployment:
-      description: GET - Deployment Detail Response
+            $ref: "#/components/schemas/Deployment"
+    GetAllDeployments:
+      description: GET all Deployments Detail Response
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/DeploymentResponsePaged"
+    GetDeployment:
+      description: GET a Deployment Detail Response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentResponsePaged"
+
     PatchDeployment:
       description: GET - Deployment Detail Response
       content:
@@ -193,8 +178,8 @@ components:
             $ref: "#/components/schemas/DeploymentResponsePaged"
 
   schemas:
-    deployment:
-      title: deployment
+    Deployment:
+      title: Deployment
       type: object
       properties:
         id:
@@ -209,85 +194,387 @@ components:
         lastModifiedDate:
           type: string
           title: lastModifiedDate
-        status:
-          $ref: "#/components/schemas/state"
-        application:
-          $ref: "#/components/schemas/application"
-        target:
-          $ref: "#/components/schemas/target"
-
-    target:
-      title: application
-      type: object
-      properties:
-        provider:
-          type: string
-          title: provider
-        targetId:
-          type: string
-          title: targetId
-
-    application:
-      title: application
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/state"
-        desiredState:
-          nullable: true
-          $ref: "#/components/schemas/state"
-        ref:
-          nullable: true
-          $ref: "#/components/schemas/ref"
-        configuration:
-          type: object
-        vCores:
-          type: integer
-        integrations:
-          type: object
-          properties:
-            services:
-              $ref: "#/components/schemas/services"
         desiredVersion:
           type: string
+          title: desiredVersion
         replicas:
           type: array
-          nullable: true
+          title: Replicas
           items:
-            $ref: "#/components/schemas/replicas"
+            $ref: '#/components/schemas/Replicas'
+        status:
+          $ref: "#/components/schemas/State"
+        application:
+          $ref: "#/components/schemas/Application"
+        target:
+          $ref: "#/components/schemas/Target"
         lastSuccessfulVersion:
           nullable: true
           type: string
 
-    replicas:
+    Target:
+      title: Target
+      description: The details of the target to perform the deployment on.
       type: object
+      properties:
+        provider:
+          type: string
+          title: TargetProvider
+          description: The cloud provider the target belongs to.
+        targetId:
+          type: string
+          title: TargetId
+          description: The unique identifier of the target.
+        deploymentSettings:
+          $ref: '#/components/schemas/DeploymentSettings'
+        replicas:
+          description: The number of replicas of the deployment.
+          type: integer
+
+    DeploymentSettings:
+      title: DeploymentSettings
+      type: object
+      description: The settings of the target for the deployment to perform.
+      properties:
+        clustered:
+          title: DeploymentSettingsClustered
+          type: boolean
+        enforceDeployingReplicasAcrossNodes:
+          title: EnforceDeployingReplicasAcrossNodes
+          type: boolean
+        http:
+          title: Http
+          type: object
+          properties:
+            inbound:
+              title: HttpInbound
+              type: object
+              properties:
+                publicUrl:
+                  title: HttpInboundPublicUrl
+                  type: string
+                pathRewrite:
+                  title: HttpInboundPathRewrite
+                  type: string
+                  description: This field is not supported on deployments to Shared Spaces. Requests containing values other than null will be rejected.
+                lastMileSecurity:
+                  title: HttpInboundLastMileSecurity
+                  type: boolean
+                forwardSslSession:
+                  title: HttpInboundForwardSslSession
+                  type: boolean
+                internalUrl:
+                  title: HttpInboundInternalUrl
+                  type: string
+                uniqueId:
+                  title: HttpInboundUniqueId
+                  type: string
+        jvm:
+          title: Jvm
+          type: object
+          properties:
+            args:
+              type: string
+        runtime:
+          title: Runtime
+          type: object
+          description: >
+            On deployment operations use this object to pick the runtime version. All fields are optional.
+
+              * On new deployment operations, if not provided, the default values will be used.
+              * On re-deployment operations, if not provided, the current version of the deployment will be used.
+          properties:
+            version:
+              title: RuntimeVersion
+              type: string
+              description: >
+                On deployment operations it can be set to:
+                  * a full image version with tag (i.e "4.6.0:40e-java17"),
+                  * a base version with a partial tag not indicating the java version (i.e. "4.6.0:40")
+                  * or only a base version (i.e. "4.6.0").
+                Defaults to the latest image version.
+                This field has precedence over the legacy 'target.deploymentSettings.runtimeVersion'
+              example: 4.6.0:40-java17
+            releaseChannel:
+              title: RuntimeReleaseChannel
+              type: string
+              description: >
+                On deployment operations it can be set to one of:
+                  * "LTS"
+                  * "EDGE"
+                  * "LEGACY".
+                Defaults to "EDGE". This field has precedence over the legacy 'target.deploymentSettings.runtimeReleaseChannel'.
+                Learn more on release channels at https://docs.mulesoft.com/release-notes/mule-runtime/lts-edge-release-cadence.
+            java:
+              title: RuntimeJava
+              type: string
+              description: >
+                On deployment operations it can be set to one of:
+                  * "8"
+                  * "17"
+                Defaults to "8".
+                Learn more about Java support at https://docs.mulesoft.com/general/java-support.
+        autoscaling:
+          title: Autoscaling
+          type: object
+          description: >
+            Use this object to provide CPU Based Horizontal Autoscaling configuration on deployment and redeployment operations. This object is optional.
+            If Autoscaling is disabled and the fields "minReplicas" and "maxReplicas" are provided, they must match the value of "target.replicas" field.
+            Learn more about Autoscaling at https://docs.mulesoft.com/cloudhub-2/ch2-configure-horizontal-autoscaling.
+          properties:
+            enabled:
+              title: AutoscalingEnabled
+              type: boolean
+              description: >
+                Enables or disables the Autoscaling feature. The possible values are: true or false.
+            minReplicas:
+              title: AutoscalingMinReplicas
+              type: integer
+              description: >
+                Set the minimum amount of replicas for your deployment. The minimum accepted value is 1. The maximum is 3.
+            maxReplicas:
+              title: AutoscalingMaxReplicas
+              type: integer
+              description: >
+                Set the maximum amount of replicas your application can scale to. The minimum accepted value is 2. The maximum is 32.
+        updateStrategy:
+          title: UpdateStrategy
+          type: string
+        resources:
+          title: Resources
+          type: object
+          properties:
+            cpu:
+              title: ResourcesCpu
+              type: object
+              properties:
+                limit:
+                  title: ResourcesCpuLimit
+                  type: string
+                reserved:
+                  title: ResourcesCpuReserved
+                  type: string
+            memory:
+              title: ResourcesMemory
+              type: object
+              properties:
+                limit:
+                  title: ResourcesMemoryLimit
+                  type: string
+                reserved:
+                  title: ResourcesMemoryReserved
+                  type: string
+            storage:
+              title: ResourcesStorage
+              type: string
+              properties:
+                limit:
+                  title: ResourcesStorageLimit
+                  type: string
+                reserved:
+                  title: ResourcesStorageReserved
+                  type: string
+        lastMileSecurity:
+          title: LastMileSecurity
+          type: boolean
+        disableAmLogForwarding:
+          title: DisableAmLogForwarding
+          type: boolean
+        persistentObjectStore:
+          title: PersistentObjectStore
+          type: boolean
+        anypointMonitoringScope:
+          title: AnypointMonitoringScope
+          type: string
+        sidecars:
+          title: Sidecars
+          type: object
+          properties:
+            anypoint-monitoring:
+              title: AnypointMonitoring
+              type: object
+        forwardSslSession:
+          title: ForwardSslSession
+          type: boolean
+        disableExternalLogForwarding:
+          title: DisableExternalLogForwarding
+          type: boolean
+        tracingEnabled:
+          title: TracingEnabled
+          type: boolean
+          description: >
+            Exposes tracing information in OpenTelemetry standard from Mule Runtime into all APM solutions. Supported only on:
+              * Mule Runtime versions 4.6 and above.
+              * RTF agent 2.6.33 and above.
+            Learn more at https://docs.mulesoft.com/cloudhub-2/ch2-deploy-private-space#enable-trace-data-collection
+        generateDefaultPublicUrl:
+          title: GenerateDefaultPublicUrl
+          type: boolean
+        cpuMax:
+          title: CpuMax
+          type: string
+        cpuReserved:
+          title: CpuReserved
+          type: string
+        memoryMax:
+          title: MemoryMax
+          type: string
+        memoryReserved:
+          title: MemoryReserved
+          type: string
+        replicationFactor:
+          title: ReplicationFactor
+          type: integer
+        environmentVariables:
+          title: EnvironmentVariables
+          type: object
+        clusteringEnabled:
+          title: ClusteringEnabled
+          type: boolean
+        publicUrl:
+          title: PublicUrl
+          type: string
+        jvmProperties:
+          title: JvmProperties
+          type: string
+
+
+    Application:
+      title: Application
+      description: The details of the application to deploy.
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/State"
+        desiredState:
+          nullable: true
+          $ref: "#/components/schemas/State"
+        ref:
+          nullable: true
+          $ref: "#/components/schemas/Ref"
+        configuration:
+          $ref: "#/components/schemas/Configuration"
+        resourceAssets:
+          type: object
+        vCores:
+          type: integer
+          description: The configuration of the application.
+        integrations:
+          type: object
+          properties:
+            services:
+              $ref: "#/components/schemas/Services"
+        objectStoreV2Enabled:
+          type: boolean
+
+    Configuration:
+      description: The configuration of the application.
+      title: Configuration
+      type: object
+      properties:
+        mule.agent.application.properties.service:
+          title: MuleAgentAppPropService
+          type: object
+          properties:
+            applicationName:
+              type: string
+            properties:
+              type: object
+            secureProperties:
+              type: object
+        mule.agent.logging.service:
+          title: MuleAgentLoggingService
+          type: object
+          properties:
+            artifactName:
+              type: string
+            scopeLoggingConfigurations:
+              type: array
+              items:
+                properties:
+                  scope:
+                    type: string
+                  logLevel:
+                    type: string
+        mule.agent.scheduling.service:
+          title: MuleAgentSchedulingService
+          type: object
+          properties:
+            applicationName:
+              type: string
+            schedulers:
+              type: array
+              items:
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  flowName:
+                    type: string
+                  enabled:
+                    type: boolean
+                  timeUnit:
+                    type: string
+                    enum:
+                      - NANOSECONDS
+                      - MICROSECONDS
+                      - MILLISECONDS
+                      - SECONDS
+                      - MINUTES
+                      - HOURS
+                      - DAYS
+                  frequency:
+                    type: string
+                  startDelay:
+                    type: string
+                  expression:
+                    type: string
+                  timeZone:
+                    type: string
+
+    Replicas:
+      title: Replicas
+      type: object
+      description: The list of replicas for the specified deployment.
       properties:
         id:
           type: string
+          description: The id of the replica in RTF
         state:
           type: string
+          description: The current state of the replica
         deploymentLocation:
           type: string
+          description: The node id in which the replica is deployed.
         currentDeploymentVersion:
           type: string
+          description: The version deployed in the replica.
         reason:
           type: string
+          description: In case of an error, it should provide information about the root cause.
 
-    services:
+    Services:
       type: object
       properties:
         objectStoreV2:
-          $ref: "#/components/schemas/objectStoreV2"
+          $ref: "#/components/schemas/ObjectStoreV2"
 
-    objectStoreV2:
+    ObjectStoreV2:
       type: object
       properties:
         enabled:
           type: boolean
 
-    ref:
+    Ref:
       type: object
       properties:
+        classifier:
+          nullable: true
+          type: string
+        type:
+          nullable: true
+          type: string
         groupId:
           type: string
         artifactId:
@@ -297,7 +584,7 @@ components:
         packaging:
           type: string
 
-    state:
+    State:
       type: string
       enum:
         - PARTIALLY_STARTED
@@ -314,12 +601,6 @@ components:
         - FAILED
         - DELETED
 
-    status:
-      type: string
-      enum:
-        - RUNNING
-        - NOT_RUNNING
-
     DeploymentResponsePaged:
       title: DeploymentResponsePaged
       type: object
@@ -331,7 +612,20 @@ components:
           type: array
           title: items
           items:
-            $ref: "#/components/schemas/deployment"
+            $ref: "#/components/schemas/Deployment"
 
-    DeploymentRequest2:
-      $ref: "#/components/schemas/deployment"
+    DeploymentRequestBody:
+      title: DeploymentRequestBody
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        target:
+          $ref: "#/components/schemas/Target"
+        application:
+          $ref: "#/components/schemas/Application"
+        desiredVersion:
+          type: string
+          title: desiredVersion
+
