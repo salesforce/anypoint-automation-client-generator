@@ -7,11 +7,11 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://anypoint.mulesoft.com/application-manager/api/v2
+  - url: https://anypoint.mulesoft.com/amc/application-manager/api/v2
     description: Anypoint Cloudhub
-  - url: https://eu1.anypoint.mulesoft.com/application-manager/api/v2
+  - url: https://eu1.anypoint.mulesoft.com/amc/application-manager/api/v2
     description: Anypoint Cloudhub EU
-  - url: https://gov.anypoint.mulesoft.com/application-manager/api/v2
+  - url: https://gov.anypoint.mulesoft.com/amc/application-manager/api/v2
     description: Anypoint Cloudhub GOV
 
 security:
@@ -445,12 +445,18 @@ components:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/State"
+          type: string
+          description: The status of the application.
+          enum:
+            - RUNNING
+            - NOT_RUNNING
         desiredState:
           nullable: true
+          description: The desired state of the application.
           $ref: "#/components/schemas/State"
         ref:
           nullable: true
+          description: The source where the application is stored.
           $ref: "#/components/schemas/Ref"
         configuration:
           $ref: "#/components/schemas/Configuration"
@@ -577,12 +583,16 @@ components:
           type: string
         groupId:
           type: string
+          description: The groupId of the application.
         artifactId:
           type: string
+          description: The artifactId of the application.
         version:
           type: string
+          description: The version of the application.
         packaging:
           type: string
+          description: The packaging of the application.
 
     State:
       type: string
