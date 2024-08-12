@@ -168,14 +168,14 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DeploymentResponsePaged"
+            $ref: "#/components/schemas/Deployment"
 
     PatchDeployment:
       description: GET - Deployment Detail Response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DeploymentResponsePaged"
+            $ref: "#/components/schemas/Deployment"
 
   schemas:
     Deployment:
