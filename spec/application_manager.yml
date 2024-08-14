@@ -3,7 +3,16 @@
 openapi: 3.0.0
 info:
   title: Deployment
-  description: Description of the AMC Application Manager
+  description: >
+    The Application Manager API exists to provide Mule Application management operations from Anypoint Control Planes to any Runtime Plane, with capabilities that include:
+      - Deploying a Mule Application or API to a Mule Runtime
+      - Scaling up or down a running application
+      - Managing application settings (ie: properties)
+      - Deleting a Mule Application Deployment
+      - Changing artifact version or configurations of a deployment
+      - Starting, Stopping or Restarting applications
+      - etc.
+    This API currently supports deployments to Runtime Fabric and CloudHub 2.0 targets only.
   version: 1.0.0
 
 servers:
@@ -189,10 +198,12 @@ components:
           type: string
           title: name
         creationDate:
-          type: string
+          type: integer
+          format: int64
           title: creationDate
         lastModifiedDate:
-          type: string
+          type: integer
+          format: int64
           title: lastModifiedDate
         desiredVersion:
           type: string
@@ -203,7 +214,7 @@ components:
           items:
             $ref: '#/components/schemas/Replicas'
         status:
-          $ref: "#/components/schemas/State"
+          type: string
         application:
           $ref: "#/components/schemas/Application"
         target:
@@ -393,6 +404,26 @@ components:
             anypoint-monitoring:
               title: AnypointMonitoring
               type: object
+              properties:
+                image:
+                  type: string
+                resources:
+                  type: object
+                  properties:
+                    cpu:
+                      type: object
+                      properties:
+                        limit:
+                          type: string
+                        reserved:
+                          type: string
+                    memory:
+                      type: object
+                      properties:
+                        limit:
+                          type: string
+                        reserved:
+                          type: string
         forwardSslSession:
           title: ForwardSslSession
           type: boolean
@@ -410,34 +441,6 @@ components:
         generateDefaultPublicUrl:
           title: GenerateDefaultPublicUrl
           type: boolean
-        cpuMax:
-          title: CpuMax
-          type: string
-        cpuReserved:
-          title: CpuReserved
-          type: string
-        memoryMax:
-          title: MemoryMax
-          type: string
-        memoryReserved:
-          title: MemoryReserved
-          type: string
-        replicationFactor:
-          title: ReplicationFactor
-          type: integer
-        environmentVariables:
-          title: EnvironmentVariables
-          type: object
-        clusteringEnabled:
-          title: ClusteringEnabled
-          type: boolean
-        publicUrl:
-          title: PublicUrl
-          type: string
-        jvmProperties:
-          title: JvmProperties
-          type: string
-
 
     Application:
       title: Application
@@ -453,18 +456,18 @@ components:
         desiredState:
           nullable: true
           description: The desired state of the application.
-          $ref: "#/components/schemas/State"
+          type: string
         ref:
           nullable: true
           description: The source where the application is stored.
           $ref: "#/components/schemas/Ref"
         configuration:
-          $ref: "#/components/schemas/Configuration"
+          $ref: "#/components/schemas/AppConfiguration"
         resourceAssets:
           type: object
         vCores:
-          type: integer
-          description: The configuration of the application.
+          type: number
+          description: The application allocated virtual cores.
         integrations:
           type: object
           properties:
@@ -473,9 +476,9 @@ components:
         objectStoreV2Enabled:
           type: boolean
 
-    Configuration:
+    AppConfiguration:
       description: The configuration of the application.
-      title: Configuration
+      title: AppConfiguration
       type: object
       properties:
         mule.agent.application.properties.service:
@@ -495,8 +498,11 @@ components:
             artifactName:
               type: string
             scopeLoggingConfigurations:
+              title: ScopeLoggingConfigurations
               type: array
               items:
+                title: scopeLoggingConfiguration
+                type: object
                 properties:
                   scope:
                     type: string
@@ -509,8 +515,10 @@ components:
             applicationName:
               type: string
             schedulers:
+              title: Schedulers
               type: array
               items:
+                title: Scheduler
                 properties:
                   name:
                     type: string
@@ -620,9 +628,41 @@ components:
           title: total
         items:
           type: array
-          title: items
+          title: deploymentItems
           items:
-            $ref: "#/components/schemas/Deployment"
+            title: deploymentItem
+            type: object
+            properties:
+              id:
+                type: string
+                description: deployment id
+              name:
+                type: string
+                description: the name of deployment
+              creationDate:
+                type: integer
+                format: int64
+              lastModifiedDate:
+                type: integer
+                format: int64
+              target:
+                type: object
+                properties:
+                  provider:
+                    type: string
+                  targetId:
+                    type: string
+              status:
+                type: string
+              application:
+                type: object
+                properties:
+                  status:
+                    type: string
+              currentRuntimeVersion:
+                type: string
+              lastSuccessfulRuntimeVersion:
+                type: string
 
     DeploymentRequestBody:
       title: DeploymentRequestBody
