@@ -377,7 +377,7 @@ components:
                   type: string
             storage:
               title: ResourcesStorage
-              type: string
+              type: object
               properties:
                 limit:
                   title: ResourcesStorageLimit
