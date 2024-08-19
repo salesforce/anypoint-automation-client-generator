@@ -472,7 +472,6 @@ components:
           type: object
         vCores:
           type: number
-          format: float
           description: The application allocated virtual cores.
         integrations:
           type: object
