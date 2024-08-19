@@ -127,6 +127,11 @@ paths:
       operationId: PatchDeployment
       summary: Patch a deployment
       description: Updates an existing deployment with the provided details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeploymentRequestBody"
       responses:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -467,6 +472,7 @@ components:
           type: object
         vCores:
           type: number
+          format: float
           description: The application allocated virtual cores.
         integrations:
           type: object
