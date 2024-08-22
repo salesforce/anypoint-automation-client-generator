@@ -1,0 +1,586 @@
+openapi: 3.0.0
+info:
+  title: Runtime Fabrics API
+  description: Runtime Fabrics API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/runtimefabric/api
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/runtimefabric/api
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/runtimefabric/api
+    description: Anypoint Cloudhub GOV
+
+
+security:
+  - bearerAuth: []
+
+
+paths:
+  /organizations/{orgId}/helmrepoproperties:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFabricsHelmRepoProps
+      summary: Retrieves Helm repo properties for a Runtime Fabrics Instance by id.
+      description: Retrieves Helm repo properties for a specific Runtime Fabrics Instance by id.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFabricsHelmRepoProps'
+
+  /organizations/{orgId}/fabrics:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetAllFabrics
+      summary: Retrieves all available Runtime Fabrics.
+      description: Retrieves a list of all available Runtime Fabrics in the given organization.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetAllFabrics'
+    post:
+      operationId: PostFabrics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FabricsPostBody"
+      summary: Creates a Runtime Fabrics
+      description: Creates a Runtime Fabrics instance.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostFabrics'
+
+  /organizations/{orgId}/fabrics/{fabricsId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: fabricsId
+        description: The Runtime Fabrics Instance id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFabrics
+      summary: Retrieves a specific Runtime Fabrics Instance by id.
+      description: Retrieves a specific Runtime Fabrics Instance by id.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFabrics'
+    delete:
+      operationId: DeleteFabrics
+      summary: Delete a specific Runtime Fabrics Instance by id.
+      description: Delete a specific Runtime Fabrics Instance by id.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteFabrics'
+
+  /organizations/{orgId}/fabrics/{fabricsId}/associations:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: fabricsId
+        description: The Runtime Fabrics Instance id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFabricsAssociations
+      summary: Get Runtime Fabrics instance Environment Associations.
+      description: Get Runtime Fabrics instance Environment Associations.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessGetFabricsAssociations'
+    post:
+      operationId: PostFabricsAssociations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FabricsAssociationsPostBody"
+      summary: Creates Runtime Fabrics instance Environment Associations.
+      description: Creates Runtime Fabrics instance Environment Associations.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostFabricsAssociations'
+
+  /organizations/{orgId}/fabrics/{fabricsId}/health:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: fabricsId
+        description: The Runtime Fabrics Instance id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetFabricsHealth
+      summary: Retrieves health for a Runtime Fabrics Instance by id.
+      description: Retrieves health for a specific Runtime Fabrics Instance by id.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetFabricsHealth'
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorsResponse"
+    NotFoundError:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              message:
+                type: string
+    SuccessGetAllFabrics:
+      description: get list secret groups
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsCollection"
+    SuccessPostFabrics:
+      description: post an instance of Fabrics
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Fabrics"
+    SuccessGetFabrics:
+      description: get an instance of Fabrics
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Fabrics"
+    SuccessDeleteFabrics:
+      description: delete and instance of Fabrics
+    SuccessGetFabricsAssociations:
+      description: get Fabrics associations
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsAssociations"
+    SuccessPostFabricsAssociations:
+      description: post Fabrics associations
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsAssociations"
+    SuccessGetFabricsHelmRepoProps:
+      description: get Fabrics Helm Repo Props
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsHelmRepoProps"
+    SuccessGetFabricsHealth:
+      description: get Fabrics Health
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FabricsHealth"
+
+  schemas:
+    errorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    FabricsCollection:
+      type: array
+      items:
+        $ref: "#/components/schemas/Fabrics"
+
+    Fabrics:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          title: "Cluster ID"
+        name:
+          type: "string"
+          title: "Cluster Name"
+        region:
+          type: "string"
+          title: "Region"
+        vendor:
+          type: "string"
+          title: "Vendor"
+        vendorMetadata:
+          type: "object"
+          title: "Vendor Metadata"
+        organizationId:
+          type: "string"
+          title: "Organization ID"
+        version:
+          type: "string"
+          title: "Version"
+        status:
+          type: "string"
+          title: "Status"
+        desiredVersion:
+          type: "string"
+          title: "Desired Version"
+        availableUpgradeVersion:
+          type: "string"
+          title: "Available Upgrade Version"
+        createdAt:
+          type: "integer"
+          format: int64
+          title: "CreatedAt"
+        upgrade:
+          type: "object"
+          properties:
+            status:
+              type: "string"
+        nodes:
+          type: "array"
+          title: "Nodes"
+          items:
+            $ref: "#/components/schemas/FabricsNode"
+        activationData:
+          type: "string"
+        secondsSinceHeartbeat:
+          type: "integer"
+          title: "Seconds Since Heartbeat"
+        kubernetesVersion:
+          type: "string"
+          title: "Kubernetes Version"
+        namespace:
+          type: "string"
+          title: "Namespace"
+        licenseExpiryDate:
+          type: "integer"
+          format: int64
+          title: "License Expiry Date"
+        isManaged:
+          type: "boolean"
+          title: "Is Managed"
+        isHelmManaged:
+          type: "boolean"
+          title: "Is Helm Managed"
+        appScopedLogForwarding:
+          type: "boolean"
+          title: "App Scoped Log Forwarding"
+        clusterConfigurationLevel:
+          type: "string"
+          title: "Cluster Configuration Level"
+        features:
+          type: "object"
+          title: "Features"
+          properties:
+            enhancedSecurity:
+              type: "boolean"
+              title: "Enhanced Security"
+            persistentStore:
+              type: "boolean"
+              title: "Persistent Store"
+        ingress:
+          type: "object"
+          title: "Ingress"
+          properties:
+            domains:
+              type: "array"
+              title: "Domains"
+              items:
+                type: "string"
+
+    FabricsNode:
+      type: "object"
+      title: "Node"
+      properties:
+        uid:
+          type: "string"
+          title: "Node UID"
+        name:
+          type: "string"
+          title: "Node Name"
+        kubeletVersion:
+          type: "string"
+          title: "Kubelet Version"
+        dockerVersion:
+          type: "string"
+          title: "Docker Version"
+        role:
+          type: "string"
+          title: "Role"
+        status:
+          type: "object"
+          title: "Status"
+          properties:
+            isHealthy:
+              type: "boolean"
+              title: "Is Healthy"
+            isReady:
+              type: "boolean"
+              title: "Is Ready"
+            isSchedulable:
+              type: "boolean"
+              title: "Is Schedulable"
+        capacity:
+          type: "object"
+          title: "Capacity"
+          properties:
+            cpu:
+              type: "integer"
+              title: "CPU"
+            cpuMillis:
+              type: "integer"
+              title: "CPU Millis"
+            memory:
+              type: "string"
+              title: "Memory"
+            memoryMi:
+              type: "integer"
+              title: "Memory Mi"
+            pods:
+              type: "integer"
+              title: "Pods"
+        allocatedRequestCapacity:
+          type: "object"
+          title: "Allocated Request Capacity"
+          properties:
+            cpu:
+              type: "integer"
+              title: "CPU"
+            cpuMillis:
+              type: "integer"
+              title: "CPU Millis"
+            memory:
+              type: "string"
+              title: "Memory"
+            memoryMi:
+              type: "integer"
+              title: "Memory Mi"
+            pods:
+              type: "integer"
+              title: "Pods"
+        allocatedLimitCapacity:
+          type: "object"
+          title: "Allocated Limit Capacity"
+          properties:
+            cpu:
+              type: "integer"
+              title: "CPU"
+            cpuMillis:
+              type: "integer"
+              title: "CPU Millis"
+            memory:
+              type: "string"
+              title: "Memory"
+            memoryMi:
+              type: "integer"
+              title: "Memory Mi"
+            pods:
+              type: "integer"
+              title: "Pods"
+
+    FabricsPostBody:
+      type: object
+      properties:
+        name:
+          type: string
+        vendor:
+          type: string
+        region:
+          type: string
+
+    FabricsAssociationsPostBody:
+      type: object
+      properties:
+        associations:
+          type: array
+          items:
+            type: object
+            properties:
+              organizationId:
+                type: string
+              environment:
+                type: string
+
+    FabricsAssociations:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          organizationId:
+            type: string
+          environmentId:
+            type: string
+          name:
+            type: string
+          deploymentStatus:
+            type: string
+          errorMessage:
+            type: string
+
+    FabricsHelmRepoProps:
+      type: object
+      properties:
+        RTF_IMAGE_REGISTRY_ENDPOINT:
+          type: string
+          description: the fabrics image registry endpoint
+        RTF_IMAGE_REGISTRY_USER:
+          type: string
+          description: the username to access the fabrics registry
+        RTF_IMAGE_REGISTRY_PASSWORD:
+          type: string
+          description: the password to access the fabrics registry
+
+    FabricsHealth:
+      type: object
+      properties:
+        clusterMonitoring:
+          description: The ability to monitor and report the status of the Runtime Fabric cluster.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        manageDeployments:
+          description: The ability to create, update, or delete application deployments in this Runtime Fabric.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        loadBalancing:
+          description: The ability to accept inbound requests and load-balance across different replicas of application instances.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        anypointMonitoring:
+          description: The ability to see metrics and logs in Anypoint Monitoring.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        externalLogForwarding:
+          description: The ability to forward application logs to an external provider.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        appliance:
+          description: Detailed status of the appliance, when applicable.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        infrastructure:
+          description: Detailed status of the infrastructure supporting the Runtime Fabric cluster.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+        persistentGateway:
+          description: Detailed status of the persistent gateway for Runtime Fabric cluster.
+          $ref: "#/components/schemas/FabricsHealthStatus"
+
+    FabricsHealthStatus:
+      type: object
+      properties:
+        healthy:
+          type: boolean
+          description: True is the component is healthy.
+        updatedAt:
+          type: integer
+          format: int64
+        probes:
+          type: string
+          description: Probes collected for this health check. Only applicable for Appliance probes.
+        failedProbes:
+          type: array
+          description: Probe failures attributing to the result of this health check.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              reason:
+                type: string
+              lastTransitionAt:
+                type: integer
+
+
