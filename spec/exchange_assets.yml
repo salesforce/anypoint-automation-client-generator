@@ -653,8 +653,6 @@ components:
         - version
         - name
         - classifier
-        - apiVersion
-        - main
         - groupId
         - asset
       type: object
@@ -679,6 +677,7 @@ components:
         classifier:
           type: string
           enum:
+            - mule-application
             - raml-fragment
             - raml
             - oas
