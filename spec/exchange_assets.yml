@@ -151,6 +151,37 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessGetAsset'
 
+  /assets/{orgId}/{assetId}/{version}/asset:
+    get:
+      summary: Get Asset by Version
+      description: Get one specific Asset by version
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: assetId
+          in: path
+          description: The ID of the asset
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The version of the asset
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':
+          $ref: '#/components/responses/SuccessGetAsset'
+
   /assets/{orgId}/{assetId}:
     patch:
       summary: update Asset name and description
