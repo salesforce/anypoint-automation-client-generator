@@ -788,7 +788,14 @@ components:
               type: array
               title: tags
               items:
-                type: string
+                type: object
+                properties:
+                  key:
+                    type: string
+                    title: key
+                  value:
+                    type: string
+                    title: value
             name:
               type: string
               title: name
