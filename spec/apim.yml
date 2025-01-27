@@ -679,7 +679,7 @@ components:
           type: string
           nullable: true
         isCloudHub:
-          type: string
+          type: boolean
           nullable: true
         deploymentType:
           type: string
@@ -741,7 +741,7 @@ components:
         type:
           type: string
         isCloudHub:
-          type: string
+          type: boolean
           nullable: true
         proxyUri:
           type: string
