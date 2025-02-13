@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Exchange Assets
-  description: Description of the Exchange Assets API
+  title: Exchange Apps
+  description: Description of the Exchange Apps API
   version: 1.0.0
 
 servers:
@@ -85,6 +85,19 @@ paths:
     delete:
       summary: Read Exchange Apps
       description: Read Exchange Apps
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: appId
+          in: path
+          description: The ID of the Exchange App
+          required: true
+          schema:
+            type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
