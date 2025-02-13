@@ -1,0 +1,173 @@
+openapi: 3.0.0
+info:
+  title: Exchange Assets
+  description: Description of the Exchange Assets API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/exchange/api/v2/
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/exchange/api/v2
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/exchange/api/v2
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /organizations/{orgId}/applications:
+    post:
+      summary: Create a new exchange app
+      description: Create a new exchange app
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: apiInstanceId
+          in: query
+          description: The API Manager Instance Id
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postExchangeAppsBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPostApp'
+    get:
+      summary: Read Exchange Apps
+      description: Read Exchange Apps
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: path
+          description: Filter results that matches the input
+          required: true
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: 'The offset specifies the offset of the first row to return'
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: 'Amount of objects retrieved in the response'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':
+          $ref: '#/components/responses/SuccessListApps'
+
+  /organizations/{orgId}/applications/{appId}:
+    delete:
+      summary: Read Exchange Apps
+      description: Read Exchange Apps
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteApp'
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here
+    SuccessPostApp:
+      description: Response for creating application
+    SuccessListApps:
+      description: Response for reading applications
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/getExchangeAppsResponse"
+    SuccessDeleteApp:
+      description: Response for deleteing an application
+
+
+  schemas:
+    postExchangeAppsBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        redirectUri:
+          type: array
+          items:
+            type: string
+        grantTypes:
+          type: array
+          items:
+            type: string
+        apiEndpoints:
+          type: boolean
+    getExchangeAppsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          description:
+            type: string
+          url:
+            type: string
+            nullable: true
+          masterOrganizationId:
+            type: string
+          id:
+            type: string
+          clientProvider:
+            type: object
+            properties:
+              providerId:
+                type: string
+                nullable: true
