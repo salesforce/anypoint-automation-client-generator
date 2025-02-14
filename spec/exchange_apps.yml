@@ -51,8 +51,8 @@ paths:
       operationId: GetExchangeClientApps
       summary: Read Exchange Client Apps
       description: >
-        Read All of partial Exchange Client Apps.
-        IF you need to get all the available exchange apps on your organization (not just the client apps created by the user making the Query).
+        Read All or partial Exchange Client Apps.
+        If you need to get all the available exchange apps on your organization (not just the client apps created by the user making the Query).
         You need to use this call with your Master Org id, a bearer token for an Admin user, and the query parameter 'targetAdminSite' set to 'true'. This call will return every application (with pagination if more than the set limit) for this particular Anypoint Account.
       parameters:
         - name: targetAdminSite
@@ -88,23 +88,23 @@ paths:
           $ref: '#/components/responses/SuccessListApps'
 
   /organizations/{orgId}/applications/{appId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: appId
+        in: path
+        description: The ID of the Exchange App
+        required: true
+        schema:
+          type: integer
     delete:
       operationId: DeleteExchangeClientApp
       summary: Delete Exchange Client Apps
       description: Delete Exchange Client Apps
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: appId
-          in: path
-          description: The ID of the Exchange App
-          required: true
-          schema:
-            type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -113,6 +113,38 @@ paths:
         '204':
           $ref: '#/components/responses/SuccessDeleteApp'
 
+  /organizations/{orgId}/applications/{appId}/contracts:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: appId
+        in: path
+        description: The ID of the Exchange App
+        required: true
+        schema:
+          type: integer
+    get:
+      operationId: GetExchangeClientAppContracts
+      summary: Get Exchange Client Application Contracts
+      description: Get Exchange Client Application Contracts
+      parameters:
+        - name: includeContractsForApiVersion
+          in: query
+          description: This field is used to filter by API version
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '204':
+          $ref: '#/components/responses/SuccessGetAppContracts'
 
 components:
   securitySchemes:
@@ -149,7 +181,12 @@ components:
             $ref: "#/components/schemas/getExchangeAppsResponse"
     SuccessDeleteApp:
       description: Response for deleteing an application
-
+    SuccessGetAppContracts:
+      description: Response for getting exchange client app contracts
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/getExchangeAppContractsResponse"
 
   schemas:
     postExchangeAppsBody:
@@ -184,7 +221,7 @@ components:
           masterOrganizationId:
             type: string
           id:
-            type: string
+            type: integer
           clientId:
             type: string
           clientSecret:
@@ -203,3 +240,31 @@ components:
             type: array
             items:
               type: string
+    getExchangeAppContractsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          status:
+            type: string
+          requestedTier:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              description:
+                type: string
+              limits:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    maximumRequests:
+                      type: integer
+                    timePeriodInMilliseconds:
+                      type: integer
+
