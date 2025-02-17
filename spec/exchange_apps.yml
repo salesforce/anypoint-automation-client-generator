@@ -110,6 +110,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: "#/components/responses/NotFoundError"
         '204':
           $ref: '#/components/responses/SuccessDeleteApp'
 
@@ -171,8 +173,23 @@ components:
                 type: string
                 title: the error message
                 example: A sample message here
+    NotFoundError:
+      description: Not Found Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
     SuccessPostApp:
       description: Response for creating application
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/postExchangeAppsReponse"
     SuccessListApps:
       description: Response for reading applications
       content:
@@ -206,6 +223,37 @@ components:
             type: string
         apiEndpoints:
           type: boolean
+        url:
+          type: string
+    postExchangeAppsReponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        masterOrganizationId:
+          type: string
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+        grantTypes:
+          type: array
+          items:
+            type: string
+        redirectUri:
+          type: array
+          items:
+            type: string
+        clientProvider:
+          type: object
+          properties:
+            providerId:
+              type: string
+              nullable: true
     getExchangeAppsResponse:
       type: array
       items:
