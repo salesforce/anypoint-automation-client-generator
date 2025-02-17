@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Exchange Apps
-  description: Description of the Exchange Apps API
+  title: Exchange Client Apps
+  description: Description of the Exchange Client Applications API
   version: 1.0.0
 
 servers:
