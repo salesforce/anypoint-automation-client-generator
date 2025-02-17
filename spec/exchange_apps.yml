@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: Exchange Apps
+  description: Description of the Exchange Apps API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/exchange/api/v2/
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/exchange/api/v2
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/exchange/api/v2
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /organizations/{orgId}/applications:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: PostExchangeClientApp
+      summary: Create a new Exchange Client App
+      description: Create a new Exchange Client App
+      parameters:
+        - name: apiInstanceId
+          in: query
+          description: The API Manager Instance Id
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postExchangeAppsBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessPostApp'
+    get:
+      operationId: GetExchangeClientApps
+      summary: Read Exchange Client Apps
+      description: >
+        Read All or partial Exchange Client Apps.
+        If you need to get all the available exchange apps on your organization (not just the client apps created by the user making the Query).
+        You need to use this call with your Master Org id, a bearer token for an Admin user, and the query parameter 'targetAdminSite' set to 'true'. This call will return every application (with pagination if more than the set limit) for this particular Anypoint Account.
+      parameters:
+        - name: targetAdminSite
+          in: query
+          description: MUST be set to true in order to get the Client ID and Secret. Without this query parameter, the same call will return all the Client Applications but not the Client ID and Secret (and other info).
+          required: false
+          schema:
+            type: boolean
+        - name: query
+          in: query
+          description: Filter results that matches the input
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: 'The offset specifies the offset of the first row to return'
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: 'Amount of objects retrieved in the response'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':
+          $ref: '#/components/responses/SuccessListApps'
+
+  /organizations/{orgId}/applications/{appId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: appId
+        in: path
+        description: The ID of the Exchange App
+        required: true
+        schema:
+          type: integer
+    delete:
+      operationId: DeleteExchangeClientApp
+      summary: Delete Exchange Client Apps
+      description: Delete Exchange Client Apps
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: "#/components/responses/NotFoundError"
+        '204':
+          $ref: '#/components/responses/SuccessDeleteApp'
+
+  /organizations/{orgId}/applications/{appId}/contracts:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: appId
+        in: path
+        description: The ID of the Exchange App
+        required: true
+        schema:
+          type: integer
+    get:
+      operationId: GetExchangeClientAppContracts
+      summary: Get Exchange Client Application Contracts
+      description: Get Exchange Client Application Contracts
+      parameters:
+        - name: includeContractsForApiVersion
+          in: query
+          description: This field is used to filter by API version
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '204':
+          $ref: '#/components/responses/SuccessGetAppContracts'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                title: the response status code
+                default: 400
+              message:
+                type: string
+                title: the error message
+                example: A sample message here
+    NotFoundError:
+      description: Not Found Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+    SuccessPostApp:
+      description: Response for creating application
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/postExchangeAppsReponse"
+    SuccessListApps:
+      description: Response for reading applications
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/getExchangeAppsResponse"
+    SuccessDeleteApp:
+      description: Response for deleteing an application
+    SuccessGetAppContracts:
+      description: Response for getting exchange client app contracts
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/getExchangeAppContractsResponse"
+
+  schemas:
+    postExchangeAppsBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        redirectUri:
+          type: array
+          items:
+            type: string
+        grantTypes:
+          type: array
+          items:
+            type: string
+        apiEndpoints:
+          type: boolean
+        url:
+          type: string
+    postExchangeAppsReponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        masterOrganizationId:
+          type: string
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+        grantTypes:
+          type: array
+          items:
+            type: string
+        redirectUri:
+          type: array
+          items:
+            type: string
+        clientProvider:
+          type: object
+          properties:
+            providerId:
+              type: string
+              nullable: true
+    getExchangeAppsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          description:
+            type: string
+          url:
+            type: string
+            nullable: true
+          masterOrganizationId:
+            type: string
+          id:
+            type: integer
+          clientId:
+            type: string
+          clientSecret:
+            type: string
+          clientProvider:
+            type: object
+            properties:
+              providerId:
+                type: string
+                nullable: true
+          grantTypes:
+            type: array
+            items:
+              type: string
+          redirectUri:
+            type: array
+            items:
+              type: string
+    getExchangeAppContractsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          status:
+            type: string
+          requestedTier:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              description:
+                type: string
+              limits:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    maximumRequests:
+                      type: integer
+                    timePeriodInMilliseconds:
+                      type: integer
+
