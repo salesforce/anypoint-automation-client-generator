@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Exchange Apps
-  description: Description of the Exchange Apps API
+  title: Exchange Client Apps
+  description: Description of the Exchange Client Applications API
   version: 1.0.0
 
 servers:
@@ -101,9 +101,22 @@ paths:
         required: true
         schema:
           type: integer
+    get:
+      operationId: GetExchangeClientApp
+      summary: Get Exchange Client App by ID
+      description: Read a specific Exchange Client App by ID.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: "#/components/responses/NotFoundError"
+        '204':
+          $ref: '#/components/responses/SuccessGetApp'
     delete:
       operationId: DeleteExchangeClientApp
-      summary: Delete Exchange Client Apps
+      summary: Delete Exchange Client App by ID
       description: Delete Exchange Client Apps
       responses:
         '401':
@@ -189,21 +202,27 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/postExchangeAppsReponse"
+            $ref: "#/components/schemas/clientApp"
     SuccessListApps:
       description: Response for reading applications
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/getExchangeAppsResponse"
+            $ref: "#/components/schemas/clientAppList"
+    SuccessGetApp:
+      description: Response for reading a specific exchange client application
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/clientApp"
     SuccessDeleteApp:
-      description: Response for deleteing an application
+      description: Response for deleting an exchange client application
     SuccessGetAppContracts:
       description: Response for getting exchange client app contracts
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/getExchangeAppContractsResponse"
+            $ref: "#/components/schemas/clientAppContractList"
 
   schemas:
     postExchangeAppsBody:
@@ -225,15 +244,19 @@ components:
           type: boolean
         url:
           type: string
-    postExchangeAppsReponse:
+    clientApp:
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
+        url:
+          type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         masterOrganizationId:
           type: string
         clientId:
@@ -254,65 +277,42 @@ components:
             providerId:
               type: string
               nullable: true
-    getExchangeAppsResponse:
+            name:
+              type: string
+            type:
+              type: string
+              nullable: true
+    clientAppList:
       type: array
       items:
-        type: object
-        properties:
-          name:
-            type: string
-          description:
-            type: string
-          url:
-            type: string
-            nullable: true
-          masterOrganizationId:
-            type: string
-          id:
-            type: integer
-          clientId:
-            type: string
-          clientSecret:
-            type: string
-          clientProvider:
-            type: object
-            properties:
-              providerId:
-                type: string
-                nullable: true
-          grantTypes:
-            type: array
-            items:
+        $ref: "#/components/schemas/clientApp"
+    clientAppContract:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        requestedTier:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
               type: string
-          redirectUri:
-            type: array
-            items:
+            description:
               type: string
-    getExchangeAppContractsResponse:
+            limits:
+              type: array
+              items:
+                type: object
+                properties:
+                  maximumRequests:
+                    type: integer
+                  timePeriodInMilliseconds:
+                    type: integer
+    clientAppContractList:
       type: array
       items:
-        type: object
-        properties:
-          id:
-            type: integer
-          status:
-            type: string
-          requestedTier:
-            type: object
-            properties:
-              id:
-                type: integer
-              name:
-                type: string
-              description:
-                type: string
-              limits:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    maximumRequests:
-                      type: integer
-                    timePeriodInMilliseconds:
-                      type: integer
+        $ref: "#/components/schemas/clientAppContract"
 
