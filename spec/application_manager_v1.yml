@@ -1,0 +1,166 @@
+
+openapi: 3.0.0
+info:
+  title: Deployment v1
+  description: >
+    The Application Manager API exists to provide Mule Application management operations from Anypoint Control Planes to any Runtime Plane, with capabilities that include:
+      - Deploying a Mule Application or API to a Mule Runtime
+      - Scaling up or down a running application
+      - Managing application settings (ie: properties)
+      - Deleting a Mule Application Deployment
+      - Changing artifact version or configurations of a deployment
+      - Starting, Stopping or Restarting applications
+      - etc.
+    This API currently supports deployments to Cloudhub 1.0 targets only.
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/armui/api/v1
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/armui/api/v1
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/armui/api/v1
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /applications:
+    get:
+      operationId: GetAllDeployments
+      summary: List deployments
+      description: Retrieves a list of deployments for the specified query. If the query returns no results, then an empty list is returned.
+      parameters:
+        - name: x-anypnt-env-id
+          in: header
+          description: The environment id where the applications are deployed
+          required: true
+          schema:
+            type: string
+        - name: x-anypnt-org-id
+          in: header
+          description: The org id where the applications are deployed
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "200":
+          $ref: "#/components/responses/GetAllDeployments"
+
+
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    DeploymentNotFoundError:
+      description: Deployment not found
+    GetAllDeployments:
+      description: Response of a list of deployments
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetAllDeploymentsResponse"
+
+  schemas:
+    Deployment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique identifier for the deployment.
+        artifact:
+          type: object
+          description: Details about the artifact associated with the deployment.
+          properties:
+            lastUpdateTime:
+              type: number
+              description: The timestamp (in milliseconds) when the artifact was last updated.
+            createTime:
+              type: number
+              nullable: true
+              description: The creation timestamp (in milliseconds); may be null.
+            name:
+              type: string
+              description: The name of the artifact.
+            fileName:
+              type: string
+              description: The file name of the artifact.
+        lastReportedStatus:
+          type: string
+          description: The last reported status of the deployment (e.g., STARTED, UNDEPLOYED).
+        details:
+          type: object
+          description: Additional details about the deployment.
+          properties:
+            domain:
+              type: string
+              description: The domain name associated with the deployment.
+          additionalProperties: true
+        target:
+          type: object
+          description: Information about the target environment where the deployment is hosted.
+          properties:
+            type:
+              type: string
+              description: The target type (e.g., CLOUDHUB, MC).
+            subtype:
+              type: string
+              description: The target subtype (if applicable).
+            provider:
+              type: string
+              description: The provider of the target platform.
+            id:
+              type: string
+              description: The identifier of the target.
+            name:
+              type: string
+              description: The name of the target.
+            status:
+              type: string
+              description: The current status of the target.
+        application:
+          type: object
+          description: Application-specific information for the deployment.
+          properties:
+            status:
+              type: string
+              description: The status of the application.
+        muleVersion:
+          type: object
+          description: Details regarding the Mule runtime version.
+          properties:
+            version:
+              type: string
+              description: The Mule runtime version.
+            updateId:
+              type: string
+              description: The identifier for the runtime update.
+            latestUpdateId:
+              type: string
+              description: The identifier for the latest runtime update.
+            endOfSupportDate:
+              type: number
+              description: The timestamp (in milliseconds) representing the end-of-support date.
+
+
+    DeploymentList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Deployment"
+
+    GetAllDeploymentsResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/DeploymentList"
+        total:
+          type: integer
