@@ -103,8 +103,10 @@ components:
           properties:
             domain:
               type: string
-              description: The domain name associated with the deployment.
-          additionalProperties: true
+              description: The domain name associated with the deployment. only present for CH1.
+            deploymentUpdateStatus:
+              type: string
+              description: The deployment update status, only present for CH1.
         target:
           type: object
           description: Information about the target environment where the deployment is hosted.
