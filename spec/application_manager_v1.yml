@@ -82,10 +82,10 @@ components:
           description: Details about the artifact associated with the deployment.
           properties:
             lastUpdateTime:
-              type: number
+              type: integer
               description: The timestamp (in milliseconds) when the artifact was last updated.
             createTime:
-              type: number
+              type: integer
               nullable: true
               description: The creation timestamp (in milliseconds); may be null.
             name:
@@ -150,7 +150,7 @@ components:
               type: string
               description: The identifier for the latest runtime update.
             endOfSupportDate:
-              type: number
+              type: integer
               description: The timestamp (in milliseconds) representing the end-of-support date.
 
 
