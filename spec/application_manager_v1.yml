@@ -12,21 +12,21 @@ info:
       - Starting, Stopping or Restarting applications
       - etc.
     This API currently supports deployments to Cloudhub 1.0 targets only.
-  version: 1.0.0
+  version: 1.1.0
 
 servers:
-  - url: https://anypoint.mulesoft.com/armui/api/v1
+  - url: https://anypoint.mulesoft.com
     description: Anypoint Cloudhub
-  - url: https://eu1.anypoint.mulesoft.com/armui/api/v1
+  - url: https://eu1.anypoint.mulesoft.com
     description: Anypoint Cloudhub EU
-  - url: https://gov.anypoint.mulesoft.com/armui/api/v1
+  - url: https://gov.anypoint.mulesoft.com
     description: Anypoint Cloudhub GOV
 
 security:
   - bearerAuth: []
 
 paths:
-  /applications:
+  /armui/api/v1/applications:
     get:
       operationId: GetAllDeployments
       summary: List deployments
@@ -50,6 +50,139 @@ paths:
         "200":
           $ref: "#/components/responses/GetAllDeployments"
 
+  /cloudhub/api/v2/applications:
+    parameters:
+      - name: x-anypnt-env-id
+        in: header
+        description: The environment id where the application is deployed
+        required: true
+        schema:
+          type: string
+      - name: x-anypnt-org-id
+        in: header
+        description: The org id where the application is deployed
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: PostDeployment
+      summary: Create a new deployment
+      description: Deploys a new Mule Application to Cloudhub (CH1).
+      requestBody:
+        description: Application deployment body containing configuration and artifact file.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DeployAppBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/PostDeploymentResponse"
+        "400":
+          description: Bad request.
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: Server error.
+    put:
+      operationId: PutDeployments
+      summary: Updates deployment states in bulk
+      description: >
+        Bulk Action (UPDATE, START, STOP, RESTART, DELETE) for Applications.
+        The threshold for number of domains in the bulk actions is 100.
+        These actions cannot be stopped. Requires 'Manage Settings' role.
+      requestBody:
+        description: Application deployment body containing configuration and artifact file.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeploymentBulkBody"
+      responses:
+        "200":
+          description: Deployment successful.
+          content:
+            application/json: {}
+        "400":
+          description: Bad request.
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: Server error.
+
+  /cloudhub/api/v2/applications/{domain}:
+    parameters:
+      - name: x-anypnt-env-id
+        in: header
+        description: The environment id where the application is deployed
+        required: true
+        schema:
+          type: string
+      - name: x-anypnt-org-id
+        in: header
+        description: The org id where the application is deployed
+        required: true
+        schema:
+          type: string
+      - name: domain
+        in: path
+        description: The application domain in the path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetDeploymentDetails
+      summary: Read deployment details
+      description: Retrieve a single application by name. Requires 'Read Applications' role.
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDeploymentResponse"
+        "400":
+          description: Bad request.
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: Server error.
+    put:
+      operationId: PutDeployment
+      summary: Update a single application.
+      description: Update a single application. Requires 'Manage Settings' role.
+      requestBody:
+        description: Application deployment body containing configuration and artifact file.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateDeploymentBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/PutDeploymentResponse"
+        "400":
+          description: Bad request.
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: Server error.
+    delete:
+      operationId: DeleteDeployment
+      summary: Delete a single application
+      description: Delete a single application
+      responses:
+        "204":
+          $ref: "#/components/responses/DeleteDeploymentResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /cloudhub/api/mule-versions:
+    get:
+      operationId: GetMuleVersions
+      summary: Read available mule versions
+      description: Read available mule versions.
+      responses:
+        "200":
+          $ref: "#/components/responses/GetMuleVersionsResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
 components:
   securitySchemes:
@@ -69,6 +202,32 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GetAllDeploymentsResponse"
+    PostDeploymentResponse:
+      description: Response of the create deployment
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentDetails"
+    GetDeploymentResponse:
+      description: Response of the get deployment
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentDetails"
+    PutDeploymentResponse:
+      description: Response of the put deployment
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentDetails"
+    DeleteDeploymentResponse:
+      description: Response of the put deployment
+    GetMuleVersionsResponse:
+      description: Response of the get deployment
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RuntimeCollection"
 
   schemas:
     Deployment:
@@ -153,7 +312,6 @@ components:
               type: integer
               description: The timestamp (in milliseconds) representing the end-of-support date.
 
-
     DeploymentList:
       type: array
       items:
@@ -166,3 +324,564 @@ components:
           $ref: "#/components/schemas/DeploymentList"
         total:
           type: integer
+
+    DeployAppBody:
+      type: object
+      properties:
+        appInfoJson:
+          type: string
+          description: >
+            A JSON string representing the deployment configuration. Look at "DeploymentInfo" for structure.
+        file:
+          type: string
+          format: binary
+          description: The Mule application artifact to be deployed.
+        autoStart:
+          type: boolean
+          description: Indicates whether the application should be automatically started after deployment.
+
+    UpdateDeploymentBody:
+      type: object
+      properties:
+        appInfoJson:
+          type: string
+          description: >
+            A JSON string representing the deployment configuration. Look at "DeploymentInfo" for structure.
+        file:
+          type: string
+          format: binary
+          description: The Mule application artifact to be deployed.
+
+    DeploymentInfo:
+      type: object
+      properties:
+        domain:
+          type: string
+        muleVersion:
+          type: object
+          properties:
+            version:
+              type: string
+        region:
+          type: string
+        monitoringEnabled:
+          type: boolean
+        monitoringAutoRestart:
+          type: boolean
+        workers:
+          type: object
+          properties:
+            amount:
+              type: integer
+              description: The number or replicas
+            type:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The size of the worker
+                  enum:
+                    - MICRO
+                    - SMALL
+                    - MEDIUM
+                    - LARGE
+                    - XLARGE
+                    - XXLARGE
+                    - 4XLARGE
+        properties:
+          type: object
+          description: Application properties
+        propertiesOptions:
+          type: object
+          description: Additional option on the properties, like security configuratoin for each prop
+          additionalProperties:
+            type: object
+            properties:
+              secure:
+                type: boolean
+        logLevels:
+          type: array
+          items:
+            type: object
+            properties:
+              level:
+                type: string
+                enum:
+                  - DEBUG
+                  - INFO
+                  - WARN
+                  - ERROR
+              packageName:
+                type: string
+        secureDataGatewayEnabled:
+          type: boolean
+        staticIPsEnabled:
+          type: boolean
+        ipAddresses:
+          type: array
+          items:
+            type: string
+        loggingCustomLog4JEnabled:
+          type: boolean
+        loggingNgEnabled:
+          type: boolean
+        persistentQueues:
+          type: boolean
+        persistentQueuesEncrypted:
+          type: boolean
+        objectStoreV1:
+          type: boolean
+          description: if set to false, Object Store v2 will be used.
+        runtime:
+          type: object
+          properties:
+            version:
+              type: string
+            releaseChannel:
+              type: string
+            java:
+              type: string
+
+    UpdateDeploymentBulkBody:
+      type: object
+      properties:
+        action:
+          type: string
+          description: >
+            * UPDATE: Update all applications in the provided list to the latest update of the Mule Version that the application is currently using
+            * START: Start all applications in the provided list if they are stopped
+            * STOP: Stop all applications in the provided list if they are started
+            * RESTART: Restart all applications in the provided list with zero downtime
+            * DELETE: Delete all applications in the provided list
+          enum:
+            - UPDATE
+            - START
+            - STOP
+            - RESTART
+            - DELETE
+        domains:
+          type: array
+          description: The list of application domains
+          maxItems: 100
+          items:
+            type: string
+
+    DeploymentDetails:
+      description: "Response schema for deploying an app to CH1"
+      type: object
+      properties:
+        domain:
+          type: string
+          description: "The short domain name of the application."
+        fullDomain:
+          type: string
+          description: "The full domain name including the CH1 suffix."
+        description:
+          type: string
+          description: "A description of the application."
+        properties:
+          type: object
+          description: "Deployment properties specific to the app configuration."
+        propertiesOptions:
+          type: object
+          description: "Options for the deployment properties, such as security flags."
+        status:
+          type: string
+          description: "Current status of the deployed application (e.g. STARTED)."
+        workers:
+          type: object
+          description: "Worker configuration for the application deployment."
+          properties:
+            type:
+              type: object
+              description: "Details about the worker type including size and resource allocations."
+              properties:
+                name:
+                  type: string
+                  description: "The name of the worker type."
+                weight:
+                  type: number
+                  description: "The weight factor for the worker type."
+                cpu:
+                  type: string
+                  description: "The CPU allocation description (e.g., '1 vCore')."
+                memory:
+                  type: string
+                  description: "The memory allocation description (e.g., '1.5 GB memory')."
+            amount:
+              type: integer
+              description: "The number of worker instances allocated."
+            remainingOrgWorkers:
+              type: integer
+              description: "Remaining worker count available to the organization."
+            totalOrgWorkers:
+              type: integer
+              description: "Total number of workers allocated to the organization."
+            recentStatistics:
+              type: object
+              description: "Recent performance statistics for the workers."
+              properties:
+                transactions:
+                  type: integer
+                  description: "The number of transactions processed."
+                cpu:
+                  type: integer
+                  description: "The current CPU usage percentage."
+        lastUpdateTime:
+          type: integer
+          format: int64
+          description: "Timestamp (in milliseconds) when the application was last updated."
+        fileName:
+          type: string
+          description: "The name of the deployed application file."
+        muleVersion:
+          type: object
+          description: "Details of the current Mule runtime version in use."
+          properties:
+            version:
+              type: string
+              description: "The Mule runtime version."
+            updateId:
+              type: string
+              description: "Identifier for the current update."
+            latestUpdateId:
+              type: string
+              description: "Identifier for the latest available update."
+            endOfSupportDate:
+              type: integer
+              format: int64
+              description: "Timestamp (in milliseconds) representing the end-of-support date."
+            endOfLifeDate:
+              type: integer
+              format: int64
+              description: "Timestamp (in milliseconds) representing the end-of-life date."
+            updateVersion:
+              type: string
+              description: "The update version string."
+            releaseChannel:
+              type: string
+              description: "The release channel for the runtime."
+            javaVersion:
+              type: string
+              description: "The version of Java used by the runtime."
+        previousMuleVersion:
+          type: object
+          description: "Details of the previous Mule runtime version before the current deployment."
+          properties:
+            version:
+              type: string
+              description: "The previous Mule runtime version."
+            updateId:
+              type: string
+              description: "Identifier for the previous update."
+            endOfSupportDate:
+              type: integer
+              format: int64
+              description: "Timestamp (in milliseconds) for the previous version's end-of-support date."
+            endOfLifeDate:
+              type: integer
+              format: int64
+              description: "Timestamp (in milliseconds) for the previous version's end-of-life date."
+            updateVersion:
+              type: string
+              description: "The previous update version string."
+            releaseChannel:
+              type: string
+              description: "The release channel for the previous runtime."
+            javaVersion:
+              type: string
+              description: "The previous Java version used."
+        tenants:
+          type: integer
+          description: "The number of tenants associated with the deployment."
+        userId:
+          type: string
+          description: "Identifier of the user who deployed the application."
+        userName:
+          type: string
+          description: "Username of the deploying user."
+        vpnConfig:
+          type: object
+          description: "VPN configuration details if applicable."
+          properties:
+            network:
+              type: string
+              description: "The VPN network address."
+            mask:
+              type: string
+              description: "The subnet mask for the VPN configuration."
+        deploymentGroup:
+          type: object
+          description: "Information about the deployment group to which this app belongs."
+          properties:
+            id:
+              type: string
+              description: "Unique identifier for the deployment group."
+            name:
+              type: string
+              description: "The name of the deployment group."
+        persistentQueues:
+          type: boolean
+          description: "Indicates whether persistent queues are enabled."
+        persistentQueuesEncryptionEnabled:
+          type: boolean
+          description: "Indicates whether encryption for persistent queues is enabled."
+        persistentQueuesEncrypted:
+          type: boolean
+          description: "Indicates whether the persistent queues are encrypted."
+        monitoringEnabled:
+          type: boolean
+          description: "Specifies if monitoring is enabled for the application."
+        monitoringAutoRestart:
+          type: boolean
+          description: "Specifies if the application is set to auto-restart when monitoring triggers."
+        staticIPsEnabled:
+          type: boolean
+          description: "Indicates whether static IPs are enabled for the deployment."
+        multitenanted:
+          type: boolean
+          description: "Indicates if the deployment supports multiple tenants."
+        hasFile:
+          type: boolean
+          description: "Indicates whether a deployment file exists for the application."
+        secureDataGatewayEnabled:
+          type: boolean
+          description: "Specifies if a secure data gateway is enabled for the deployment."
+        vpnEnabled:
+          type: boolean
+          description: "Indicates if VPN is enabled for the deployment."
+        trackingSettings:
+          type: object
+          description: "Settings for tracking application performance or usage."
+          properties:
+            trackingLevel:
+              type: string
+              description: "The level of tracking applied (e.g., DISABLED, BASIC, FULL)."
+        logLevels:
+          type: array
+          description: "List of log level configurations for the application."
+          items:
+            type: object
+            properties: {}
+        ipAddresses:
+          type: array
+          description: "List of IP addresses associated with the deployment."
+          items:
+            type: string
+
+    RuntimeCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Runtime"
+        total:
+          type: integer
+
+    Runtime:
+      type: object
+      properties:
+        version:
+          type: string
+          description: "The runtime version identifier."
+        displayName:
+          type: string
+          description: "The display name for the runtime."
+        recommended:
+          type: boolean
+          description: "Indicates whether this runtime is recommended."
+        endOfSupportDate:
+          type: number
+          description: "The timestamp (in milliseconds) when support ends for this runtime."
+        endOfLifeDate:
+          type: number
+          description: "The timestamp (in milliseconds) when this runtime reaches end of life."
+        latestUpdate:
+          type: object
+          properties:
+            id:
+              type: string
+              description: "The unique identifier of the update."
+            name:
+              type: string
+              description: "The name of the update."
+            releaseDate:
+              type: number
+              description: "The release date as a timestamp (in milliseconds)."
+            releaseNotes:
+              type: string
+              description: "URL or text of the release notes."
+            flags:
+              type: object
+              properties:
+                performLog4jReplacement:
+                  type: boolean
+                skipMMCPairing:
+                  type: boolean
+                log4j1Used:
+                  type: boolean
+                usingMuleAgent:
+                  type: boolean
+                vpnSupported:
+                  type: boolean
+                monitoringSupported:
+                  type: boolean
+                objectStoreV1:
+                  type: boolean
+                loggingNgSupported:
+                  type: boolean
+                diagnosticsSupported:
+                  type: boolean
+                persistentQueuesSupported:
+                  type: boolean
+                asyncScheduleSupported:
+                  type: boolean
+                muleLivenessSupported:
+                  type: boolean
+                muleReadinessCheckSupported:
+                  type: boolean
+                ocsServiceSupported:
+                  type: boolean
+                injectLog4j2Supported:
+                  type: boolean
+                injectMuleLogsWhenFail:
+                  type: boolean
+                amiVersionData:
+                  type: object
+                  properties:
+                    "ch,extension":
+                      type: string
+                    "mule,version":
+                      type: string
+                    "objectstore,plugin,artifact":
+                      type: string
+                    "ning,version":
+                      type: string
+                    "mule,distro,artifactId":
+                      type: string
+                    "mozart,monitoring,service,version":
+                      type: string
+                    "mule,agent,metrics,collector,version":
+                      type: string
+                    "mule,distro,version":
+                      type: string
+                    "httpcomponents,httpclient,version":
+                      type: string
+                    "mule,agent,extension,version":
+                      type: string
+                    "outputDirectory,plugins,agent,ch":
+                      type: string
+                    "munit,version":
+                      type: string
+                    "outputDirectory,lib,mule":
+                      type: string
+                    "objectstore,plugin,mule3,version":
+                      type: string
+                    "cloudhub,mule,agent,extension,version":
+                      type: string
+                    "mule,distro,groupId":
+                      type: string
+                    "netty,typesafe,version":
+                      type: string
+                    "hawtjournal,version":
+                      type: string
+                    "licm,version":
+                      type: string
+                    "cloudhub-common,version":
+                      type: string
+                    "mule,extension,version":
+                      type: string
+                    "clm,serverId":
+                      type: string
+                    "cloudhub-platform,artifact":
+                      type: string
+                    "cloudhub-log-appender,version":
+                      type: string
+                    "mule,patch,version":
+                      type: string
+                    "outputDirectory,ch,logging":
+                      type: string
+                    "aws-java-sdk,version":
+                      type: string
+                    "outputDirectory,services":
+                      type: string
+                    "outputDirectory,lib,patches":
+                      type: string
+                    "agw,s3,provider,version":
+                      type: string
+                    "quartz,version":
+                      type: string
+                    "netty,version":
+                      type: string
+                    "mozart,agent,service,version":
+                      type: string
+                    "outputDirectory,lib,alternative":
+                      type: string
+                    "branchFullName":
+                      type: string
+                    "mule,version,folder":
+                      type: string
+                    "distro,version,extension":
+                      type: string
+                    "common-jackson,version":
+                      type: string
+                    "licensePath":
+                      type: string
+                    "objectstore,plugin,mule4,version":
+                      type: string
+                    "outputDirectory,lib,boot":
+                      type: string
+                    "hawtbuf,version":
+                      type: string
+                    "outputDirectory,lib,artifact-patches":
+                      type: string
+                    "branchType":
+                      type: string
+                    "jasypt,version":
+                      type: string
+                    "munit,agent,service,version":
+                      type: string
+                    "mule,distro,target,directory":
+                      type: string
+                    "mule,agent,version":
+                      type: string
+                    "branchDetail":
+                      type: string
+                    "httpcomponents,httpcore,version":
+                      type: string
+                    "outputDirectory,lib,user":
+                      type: string
+                    "objectstore,plugin,version":
+                      type: string
+                    "objectstore,plugin,type":
+                      type: string
+                    "objectstore,plugin,classifier":
+                      type: string
+                    "outputDirectory,bin":
+                      type: string
+                    "mule,version,suffix":
+                      type: string
+                    "outputDirectory,lib,opt":
+                      type: string
+                    "outputDirectory,plugins":
+                      type: string
+                    "clm,serverUrl":
+                      type: string
+                    "mule,unpack,directory":
+                      type: string
+                    "clm,applicationId":
+                      type: string
+        state:
+          type: string
+          description: "The state of the runtime (for example, ACTIVE)."
+        releaseChannel:
+          type: string
+          description: "The release channel of the runtime (for example, EDGE, LTS)."
+        javaVersion:
+          type: string
+          description: "The Java version used by the runtime."
+        default:
+          type: boolean
+          description: "Indicates whether this runtime is the default."
+
