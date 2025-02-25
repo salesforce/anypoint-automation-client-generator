@@ -89,12 +89,6 @@ paths:
       summary: Updates deployment states in bulk
       description: >
         Bulk Action (UPDATE, START, STOP, RESTART, DELETE) for Applications.
-        UPDATE: Update all applications in the provided list to the latest update of the Mule Version that the application is currently using
-        START: Start all applications in the provided list if they are stopped
-        STOP: Stop all applications in the provided list if they are started
-        RESTART: Restart all applications in the provided list with zero downtime
-        DELETE: Delete all applications in the provided list
-
         The threshold for number of domains in the bulk actions is 100.
         These actions cannot be stopped. Requires 'Manage Settings' role.
       requestBody:
@@ -453,8 +447,18 @@ components:
       properties:
         action:
           type: string
+          description: >
+            * UPDATE: Update all applications in the provided list to the latest update of the Mule Version that the application is currently using
+            * START: Start all applications in the provided list if they are stopped
+            * STOP: Stop all applications in the provided list if they are started
+            * RESTART: Restart all applications in the provided list with zero downtime
+            * DELETE: Delete all applications in the provided list
           enum:
             - UPDATE
+            - START
+            - STOP
+            - RESTART
+            - DELETE
         domains:
           type: array
           description: The list of application domains
