@@ -651,16 +651,44 @@ components:
     ApimPolicyCollection:
       oneOf:
         - type: array
-          title: "ApimPolicyCollecion"
+          title: "ApimPolicyCollection"
           items:
             $ref: "#/components/schemas/ApimPolicy"
-        - type: object
-          title: "ApimPolicyFullCollecion"
+        - $ref: "#/components/schemas/ApimPolicyFullData"
+
+    ApimPolicyFullData:
+      type: object
+      title: "ApimPolicyFullData"
+      properties:
+        policies:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApimPolicyFull"
+        tiers:
+          type: object
           properties:
-            policies:
+            values:
               type: array
               items:
-                $ref: "#/components/schemas/ApimPolicyFull"
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  limits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        maximumRequests:
+                          type: integer
+                        timePeriodInMilliseconds:
+                          type: integer
+                          format: int64
+                        visible:
+                          type: boolean
+            version:
+              type: integer
+              format: int64
 
     ApimPolicy:
       type: object
