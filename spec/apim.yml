@@ -704,8 +704,7 @@ components:
           type: string
           nullable: true
         console:
-          type: string
-          nullable: true
+          $ref: '#/components/schemas/Console'
         tlsContexts:
           type: object
           properties:
@@ -834,6 +833,16 @@ components:
           type: string
         apiId:
           type: integer
+
+    Console:
+      title: Console
+      type: object
+      nullable: true
+      properties:
+        enabled:
+          type: boolean
+        path:
+          type: string
 
     DeploymentPostBody:
       title: DeploymentPostBody
