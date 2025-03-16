@@ -242,9 +242,12 @@ components:
           properties:
             lastUpdateTime:
               type: integer
+              format: int64
+              nullable: true
               description: The timestamp (in milliseconds) when the artifact was last updated.
             createTime:
               type: integer
+              format: int64
               nullable: true
               description: The creation timestamp (in milliseconds); may be null.
             name:
@@ -310,6 +313,7 @@ components:
               description: The identifier for the latest runtime update.
             endOfSupportDate:
               type: integer
+              format: int64
               description: The timestamp (in milliseconds) representing the end-of-support date.
 
     DeploymentList:
