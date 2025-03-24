@@ -16,7 +16,8 @@ security:
   - bearerAuth: []
 
 paths:
-  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/contracts:
+
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/contracts:
     parameters:
       - in: path
         name: orgId
@@ -36,39 +37,86 @@ paths:
         required: true
         schema:
           type: string
-      - in: query
-        name: limit
-        description: The maximum number of contracts to return
-        required: false
-        schema:
-          type: integer
-      - in: query
-        name: offset
-        description: The offset of the first contract to return
-        required: false
-        schema:
-          type: integer
-      - in: query
-        name: sort
-        description: The sort order of the contracts
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: ascending
-        description: Order for sorting.
-        required: false
-        schema:
-          type: boolean
     get:
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of contracts to return
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The offset of the first contract to return
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: The field to sort by
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          description: The order to sort by
+          required: false
+          schema:
+            type: string
+        - name: ascending
+          in: query
+          description: The order to sort by
+          required: false
+          schema:
+            type: boolean
+        - name: status
+          in: query
+          description: The status of the contract
+          required: false
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: A string that will be checked for a partial or similar matches of the name, description, label and tags
+          required: false
+          schema:
+            type: string
+        - name: includeExtraApplicationData
+          in: query
+          description: Whether to include extra application data
+          required: false
+          schema:
+            type: boolean
       operationId: GetApiContracts
       summary: Retrieves all contracts for a given API in a given organization and environment
-      description: Retrieves all contracts for a given API in a given organization and environment
+      description: >
+        Retrieves all contracts for a given API in a given organization and environment
+        Connected Apps require the following scopes:
+        - View Contracts
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           $ref: '#/components/responses/SuccessGetApiContracts'
+    post:
+      operationId: CreateApiContract
+      summary: Creates a new contract for a given API in a given organization and environment
+      description: >
+        Creates a new contract for a given API in a given organization and environment
+        Connected Apps require the following scopes:
+        - Manage Contracts
+        - Exchange Viewer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessCreateApiContract'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostApiContract'
 
   /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/contracts/{contractId}:
     parameters:
@@ -99,11 +147,96 @@ paths:
     get:
       operationId: GetApiContract
       summary: Retrieves a contract for a given API in a given organization and environment
-      description: Retrieves a contract for a given API in a given organization and environment
+      description: >
+        Retrieves a contract for a given API in a given organization and environment
+        Connected Apps require the following scopes:
+        - View Contracts
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
+          $ref: '#/components/responses/SuccessGetApiContract'
+    patch:
+      operationId: UpdateApiContract
+      summary: Updates a contract for a given API in a given organization and environment
+      description: >
+        Updates a contract for a given API in a given organization and environment
+        Connected Apps require the following scopes:
+        - Manage Contracts
+        - Exchange Viewer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApiContract'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchApiContract'
+    delete:
+      operationId: DeleteApiContract
+      summary: Deletes a contract for a given API in a given organization and environment
+      description: >
+        Deletes a contract for a given API in a given organization and environment
+        Connected Apps require the following scopes:
+        - Manage Contracts
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteApiContract'
+
+
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/contracts/{contractId}/{action}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance id for a given environment
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: contractId
+        description: The contract id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: action
+        description: The action to be performed on the contract
+        required: true
+        schema:
+          type: string
+          enum:
+            - approve
+            - reject
+            - revoke
+            - restore
+    post:
+      operationId: UpdateApiContractStatus
+      summary: Performs an action on a contract for a given API in a given organization and environment
+      description: >
+        Performs an action on a contract for a given API in a given organization and environment
+        Connected Apps require the following scopes:
+        - Manage Contracts
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':    # status code
           $ref: '#/components/responses/SuccessGetApiContract'
 
 components:
@@ -145,6 +278,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GetContractResponse'
+    SuccessCreateApiContract:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetContractResponse'
+    SuccessDeleteApiContract:
+      description: Successful response
 
   schemas:
     ErrorsResponse:
@@ -186,6 +327,25 @@ components:
             $ref: '#/components/schemas/Contract'
     GetContractResponse:
       $ref: '#/components/schemas/ContractDetails'
+    PostApiContract:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+        requestedTierId:
+          type: integer
+        requestAccessInfo:
+          type: object
+          properties:
+            reason:
+              type: string
+    PatchApiContract:
+      type: object
+      properties:
+        requestedTierId:
+          type: integer
+        tierId:
+          type: integer
     ContractDetails:
       type: object
       properties:
@@ -252,7 +412,6 @@ components:
           example: 6273842
         status:
           type: string
-          enum: [APPROVED, REJECTED, REVOKED]
         approvedDate:
           type: string
           nullable: true
@@ -295,9 +454,6 @@ components:
         partyName:
           type: string
           nullable: true
-        condition:
-          type: string
-          enum: [APPLIED]
         apiId:
           type: integer
           example: 18972610
@@ -358,7 +514,6 @@ components:
             $ref: '#/components/schemas/Limit'
         status:
           type: string
-          enum: [ACTIVE, INACTIVE]
         autoApprove:
           type: boolean
     Limit:
@@ -452,7 +607,6 @@ components:
                 type: boolean
         status:
           type: string
-          enum: [ACTIVE, INACTIVE]
         autoApprove:
           type: boolean
     ApplicationOwner:
@@ -474,4 +628,4 @@ components:
           type: string
         entityType:
           type: string
-          enum: [user]
+
