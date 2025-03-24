@@ -271,6 +271,38 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessPatchApimInstance'
 
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/apiAsset:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The API id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApiAsset
+      summary: Get API Asset
+      description: Get API Asset
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApiAsset'
+
 components:
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
@@ -324,6 +356,12 @@ components:
             $ref: '#/components/schemas/ApimInstancePatchResponse'
     SuccessDeleteApimInstance:
       description: API Instance Delete
+    SuccessGetApiAsset:
+      description: API Asset
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApimAsset'
 
   schemas:
     errorsResponse:
@@ -651,6 +689,26 @@ components:
               "gatewayVersion": "1.0.0"
           }
         }
+
+    ApimAsset:
+      type: object
+      properties:
+        audit:
+          $ref: '#/components/schemas/Audit'
+        masterOrganizationId:
+          type: string
+        organizationId:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        exchangeAssetName:
+          type: string
+        groupId:
+          type: string
+        assetId:
+          type: string
 
     Endpoint:
       title: Endpoint
