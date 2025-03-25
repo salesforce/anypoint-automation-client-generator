@@ -614,8 +614,10 @@ components:
         gateways:
           $ref: '#/components/schemas/GatewaysEntitlement'
         globalDeployment:
-          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          default: false
+          description: Global Deployment entitlements
           title: globalDeployment
+          type: boolean
         hybrid:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: hybrid
