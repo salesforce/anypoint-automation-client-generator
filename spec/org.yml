@@ -251,6 +251,11 @@ components:
           description: Whether the organization is federated.
           title: isFederated
           type: boolean
+        isRoot:
+          default: false
+          description: Whether the organization is a root organization.
+          title: isRoot
+          type: boolean
         isMaster:
           default: false
           description: Whether the organization is a master organization.
@@ -344,6 +349,22 @@ components:
                   description: The type of the subscription.
                   title: type
                   type: string
+            gdotId:
+              default: ''
+              description: The gdot id of the organization
+              title: gdotId
+              type: string
+            deletedAt:
+              default: null
+              description: The deleted date of the organization
+              title: deletedAt
+              type: string
+              nullable: true
+            orgType:
+              default: ''
+              description: The type of the organization
+              title: orgType
+              type: string
 
     Environment:
       default: {}
