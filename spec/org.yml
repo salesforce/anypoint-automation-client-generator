@@ -1143,15 +1143,31 @@ components:
       type: object
       properties:
         cpu:
-          type: integer
-          description: CPU
-          title: cpu
-          default: 0
+          type: object
+          properties:
+            base:
+              type: integer
+              description: Base
+              title: base
+              default: 0
+            extra:
+              type: integer
+              description: Extra
+              title: extra
+              default: 0
         memory:
-          type: integer
-          description: Memory
-          title: memory
-          default: 0
+          type: object
+          properties:
+            base:
+              type: integer
+              description: Base
+              title: base
+              default: 0
+            extra:
+              type: integer
+              description: Extra
+              title: extra
+              default: 0
 
     Usage:
       type: object
