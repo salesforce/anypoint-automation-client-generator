@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Organization API
   description: Description of the Organization API
-  version: 1.1.0
+  version: 1.1.1
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub
@@ -132,7 +132,6 @@ components:
         application/json:
           schema:
             type: object
-            default: {}
     SuccessUpdateBG:
       description: Success response
       content:
@@ -225,7 +224,6 @@ components:
         entitlements:
           $ref: "#/components/schemas/Entitlements"
         environments:
-          default: []
           title: environments
           type: array
           description: List of environments.
@@ -277,7 +275,6 @@ components:
           title: ownerId
           type: string
         parentOrganizationIds:
-          default: []
           description: The ids of the parent organizations.
           items:
             title: parentOrganizationId
@@ -285,12 +282,10 @@ components:
           title: parentOrganizationIds
           type: array
         properties:
-          default: {}
           description: The properties of the organization.
           title: properties
           type: object
         subOrganizationIds:
-          default: []
           description: The ids of the sub organizations.
           items:
             default: ''
@@ -300,7 +295,6 @@ components:
           title: subOrganizationIds
           type: array
         tenantOrganizationIds:
-          default: []
           description: The ids of the tenant organizations.
           items:
             title: tenantOrganizationId
@@ -329,7 +323,6 @@ components:
               title: sessionTimeout
               type: integer
             subscription:
-              default: {}
               title: subscription
               type: object
               description: The subscription details of the organization.
@@ -367,7 +360,6 @@ components:
               type: string
 
     Environment:
-      default: {}
       title: environment
       type: object
       description: an instance of an environment.
@@ -494,7 +486,6 @@ components:
       description: Business Group entitlements
       properties:
         angGovernance:
-          default: {}
           description: Ang Governance entitlements
           properties:
             level:
@@ -516,7 +507,6 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: apiCommunityManager
         apiMonitoring:
-          default: {}
           description: API Monitoring entitlements
           properties:
             schedules:
@@ -527,7 +517,6 @@ components:
           title: apiMonitoring
           type: object
         apiQuery:
-          default: {}
           title: apiQuery
           type: object
           description: API Query entitlements
@@ -577,7 +566,6 @@ components:
           title: createSubOrgs
           type: boolean
         crowd:
-          default: {}
           title: crowd
           type: object
           description: Crowd entitlements
@@ -601,7 +589,6 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: crowdSelfServiceMigration
         designCenter:
-          default: {}
           title: designCenter
           type: object
           description: Design Center entitlements
@@ -955,7 +942,6 @@ components:
       title: workerClouds
 
     MessagingEntitlement:
-      default: {}
       description: Messaging entitlements
       properties:
         assigned:
@@ -967,7 +953,6 @@ components:
       type: object
 
     MonitoringCenterEntitlement:
-      default: {}
       description: Monitoring Center entitlements
       properties:
         productSKU:
@@ -979,7 +964,6 @@ components:
       type: object
 
     PartnersSandboxEntitlement:
-      default: {}
       description: Partners Sandbox entitlements
       properties:
         assigned:
@@ -991,7 +975,6 @@ components:
       type: object
 
     GatewaysEntitlement:
-      default: {}
       description: Gateway entitlements
       properties:
         assigned:
@@ -1003,7 +986,6 @@ components:
       type: object
 
     PartnersProductionEntitlement:
-      default: {}
       description: Partners Production entitlements
       properties:
         assigned:
