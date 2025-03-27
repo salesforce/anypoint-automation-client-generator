@@ -12,7 +12,7 @@ info:
       - Starting, Stopping or Restarting applications
       - etc.
     This API currently supports deployments to Cloudhub 1.0 targets only.
-  version: 1.1.0
+  version: 1.2.0
 
 servers:
   - url: https://anypoint.mulesoft.com
@@ -64,6 +64,47 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      operationId: GetCH1Deployments
+      summary: List Cloudhub1 deployments
+      description: Retrieves a list of Cloudhub1 deployments for the specified query. If the query returns no results, then an empty list is returned.
+      parameters:
+        - name: retrieveStatistics
+          in: query
+          description: "Include statistics for each application in the response."
+          required: false
+          schema:
+            type: boolean
+        - name: period
+          in: query
+          description: "Number of milliseconds of statistics to gather."
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: retrieveLogLevels
+          in: query
+          description: "Include log levels for each application in the response."
+          required: false
+          schema:
+            type: boolean
+        - name: retrieveTrackingSettings
+          in: query
+          description: "Include tracking settings for each application in the response."
+          required: false
+          schema:
+            type: boolean
+        - name: retrieveIpAddresses
+          in: query
+          description: "Include ip address allocations for each application in the response."
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "200":
+          $ref: "#/components/responses/GetCH1Deployments"
     post:
       operationId: PostDeployment
       summary: Create a new deployment
@@ -131,7 +172,7 @@ paths:
         schema:
           type: string
     get:
-      operationId: GetDeploymentDetails
+      operationId: GetDeploymentCH1Details
       summary: Read deployment details
       description: Retrieve a single application by name. Requires 'Read Applications' role.
       responses:
@@ -202,24 +243,30 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GetAllDeploymentsResponse"
+    GetCH1Deployments:
+      description: Response of a list of deployments
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetCH1DeploymentsResponse"
     PostDeploymentResponse:
       description: Response of the create deployment
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DeploymentDetails"
+            $ref: "#/components/schemas/DeploymentCH1Details"
     GetDeploymentResponse:
       description: Response of the get deployment
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DeploymentDetails"
+            $ref: "#/components/schemas/DeploymentCH1Details"
     PutDeploymentResponse:
       description: Response of the put deployment
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DeploymentDetails"
+            $ref: "#/components/schemas/DeploymentCH1Details"
     DeleteDeploymentResponse:
       description: Response of the put deployment
     GetMuleVersionsResponse:
@@ -230,91 +277,6 @@ components:
             $ref: "#/components/schemas/RuntimeCollection"
 
   schemas:
-    Deployment:
-      type: object
-      properties:
-        id:
-          type: string
-          description: A unique identifier for the deployment.
-        artifact:
-          type: object
-          description: Details about the artifact associated with the deployment.
-          properties:
-            lastUpdateTime:
-              type: integer
-              format: int64
-              nullable: true
-              description: The timestamp (in milliseconds) when the artifact was last updated.
-            createTime:
-              type: integer
-              format: int64
-              nullable: true
-              description: The creation timestamp (in milliseconds); may be null.
-            name:
-              type: string
-              description: The name of the artifact.
-            fileName:
-              type: string
-              description: The file name of the artifact.
-        lastReportedStatus:
-          type: string
-          description: The last reported status of the deployment (e.g., STARTED, UNDEPLOYED).
-        details:
-          type: object
-          description: Additional details about the deployment.
-          properties:
-            domain:
-              type: string
-              description: The domain name associated with the deployment. only present for CH1.
-            deploymentUpdateStatus:
-              type: string
-              description: The deployment update status, only present for CH1.
-        target:
-          type: object
-          description: Information about the target environment where the deployment is hosted.
-          properties:
-            type:
-              type: string
-              description: The target type (e.g., CLOUDHUB, MC).
-            subtype:
-              type: string
-              description: The target subtype (if applicable).
-            provider:
-              type: string
-              description: The provider of the target platform.
-            id:
-              type: string
-              description: The identifier of the target.
-            name:
-              type: string
-              description: The name of the target.
-            status:
-              type: string
-              description: The current status of the target.
-        application:
-          type: object
-          description: Application-specific information for the deployment.
-          properties:
-            status:
-              type: string
-              description: The status of the application.
-        muleVersion:
-          type: object
-          description: Details regarding the Mule runtime version.
-          properties:
-            version:
-              type: string
-              description: The Mule runtime version.
-            updateId:
-              type: string
-              description: The identifier for the runtime update.
-            latestUpdateId:
-              type: string
-              description: The identifier for the latest runtime update.
-            endOfSupportDate:
-              type: integer
-              format: int64
-              description: The timestamp (in milliseconds) representing the end-of-support date.
 
     DeploymentList:
       type: array
@@ -329,13 +291,18 @@ components:
         total:
           type: integer
 
+    GetCH1DeploymentsResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/DeploymentCH1Summary"
+
     DeployAppBody:
       type: object
       properties:
         appInfoJson:
           type: string
           description: >
-            A JSON string representing the deployment configuration. Look at "DeploymentInfo" for structure.
+            A JSON string representing the deployment configuration. Look at "NewDeploymentStruct" for structure.
         file:
           type: string
           format: binary
@@ -350,13 +317,13 @@ components:
         appInfoJson:
           type: string
           description: >
-            A JSON string representing the deployment configuration. Look at "DeploymentInfo" for structure.
+            A JSON string representing the deployment configuration. Look at "NewDeploymentStruct" for structure.
         file:
           type: string
           format: binary
           description: The Mule application artifact to be deployed.
 
-    DeploymentInfo:
+    NewDeploymentStruct:
       type: object
       properties:
         domain:
@@ -470,7 +437,7 @@ components:
           items:
             type: string
 
-    DeploymentDetails:
+    DeploymentCH1Details:
       description: "Response schema for deploying an app to CH1"
       type: object
       properties:
@@ -493,44 +460,8 @@ components:
           type: string
           description: "Current status of the deployed application (e.g. STARTED)."
         workers:
-          type: object
-          description: "Worker configuration for the application deployment."
-          properties:
-            type:
-              type: object
-              description: "Details about the worker type including size and resource allocations."
-              properties:
-                name:
-                  type: string
-                  description: "The name of the worker type."
-                weight:
-                  type: number
-                  description: "The weight factor for the worker type."
-                cpu:
-                  type: string
-                  description: "The CPU allocation description (e.g., '1 vCore')."
-                memory:
-                  type: string
-                  description: "The memory allocation description (e.g., '1.5 GB memory')."
-            amount:
-              type: integer
-              description: "The number of worker instances allocated."
-            remainingOrgWorkers:
-              type: integer
-              description: "Remaining worker count available to the organization."
-            totalOrgWorkers:
-              type: integer
-              description: "Total number of workers allocated to the organization."
-            recentStatistics:
-              type: object
-              description: "Recent performance statistics for the workers."
-              properties:
-                transactions:
-                  type: integer
-                  description: "The number of transactions processed."
-                cpu:
-                  type: integer
-                  description: "The current CPU usage percentage."
+          $ref: '#/components/schemas/Workers'
+          title: workers
         lastUpdateTime:
           type: integer
           format: int64
@@ -539,62 +470,13 @@ components:
           type: string
           description: "The name of the deployed application file."
         muleVersion:
-          type: object
+          title: muleVersion
           description: "Details of the current Mule runtime version in use."
-          properties:
-            version:
-              type: string
-              description: "The Mule runtime version."
-            updateId:
-              type: string
-              description: "Identifier for the current update."
-            latestUpdateId:
-              type: string
-              description: "Identifier for the latest available update."
-            endOfSupportDate:
-              type: integer
-              format: int64
-              description: "Timestamp (in milliseconds) representing the end-of-support date."
-            endOfLifeDate:
-              type: integer
-              format: int64
-              description: "Timestamp (in milliseconds) representing the end-of-life date."
-            updateVersion:
-              type: string
-              description: "The update version string."
-            releaseChannel:
-              type: string
-              description: "The release channel for the runtime."
-            javaVersion:
-              type: string
-              description: "The version of Java used by the runtime."
+          $ref: '#/components/schemas/MuleVersion'
         previousMuleVersion:
-          type: object
+          title: previousMuleVersion
           description: "Details of the previous Mule runtime version before the current deployment."
-          properties:
-            version:
-              type: string
-              description: "The previous Mule runtime version."
-            updateId:
-              type: string
-              description: "Identifier for the previous update."
-            endOfSupportDate:
-              type: integer
-              format: int64
-              description: "Timestamp (in milliseconds) for the previous version's end-of-support date."
-            endOfLifeDate:
-              type: integer
-              format: int64
-              description: "Timestamp (in milliseconds) for the previous version's end-of-life date."
-            updateVersion:
-              type: string
-              description: "The previous update version string."
-            releaseChannel:
-              type: string
-              description: "The release channel for the previous runtime."
-            javaVersion:
-              type: string
-              description: "The previous Java version used."
+          $ref: '#/components/schemas/MuleVersion'
         tenants:
           type: integer
           description: "The number of tenants associated with the deployment."
@@ -615,15 +497,8 @@ components:
               type: string
               description: "The subnet mask for the VPN configuration."
         deploymentGroup:
-          type: object
-          description: "Information about the deployment group to which this app belongs."
-          properties:
-            id:
-              type: string
-              description: "Unique identifier for the deployment group."
-            name:
-              type: string
-              description: "The name of the deployment group."
+          title: deploymentGroup
+          $ref: '#/components/schemas/DeploymentGroup'
         persistentQueues:
           type: boolean
           description: "Indicates whether persistent queues are enabled."
@@ -655,23 +530,19 @@ components:
           type: boolean
           description: "Indicates if VPN is enabled for the deployment."
         trackingSettings:
-          type: object
-          description: "Settings for tracking application performance or usage."
-          properties:
-            trackingLevel:
-              type: string
-              description: "The level of tracking applied (e.g., DISABLED, BASIC, FULL)."
+          $ref: '#/components/schemas/TrackingSettings'
+          title: trackingSettings
         logLevels:
+          title: logLevels
           type: array
           description: "List of log level configurations for the application."
           items:
-            type: object
-            properties: {}
+            $ref: '#/components/schemas/LogLevel'
         ipAddresses:
           type: array
           description: "List of IP addresses associated with the deployment."
           items:
-            type: string
+            $ref: '#/components/schemas/IpAddress'
 
     RuntimeCollection:
       type: object
@@ -889,3 +760,290 @@ components:
           type: boolean
           description: "Indicates whether this runtime is the default."
 
+    Deployment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique identifier for the deployment.
+        artifact:
+          type: object
+          description: Details about the artifact associated with the deployment.
+          properties:
+            lastUpdateTime:
+              type: integer
+              format: int64
+              nullable: true
+              description: The timestamp (in milliseconds) when the artifact was last updated.
+            createTime:
+              type: integer
+              format: int64
+              nullable: true
+              description: The creation timestamp (in milliseconds); may be null.
+            name:
+              type: string
+              description: The name of the artifact.
+            fileName:
+              type: string
+              description: The file name of the artifact.
+        lastReportedStatus:
+          type: string
+          description: The last reported status of the deployment (e.g., STARTED, UNDEPLOYED).
+        details:
+          type: object
+          description: Additional details about the deployment.
+          properties:
+            domain:
+              type: string
+              description: The domain name associated with the deployment. only present for CH1.
+            deploymentUpdateStatus:
+              type: string
+              description: The deployment update status, only present for CH1.
+        target:
+          type: object
+          description: Information about the target environment where the deployment is hosted.
+          properties:
+            type:
+              type: string
+              description: The target type (e.g., CLOUDHUB, MC).
+            subtype:
+              type: string
+              description: The target subtype (if applicable).
+            provider:
+              type: string
+              description: The provider of the target platform.
+            id:
+              type: string
+              description: The identifier of the target.
+            name:
+              type: string
+              description: The name of the target.
+            status:
+              type: string
+              description: The current status of the target.
+        application:
+          type: object
+          description: Application-specific information for the deployment.
+          properties:
+            status:
+              type: string
+              description: The status of the application.
+        muleVersion:
+          type: object
+          description: Details regarding the Mule runtime version.
+          properties:
+            version:
+              type: string
+              description: The Mule runtime version.
+            updateId:
+              type: string
+              description: The identifier for the runtime update.
+            latestUpdateId:
+              type: string
+              description: The identifier for the latest runtime update.
+            endOfSupportDate:
+              type: integer
+              format: int64
+              description: The timestamp (in milliseconds) representing the end-of-support date.
+
+    DeploymentCH1Summary:
+      type: object
+      properties:
+        region:
+          type: string
+          example: "eu-central-1"
+        versionId:
+          type: string
+          example: "5cc1d92e2660b11343296d0b"
+        loggingNgEnabled:
+          type: boolean
+        loggingCustomLog4JEnabled:
+          type: boolean
+        updateRuntimeConfig:
+          type: boolean
+        deploymentErrorMessage:
+          type: string
+        domain:
+          type: string
+          example: "proc-communication-dev-eu-v1"
+        fullDomain:
+          type: string
+          example: "proc-communication-dev-eu-v1.de-c1.cloudhub.io"
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            securePlaceholder.key: "uUKmva7DCqvqFu8B"
+            anypoint.platform.client_id: "6d5ca2c2581b4cabad893c265c87f0fc"
+        propertiesOptions:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              secure:
+                type: boolean
+        status:
+          type: string
+          enum: ["STARTED", "UNDEPLOYED"]
+        workers:
+          $ref: "#/components/schemas/Workers"
+        lastUpdateTime:
+          type: integer
+          format: int64
+          example: 1742834921019
+        fileName:
+          type: string
+          example: "proc-communication-api-1.22.99-mule-application.jar"
+        persistentQueues:
+          type: boolean
+        persistentQueuesEncryptionEnabled:
+          type: boolean
+        persistentQueuesEncrypted:
+          type: boolean
+        monitoringEnabled:
+          type: boolean
+        monitoringAutoRestart:
+          type: boolean
+        staticIPsEnabled:
+          type: boolean
+        hasFile:
+          type: boolean
+        secureDataGatewayEnabled:
+          type: boolean
+        deploymentGroup:
+          $ref: "#/components/schemas/DeploymentGroup"
+        trackingSettings:
+          $ref: "#/components/schemas/TrackingSettings"
+        logLevels:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogLevel"
+        ipAddresses:
+          type: array
+          items:
+            $ref: "#/components/schemas/IpAddress"
+        muleVersion:
+          $ref: "#/components/schemas/MuleVersion"
+        previousMuleVersion:
+          $ref: "#/components/schemas/MuleVersion"
+
+    Workers:
+      type: object
+      description: "Worker configuration for the application deployment."
+      properties:
+        type:
+          $ref: "#/components/schemas/WorkerType"
+        amount:
+          type: integer
+          description: "The number of worker instances allocated."
+        remainingOrgWorkers:
+          type: number
+          description: "Remaining worker count available to the organization."
+        totalOrgWorkers:
+          type: number
+          description: "Total number of workers allocated to the organization."
+        recentStatistics:
+          type: object
+          description: "Recent performance statistics for the workers."
+          properties:
+            transactions:
+              type: integer
+              description: "The number of transactions processed."
+            cpu:
+              type: integer
+              description: "The current CPU usage percentage."
+
+    WorkerType:
+      type: object
+      description: "Worker type configuration for the application deployment."
+      properties:
+        name:
+          type: string
+          description: "The name of the worker type."
+        weight:
+          type: number
+          description: "The weight factor for the worker type."
+        cpu:
+          type: string
+          description: "The CPU allocation description (e.g., '1 vCore')."
+        memory:
+          type: string
+          description: "The memory allocation description (e.g., '1.5 GB memory')."
+
+    MuleVersion:
+      type: object
+      properties:
+        version:
+          type: string
+          description: "The Mule runtime version."
+        updateId:
+          type: string
+          description: "Identifier for the current update."
+        latestUpdateId:
+          type: string
+          description: "Identifier for the latest available update."
+        endOfSupportDate:
+          type: integer
+          format: int64
+          description: "Timestamp (in milliseconds) representing the end-of-support date."
+        endOfLifeDate:
+          type: integer
+          format: int64
+          description: "Timestamp (in milliseconds) representing the end-of-life date."
+        updateVersion:
+          type: string
+          description: "The update version string."
+        releaseChannel:
+          type: string
+          description: "The release channel for the runtime."
+        javaVersion:
+          type: string
+          description: "The version of Java used by the runtime."
+
+    DeploymentGroup:
+      type: object
+      description: "Information about the deployment group to which this app belongs."
+      properties:
+        id:
+          type: string
+          description: "Unique identifier for the deployment group."
+        name:
+          type: string
+          description: "The name of the deployment group."
+
+    TrackingSettings:
+      type: object
+      description: "Settings for tracking application performance or usage."
+      properties:
+        trackingLevel:
+          type: string
+          description: "The level of tracking applied (e.g., DISABLED, BASIC, FULL)."
+
+    LogLevel:
+      type: object
+      description: "Configuration for log levels in the application."
+      properties:
+        packageName:
+          type: string
+        level:
+          type: string
+
+    IpAddress:
+      type: object
+      properties:
+        regionId:
+          type: string
+          description: "The region identifier for the IP address."
+        regionName:
+          type: string
+          description: "The region name for the IP address."
+        type:
+          type: string
+          description: "The type of IP address (ex. vpc)"
+        address:
+          type: string
+          description: "The IP address."
+        state:
+          type: string
+          description: "The state of the IP address (ex. available, in use)."
