@@ -486,17 +486,9 @@ components:
       description: Business Group entitlements
       properties:
         angGovernance:
+          $ref: '#/components/schemas/AngGovernanceEntitlement'
           description: Ang Governance entitlements
-          properties:
-            level:
-              default: 0
-              description: Ang Governance level
-              example:
-              - -1
-              title: level
-              type: integer
           title: angGovernance
-          type: object
         anypointSecurityEdgePolicies:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: anypointSecurityEdgePolicies
@@ -507,30 +499,12 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: apiCommunityManager
         apiMonitoring:
+          $ref: '#/components/schemas/ApiMonitoringEntitlement'
           description: API Monitoring entitlements
-          properties:
-            schedules:
-              default: 0
-              description: Schedules
-              title: schedules
-              type: integer
           title: apiMonitoring
-          type: object
         apiQuery:
           title: apiQuery
-          type: object
-          description: API Query entitlements
-          properties:
-            enabled:
-              default: false
-              description: API Query enabled
-              title: enabled
-              type: boolean
-            productSKU:
-              default: 0
-              description: Product SKU
-              title: productSKU
-              type: integer
+          $ref: '#/components/schemas/ApiQueryEntitlement'
         apiQueryC360:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: apiQueryC360
@@ -538,17 +512,14 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: apis
         appViz:
-          default: false
           description: AppViz entitlements
           title: appViz
           type: boolean
         armAlerts:
-          default: false
           description: ARM Alerts entitlements
           title: armAlerts
           type: boolean
         autoscaling:
-          default: false
           description: Autoscaling entitlements
           title: autoscaling
           type: boolean
@@ -556,65 +527,32 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: cam
         createEnvironments:
-          default: false
           description: Create Environments entitlements
           title: createEnvironments
           type: boolean
         createSubOrgs:
-          default: false
           description: Create Sub Orgs entitlements
           title: createSubOrgs
           type: boolean
         crowd:
           title: crowd
-          type: object
-          description: Crowd entitlements
-          properties:
-            environments:
-              default: false
-              description: Crowd environments
-              title: environments
-              type: boolean
-            hideApiManagerDesigner:
-              default: false
-              description: Crowd Hide API Manager Designer
-              title: hideApiManagerDesigner
-              type: boolean
-            hideFormerApiPlatform:
-              default: false
-              description: Crowd Hide Former API Platform
-              title: hideFormerApiPlatform
-              type: boolean
+          $ref: '#/components/schemas/CrowdEntitlement'
         crowdSelfServiceMigration:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: crowdSelfServiceMigration
         designCenter:
           title: designCenter
-          type: object
-          description: Design Center entitlements
-          properties:
-            api:
-              default: false
-              description: API entitlements
-              title: api
-              type: boolean
-            mozart:
-              default: false
-              description: Mozart entitlements
-              title: mozart
-              type: boolean
+          $ref: '#/components/schemas/DesignCenterEntitlement'
         exchange2:
-          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          $ref: '#/components/schemas/Exchange2Entitlement'
           title: exchange2
         externalIdentity:
-          default: false
           description: External Identity entitlements
           title: externalIdentity
           type: boolean
         gateways:
           $ref: '#/components/schemas/GatewaysEntitlement'
         globalDeployment:
-          default: false
           description: Global Deployment entitlements
           title: globalDeployment
           type: boolean
@@ -622,12 +560,10 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: hybrid
         hybridAutoDiscoverProperties:
-          default: false
           description: Hybrid auto-discover properties
           title: hybridAutoDiscoverProperties
           type: boolean
         hybridInsight:
-          default: false
           description: Hybrid Insight entitlements
           title: hybridInsight
           type: boolean
@@ -662,12 +598,10 @@ components:
           $ref: '#/components/schemas/PartnersSandboxEntitlement'
           title: partnersSandbox
         pcf:
-          default: false
           description: PCF entitlements
           title: pcf
           type: boolean
         runtimeFabric:
-          default: false
           description: Runtime Fabric entitlements
           title: runtimeFabric
           type: boolean
@@ -679,22 +613,31 @@ components:
           title: serviceMesh
         staticIps:
           $ref: '#/components/schemas/StaticIpsEntitlement'
+          title: staticIps
         tradingPartnersProduction:
           $ref: '#/components/schemas/TradingPartnersProductionEntitlement'
+          title: tradingPartnersProduction
         tradingPartnersSandbox:
           $ref: '#/components/schemas/TradingPartnersSandboxEntitlement'
+          title: tradingPartnersSandbox
         vCoresDesign:
           $ref: '#/components/schemas/vCoresDesignEntitlement'
+          title: vCoresDesign
         vCoresProduction:
           $ref: '#/components/schemas/vCoresProductionEntitlement'
+          title: vCoresProduction
         vCoresSandbox:
           $ref: '#/components/schemas/vCoresSandboxEntitlement'
+          title: vCoresSandbox
         vpcs:
           $ref: '#/components/schemas/VpcsEntitlement'
+          title: vpcs
         vpns:
           $ref: '#/components/schemas/VpnsEntitlement'
+          title: vpns
         workerClouds:
           $ref: '#/components/schemas/WorkerCloudsEntitlement'
+          title: workerClouds
         workerLoggingOverride:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: workerLoggingOverride
@@ -708,40 +651,17 @@ components:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: muleDxEDA
         highAvailability:
-          type: object
+          $ref: '#/components/schemas/HighAvailabilityEntitlement'
           title: highAvailability
-          properties:
-            clustering:
-              type: boolean
-              description: Clustering
-              title: clustering
-              default: false
         cloudhub1:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: cloudhub1
         apiGovernance:
-          type: object
+          $ref: '#/components/schemas/ApiGovernanceEntitlement'
           title: apiGovernance
-          properties:
-            enabled:
-              type: boolean
-              description: API Governance enabled
-              title: enabled
-              default: false
-            apisPerMonth:
-              type: integer
-              description: APIs per month
-              title: apisPerMonth
-              default: 20
         apiGovernanceDomain:
-          type: object
+          $ref: '#/components/schemas/ApiGovernanceDomainEntitlement'
           title: apiGovernanceDomain
-          properties:
-            domain:
-              type: string
-              description: API Governance domain
-              title: domain
-              default: ASSET
         apiCatalog:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: apiCatalog
@@ -766,7 +686,15 @@ components:
         telemetryExporter:
           $ref: '#/components/schemas/EnablementResourceEntitlement'
           title: telemetryExporter
-
+        managedGatewaySmall:
+          $ref: '#/components/schemas/ManagedGatewaySmallEntitlement'
+          title: managedGatewaySmall
+        managedGatewayLarge:
+          $ref: '#/components/schemas/ManagedGatewayLargeEntitlement'
+          title: managedGatewayLarge
+        networkConnections:
+          $ref: '#/components/schemas/NetworkConnectionsEntitlement'
+          title: networkConnections
 
     EntitlementsCore:
       description: Entitlements core
@@ -802,6 +730,23 @@ components:
           $ref: '#/components/schemas/VpnsEntitlement'
       title: entitlementsCore
       type: object
+
+    AngGovernanceEntitlement:
+      type: object
+      properties:
+        level:
+          description: Ang Governance level
+          example: -1
+          title: level
+          type: integer
+
+    ApiMonitoringEntitlement:
+      type: object
+      properties:
+        schedules:
+          description: Schedules
+          title: schedules
+          type: integer
 
     TradingPartnersProductionEntitlement:
       type: object
@@ -840,6 +785,7 @@ components:
 
     StaticIpsEntitlement:
       type: object
+      description: Static IPs entitlements
       properties:
         assigned:
           type: integer
@@ -851,7 +797,6 @@ components:
           description: Static IPs reassigned
           title: reassigned
           default: 0
-      title: staticIps
 
     VpnsEntitlement:
       type: object
@@ -929,6 +874,7 @@ components:
       title: vCoresSandbox
 
     WorkerCloudsEntitlement:
+      title: workerClouds
       type: object
       properties:
         assigned:
@@ -941,7 +887,6 @@ components:
           description: Worker Clouds reassigned
           title: reassigned
           default: 0
-      title: workerClouds
 
     MessagingEntitlement:
       description: Messaging entitlements
@@ -958,10 +903,29 @@ components:
       description: Monitoring Center entitlements
       properties:
         productSKU:
-          default: 0
           description: Product SKU
           title: productSKU
           type: integer
+        dataRegion:
+          description: Data region
+          title: dataRegion
+          type: string
+        storageBase:
+          description: Storage base
+          title: storageBase
+          type: number
+        storageAddOn:
+          description: Storage add-on
+          title: storageAddOn
+          type: number
+        productionUnits:
+          description: Production units
+          title: productionUnits
+          type: number
+        preProductionUnits:
+          description: Pre-production units
+          title: preProductionUnits
+          type: number
       title: monitoringCenter
       type: object
 
@@ -969,7 +933,6 @@ components:
       description: Partners Sandbox entitlements
       properties:
         assigned:
-          default: 0
           description: Partners Sandbox assigned
           title: assigned
           type: integer
@@ -1007,8 +970,6 @@ components:
           description: Whether entitlement resource is enabled
           title: enabled
           type: boolean
-      required:
-        - enabled
 
     AddOnEntitlement:
       type: object
@@ -1070,27 +1031,22 @@ components:
           type: boolean
           description: Composer enabled
           title: enabled
-          default: false
         tasksPerMonth:
           type: integer
           description: Tasks per month
           title: tasksPerMonth
-          default: 0
         maxConnectors:
           type: integer
           description: Max connectors
           title: maxConnectors
-          default: 0
         unlimitedConnectors:
           type: boolean
           description: Unlimited connectors
           title: unlimitedConnectors
-          default: false
         isHyperAutomation:
           type: boolean
           description: Hyper Automation
           title: hyperAutomation
-          default: false
 
     RpaEntitlement:
       type: object
@@ -1099,17 +1055,14 @@ components:
           type: boolean
           description: RPA enabled
           title: enabled
-          default: false
         active:
           type: boolean
           description: RPA active
           title: active
-          default: false
         composerVersion:
           type: string
           description: Composer version
           title: composerVersion
-          default: ""
 
     UsageBasedPricingEntitlement:
       type: object
@@ -1168,6 +1121,153 @@ components:
               description: Extra
               title: extra
               default: 0
+
+    ApiQueryEntitlement:
+      type: object
+      description: API Query entitlements
+      properties:
+        enabled:
+          default: false
+          description: API Query enabled
+          title: enabled
+          type: boolean
+        productSKU:
+          default: 0
+          description: Product SKU
+          title: productSKU
+          type: integer
+        sandbox:
+          description: Product SKU
+          title: productSKU
+          type: integer
+        production:
+          description: Product SKU
+          title: productSKU
+          type: integer
+
+    CrowdEntitlement:
+      type: object
+      description: Crowd entitlements
+      properties:
+        environments:
+          default: false
+          description: Crowd environments
+          title: environments
+          type: boolean
+        hideApiManagerDesigner:
+          default: false
+          description: Crowd Hide API Manager Designer
+          title: hideApiManagerDesigner
+          type: boolean
+        hideFormerApiPlatform:
+          default: false
+          description: Crowd Hide Former API Platform
+          title: hideFormerApiPlatform
+          type: boolean
+
+    Exchange2Entitlement:
+      type: object
+      description: Exchange 2 entitlements
+      properties:
+        enabled:
+          description: Exchange 2 enabled
+          title: enabled
+          type: boolean
+        assetUsageAndEngagement:
+          type: object
+          properties:
+            enabled:
+              description: Asset usage and engagement enabled
+              title: enabled
+              type: boolean
+
+    DesignCenterEntitlement:
+      type: object
+      description: Design Center entitlements
+      properties:
+        api:
+          description: API entitlements
+          title: api
+          type: boolean
+        mozart:
+          description: Mozart entitlements
+          title: mozart
+          type: boolean
+        apiVisual:
+          description: API Visual entitlements
+          title: apiVisual
+          type: boolean
+        apiExample:
+          description: API Example entitlements
+          title: apiExample
+          type: boolean
+
+    ManagedGatewaySmallEntitlement:
+      type: object
+      description: Managed Gateway Small entitlements
+      properties:
+        assigned:
+          description: Managed Gateway Small assigned
+          title: assigned
+          type: integer
+        reassigned:
+          description: Managed Gateway Small reassigned
+          title: reassigned
+          type: integer
+
+    ManagedGatewayLargeEntitlement:
+      type: object
+      description: Managed Gateway Large entitlements
+      properties:
+        assigned:
+          description: Managed Gateway Large assigned
+          title: assigned
+          type: integer
+        reassigned:
+          description: Managed Gateway Large reassigned
+          title: reassigned
+          type: integer
+
+    NetworkConnectionsEntitlement:
+      type: object
+      description: Network connections entitlements
+      properties:
+        assigned:
+          description: Network connections assigned
+          title: assigned
+          type: integer
+        reassigned:
+          description: Network connections reassigned
+          title: reassigned
+          type: integer
+
+    ApiGovernanceEntitlement:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: API Governance enabled
+          title: enabled
+        apisPerMonth:
+          type: integer
+          description: APIs per month
+          title: apisPerMonth
+
+    ApiGovernanceDomainEntitlement:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: API Governance domain
+          title: domain
+
+    HighAvailabilityEntitlement:
+      type: object
+      properties:
+        clustering:
+          type: boolean
+          description: Clustering
+          title: clustering
 
     Usage:
       type: object
