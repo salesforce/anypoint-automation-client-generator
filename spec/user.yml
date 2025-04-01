@@ -1,30 +1,32 @@
 openapi: 3.0.0
 info:
   title: User API
-  description: Description of the User API 
-  version: 1.0.0
+  description: Description of the User API
+  version: 1.1.1
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 paths:
   /organizations/{orgId}/users:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
     get:
+      operationId: listUsers
       description: Returns the group of users that belong to the specified organization.
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
         - name: type
           in: query
           description: A search string to specify the type of user you want to retrieve.
@@ -50,14 +52,8 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessListUsers'
     post:
+      operationId: createUser
       description: Creates a User
-      parameters:
-      - name: orgId
-        in: path
-        description: The ID of the organization in GUID format
-        required: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -72,29 +68,7 @@ paths:
           $ref: '#/components/responses/SuccessPostUser'
 
   /organizations/{orgId}/users/{userId}:
-    get:
-      description: Returns a specific user that belong to the specified organization.
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: userId
-          in: path
-          description: the ID of the user
-          required: true
-          schema:
-            type: string
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '200':    # status code
-          $ref: '#/components/responses/SuccessGetUser'
-    put:
-      description: Update a user
-      parameters:
+    parameters:
       - name: orgId
         in: path
         description: The ID of the organization in GUID format
@@ -103,10 +77,21 @@ paths:
           type: string
       - name: userId
         in: path
-        description: The ID of the user
+        description: the ID of the user
         required: true
         schema:
           type: string
+    get:
+      operationId: getUser
+      description: Returns a specific user that belong to the specified organization.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetUser'
+    put:
+      operationId: updateUser
+      description: Update a user
       requestBody:
         content:
           application/json:
@@ -120,20 +105,8 @@ paths:
         '204':
           $ref: '#/components/responses/SuccessPutUser'
     delete:
+      operationId: deleteUser
       description: Delete the user
-      parameters:
-      - name: orgId
-        in: path
-        description: The ID of the organization in GUID format
-        required: true
-        schema:
-          type: string
-      - name: userId
-        in: path
-        description: The ID of the user
-        required: true
-        schema:
-          type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -159,12 +132,12 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 400
               message:
                 type: string
                 title: the error message
-                example: A sample message here 
+                example: A sample message here
     SuccessPostUser:
       description: Success response
       content:
@@ -350,7 +323,7 @@ components:
           type: object
           title: primaryOrganization
           properties:
-            id: 
+            id:
               type: string
               title: id
             name:
@@ -437,7 +410,7 @@ components:
       title: memberOfOrganizations
       items:
         $ref: "#/components/schemas/org"
-    
+
     contributorOfOrganizations:
       type: array
       title: contributorOfOrganizations
@@ -462,7 +435,7 @@ components:
         name:
           type: string
           title: name
-        id: 
+        id:
           type: string
           title: id
         createdAt:
