@@ -1,37 +1,39 @@
 openapi: 3.0.0
 info:
   title: Team Members API
-  description: Description of the Team Members API 
-  version: 1.0.0
+  description: Description of the Team Members API
+  version: 1.1.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 
-paths: 
+paths:
   /organizations/{orgId}/teams/{teamId}/members:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: teamId
+        in: path
+        description: The ID of the team in GUID format
+        required: true
+        schema:
+          type: string
     get:
+      operationId: getTeamMembers
       description: retrieves team members
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
         - name: membership_type
           in: query
           description: Include the group access mappings that grant the provided membership type By default, all group access mappings are returned
@@ -94,60 +96,43 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '201':    # status code
           $ref: '#/components/responses/SuccessListTeamMembers'
-    
+
   /organizations/{orgId}/teams/{teamId}/members/{userId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: teamId
+        in: path
+        description: The ID of the team in GUID format
+        required: true
+        schema:
+          type: string
+      - name: userId
+        in: path
+        description: The ID of the user in GUID format
+        required: true
+        schema:
+          type: string
     put:
+      operationId: putTeamMember
       description: adds the given user to the given team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
-        - name: userId
-          in: path
-          description: The ID of the user in GUID format
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamMemberPutBody"
+              $ref: "#/components/schemas/TeamMemberPutBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPutTeamMember'
     delete:
+      operationId: deleteTeamMember
       description: delete the given user from the given team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
-        - name: userId
-          in: path
-          description: The ID of the user in GUID format
-          required: true
-          schema:
-            type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -170,7 +155,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorsResponse"
+            $ref: "#/components/schemas/ErrorsResponse"
     NotFoundError:
       description: resource not found
     SuccessListTeamMembers:
@@ -178,7 +163,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/teamMemberCollection"
+            $ref: "#/components/schemas/TeamMemberCollection"
     SuccessPutTeamMember:
       description: Success response
     SuccessDeleteTeamMember:
@@ -186,9 +171,9 @@ components:
 
 
   schemas:
-    errorsResponse:
+    ErrorsResponse:
       type: object
-      title: errorsResponse
+      title: ErrorsResponse
       properties:
         errors:
           type: array
@@ -214,9 +199,9 @@ components:
                 type: string
                 title: message
 
-    teamMemberPutBody:
+    TeamMemberPutBody:
       type: object
-      title: teamMemberPutBody
+      title: TeamMemberPutBody
       properties:
         membership_type:
           type: string
@@ -225,9 +210,9 @@ components:
             - member
             - maintainer
 
-    teamMember:
+    TeamMember:
       type: object
-      title: teamMember
+      title: TeamMember
       properties:
         identity_type:
           type: string
@@ -250,16 +235,16 @@ components:
         updated_at:
           type: string
           title: updatedAt
-    
-    teamMemberCollection:
+
+    TeamMemberCollection:
       type: object
-      title: teamMemberCollection
+      title: TeamMemberCollection
       properties:
         data:
           type: array
           title: data
           items:
-            $ref: "#/components/schemas/teamMember"
+            $ref: "#/components/schemas/TeamMember"
         total:
           type: integer
           title: total

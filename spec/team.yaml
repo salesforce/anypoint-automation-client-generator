@@ -1,31 +1,33 @@
 openapi: 3.0.0
 info:
   title: Team API
-  description: Description of the Team API 
-  version: 1.0.0
+  description: Description of the Team API
+  version: 1.1.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
-
+  - bearerAuth: []
 
 paths:
   /organizations/{orgId}/teams:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
     get:
-      description: Returns teams.
+      operationId: getTeams
+      summary: Read all Teams for a given org
+      description: Returns all teams for a given org
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
         - name: ancestor_team_id
           in: query
           description: team_id that must appear in the team's ancestor_team_ids.
@@ -98,41 +100,38 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessListTeams'
     post:
+      operationId: createTeam
+      summary: Create a new team
       description: Creates a new team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamPostBody"
+              $ref: "#/components/schemas/TeamPostBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPostTeam'
-    
+
   /organizations/{orgId}/teams/{teamId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: teamId
+        in: path
+        description: The ID of the team in GUID format
+        required: true
+        schema:
+          type: string
     get:
-      description: retrieves team by id
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
+      operationId: getTeam
+      summary: Read a team by id
+      description: Retrieves a team by id
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -141,45 +140,23 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessGetTeam'
     patch:
-      description: updates a team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
+      operationId: updateTeam
+      summary: Update a team by id
+      description: Updates a team by id
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamPatchBody"
+              $ref: "#/components/schemas/TeamPatchBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPatchTeam'
     delete:
-      description: delete a team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
+      operationId: deleteTeam
+      summary: Delete a team by id
+      description: Deletes a team by id
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -187,26 +164,28 @@ paths:
           $ref: '#/components/responses/SuccessDeleteTeam'
 
   /organizations/{orgId}/teams/{teamId}/parent:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: teamId
+        in: path
+        description: The ID of the team in GUID format
+        required: true
+        schema:
+          type: string
     put:
-      description: moves a team (along with its nested teams) from one parent team to another
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
+      operationId: moveTeam
+      summary: Move a team
+      description: Moves a team (along with its nested teams) from one parent team to another
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamPutBody"
+              $ref: "#/components/schemas/TeamPutBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -229,7 +208,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorsResponse"
+            $ref: "#/components/schemas/ErrorsResponse"
     NotFoundError:
       description: resource not found
     SuccessListTeams:
@@ -237,46 +216,37 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/teamCollection"
+            $ref: "#/components/schemas/TeamCollection"
     SuccessGetTeam:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/team"
+            $ref: "#/components/schemas/Team"
     SuccessPostTeam:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/team"
+            $ref: "#/components/schemas/Team"
     SuccessPatchTeam:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/team"
+            $ref: "#/components/schemas/Team"
     SuccessPutTeam:
       description: Success response
       content:
         application/json:
           schema:
-            allOf:
-              - $ref: "#/components/schemas/team"
-              - type: object
-                title: previousTeamState
-                properties:
-                  previous_ancestor_team_ids:
-                    type: array
-                    title: previousAncestorTeamIds
-                    items:
-                      type: string
+            $ref: "#/components/schemas/PutTeamResponse"
     SuccessDeleteTeam:
       description: Success response
 
 
   schemas:
-    errorsResponse:
+    ErrorsResponse:
       type: object
       title: errorsResponse
       properties:
@@ -304,9 +274,21 @@ components:
                 type: string
                 title: message
 
-    teamPostBody:
+    PutTeamResponse:
+      allOf:
+        - $ref: "#/components/schemas/Team"
+        - type: object
+          title: previousTeamState
+          properties:
+            previous_ancestor_team_ids:
+              type: array
+              title: previousAncestorTeamIds
+              items:
+                type: string
+
+    TeamPostBody:
       type: object
-      title: teamPostBody
+      title: TeamPostBody
       properties:
         parent_team_id:
           type: string
@@ -319,9 +301,9 @@ components:
           title: teamType
           default: internal
 
-    teamPatchBody:
+    TeamPatchBody:
       type: object
-      title: teamPatchBody
+      title: TeamPatchBody
       properties:
         team_name:
           type: string
@@ -331,17 +313,17 @@ components:
           title: teamType
           default: internal
 
-    teamPutBody:
+    TeamPutBody:
       type: object
-      title: teamPutBody
+      title: TeamPutBody
       properties:
         parent_team_id:
           type: string
           title: parentTeamId
 
-    team:
+    Team:
       type: object
-      title: team
+      title: Team
       properties:
         org_id:
           type: string
@@ -366,16 +348,16 @@ components:
         updated_at:
           type: string
           title: updatedAt
-    
-    teamCollection:
+
+    TeamCollection:
       type: object
-      title: teamCollection
+      title: TeamCollection
       properties:
         data:
           type: array
           title: data
           items:
-            $ref: "#/components/schemas/team"
+            $ref: "#/components/schemas/Team"
         total:
           type: integer
           title: total
