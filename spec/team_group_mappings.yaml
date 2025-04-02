@@ -31,6 +31,7 @@ paths:
         schema:
           type: string
     get:
+      operationId: getTeamGroupMappings
       description: retrieves team groupmappings
       parameters:
         - name: limit
@@ -56,6 +57,7 @@ paths:
           $ref: '#/components/responses/SuccessListTeamGroupMappings'
 
     put:
+      operationId: putTeamGroupMappings
       description: adds the given group mappings to the given team
       requestBody:
         content:
