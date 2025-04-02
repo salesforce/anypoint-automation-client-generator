@@ -1,37 +1,38 @@
 openapi: 3.0.0
 info:
   title: Team Group Mappings API
-  description: Description of the Team Group Mappings API 
-  version: 1.0.0
+  description: Description of the Team Group Mappings API
+  version: 1.1.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 
-paths: 
+paths:
   /organizations/{orgId}/teams/{teamId}/groupmappings:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: teamId
+        in: path
+        description: The ID of the team in GUID format
+        required: true
+        schema:
+          type: string
     get:
       description: retrieves team groupmappings
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
         - name: limit
           in: query
           description: Maximum number of rolegroups to retrieve per request.
@@ -51,33 +52,20 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '201':    # status code
+        '201':
           $ref: '#/components/responses/SuccessListTeamGroupMappings'
-    
+
     put:
       description: adds the given group mappings to the given team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamGroupMappingsPutBody"
+              $ref: "#/components/schemas/TeamGroupMappingsPutBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '201':    # status code
+        '201':
           $ref: '#/components/responses/SuccessPutGroupMappings'
 
 components:
@@ -87,7 +75,6 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
-
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -96,7 +83,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorsResponse"
+            $ref: "#/components/schemas/ErrorsResponse"
     NotFoundError:
       description: resource not found
     SuccessListTeamGroupMappings:
@@ -104,15 +91,15 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/teamGroupMappingsCollection"
+            $ref: "#/components/schemas/TeamGroupMappingsCollection"
     SuccessPutGroupMappings:
       description: Success response
 
 
   schemas:
-    errorsResponse:
+    ErrorsResponse:
       type: object
-      title: errorsResponse
+      title: ErrorsResponse
       properties:
         errors:
           type: array
@@ -138,12 +125,12 @@ components:
                 type: string
                 title: message
 
-    teamGroupMappingsPutBody:
+    TeamGroupMappingsPutBody:
       type: array
-      title: teamGroupMappingsPutBody
+      title: TeamGroupMappingsPutBody
       items:
         type: object
-        title: teamGroupMappingPutBody
+        title: TeamGroupMappingPutBody
         properties:
           membership_type:
             type: string
@@ -158,9 +145,9 @@ components:
             type: string
             title: providerId
 
-    teamGroupMapping:
+    TeamGroupMapping:
       type: object
-      title: teamGroupMapping
+      title: TeamGroupMapping
       properties:
         membership_type:
           type: string
@@ -171,16 +158,16 @@ components:
         provider_id:
           type: string
           title: providerId
-    
-    teamGroupMappingsCollection:
+
+    TeamGroupMappingsCollection:
       type: object
-      title: teamGroupMappingsCollection
+      title: TeamGroupMappingsCollection
       properties:
         data:
           type: array
           title: data
           items:
-            $ref: "#/components/schemas/teamGroupMapping"
+            $ref: "#/components/schemas/TeamGroupMapping"
         total:
           type: integer
           title: total

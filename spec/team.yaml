@@ -14,7 +14,6 @@ servers:
 security:
   - bearerAuth: []
 
-
 paths:
   /organizations/{orgId}/teams:
     parameters:
@@ -148,7 +147,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamPatchBody"
+              $ref: "#/components/schemas/TeamPatchBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -241,16 +240,7 @@ components:
       content:
         application/json:
           schema:
-            allOf:
-              - $ref: "#/components/schemas/Team"
-              - type: object
-                title: previousTeamState
-                properties:
-                  previous_ancestor_team_ids:
-                    type: array
-                    title: previousAncestorTeamIds
-                    items:
-                      type: string
+            $ref: "#/components/schemas/PutTeamResponse"
     SuccessDeleteTeam:
       description: Success response
 
@@ -283,6 +273,18 @@ components:
               message:
                 type: string
                 title: message
+
+    PutTeamResponse:
+      allOf:
+        - $ref: "#/components/schemas/Team"
+        - type: object
+          title: previousTeamState
+          properties:
+            previous_ancestor_team_ids:
+              type: array
+              title: previousAncestorTeamIds
+              items:
+                type: string
 
     TeamPostBody:
       type: object
