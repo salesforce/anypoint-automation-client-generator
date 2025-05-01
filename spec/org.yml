@@ -78,6 +78,29 @@ paths:
         '204':    # status code
           $ref: '#/components/responses/SuccessDeleteBG'
 
+  /organizations/{orgId}/clients/{clientId}:
+    get:
+      operationId: getClientCredentials
+      description: Get client ID and client secret
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: clientId
+        in: path
+        description: The client ID of the client
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetClient'
+
   /cs/organizations/{orgId}/usage:
     parameters:
       - in: path
@@ -138,6 +161,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BGCore'
+    SuccessGetClient:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Client'
     SuccessGetUsage:
       description: Success response
       content:
@@ -1317,3 +1346,27 @@ components:
           description: Load balancer workers consumed
           title: loadbalancerWorkersConsumed
           default: 0
+
+    Client:
+      type: object
+      properties:
+        client_id:
+          type: string
+          title: Client ID
+        client_secret:
+          type: string
+          title: Client Secret
+        name:
+          type: string
+          title: Credentials name
+        org_id:
+          type: string
+          title: Organization ID
+        user_id:
+          type: string
+          title:
+        grant_types:
+          type: array
+          title: Grants for the client credentials
+          items:
+            type: string
