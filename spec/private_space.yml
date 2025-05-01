@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Private Space API
   description: Description of the Private Space API
-  version: 1.1.0
+  version: 1.0.0
 servers:
   - url: https://anypoint.mulesoft.com/runtimefabric/api
     description: Anypoint Cloudhub
