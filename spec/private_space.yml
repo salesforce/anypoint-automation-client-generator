@@ -24,6 +24,31 @@ paths:
         schema:
           type: string
     get:
+      parameters:
+        - name: offset
+          in: query
+          description: 'The offset specifies the offset of the first row to return'
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: 'Amount of objects retrieved in the response'
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: 'Property to sort by'
+          required: false
+          schema:
+            type: string
+        - name: ascending
+          in: query
+          description: 'Order for sorting'
+          required: false
+          schema:
+            type: string
       operationId: getPrivateSpaces
       description: retrieves private spaces for the given organization
       responses:
@@ -146,7 +171,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/PrivateSpaces'
+            $ref: '#/components/schemas/PrivateSpaceSummary'
     SuccessCreatePrivateSpace:
       description: Private space created
       content:
@@ -169,10 +194,78 @@ components:
       description: Private space deleted
 
   schemas:
-    PrivateSpaces:
-      type: array
-      items:
-        $ref: '#/components/schemas/PrivateSpace'
+    PrivateSpaceSummary:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            title: PrivateSpaceSummaryContentItem
+            type: object
+            properties:
+              id:
+                type: string
+                description: private space id
+              name:
+                type: string
+                description: private space name
+              organizationId:
+                type: string
+                description: private space organization id
+              rootOrganizationId:
+                type: string
+                description: private space root organization id
+              status:
+                type: string
+                description: private space status
+        pageable:
+          type: object
+          properties:
+            sort:
+              type: object
+              properties:
+                empty:
+                  type: boolean
+                sorted:
+                  type: boolean
+                unsorted:
+                  type: boolean
+            pageNumber:
+              type: integer
+            offset:
+              type: integer
+            pageSize:
+              type: integer
+            paged:
+              type: boolean
+            unpaged:
+              type: boolean
+        last:
+          type: boolean
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        first:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+        sort:
+          type: object
+          properties:
+            empty:
+              type: boolean
+            sorted:
+              type: boolean
+            unsorted:
+              type: boolean
+        numberOfElements:
+          type: integer
+        empty:
+          type: boolean
+
 
     PrivateSpace:
       title: PrivateSpace
@@ -232,7 +325,7 @@ components:
         environments:
           $ref: '#/components/schemas/PrivateSpaceAssociatedEnvironments'
         network:
-          $ref: '#/components/schemas/PrivateNetworkEditable'
+          $ref: '#/components/schemas/PrivateSpaceNetworkEditable'
         firewallRules:
           type: array
           description: The list of firewall rules for the Private Space network.
@@ -246,7 +339,7 @@ components:
         environments:
           $ref: '#/components/schemas/PrivateSpaceAssociatedEnvironments'
         network:
-          $ref: '#/components/schemas/PrivateNetworkEditable'
+          $ref: '#/components/schemas/PrivateSpaceNetworkEditable'
         firewallRules:
           type: array
           description: The list of firewall rules for the Private Space network.
@@ -277,7 +370,7 @@ components:
             type: string
             description: The business group of the environment.
 
-    PrivateNetworkEditable:
+    PrivateSpaceNetworkEditable:
       type: object
       properties:
         region:
