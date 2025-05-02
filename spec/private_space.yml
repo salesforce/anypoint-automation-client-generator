@@ -280,6 +280,9 @@ components:
         organizationId:
           type: string
           description: The ID of the organization in GUID format.
+        rootOrganizationId:
+          type: string
+          description: The root organization ID of the private space in GUID format.
         status:
           type: string
           description: The status of the private space.
