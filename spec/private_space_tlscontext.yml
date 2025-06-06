@@ -145,6 +145,12 @@ paths:
 
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
