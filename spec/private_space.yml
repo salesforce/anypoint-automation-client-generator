@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Private Space API
   description: Description of the Private Space API
-  version: 1.0.0
+  version: 1.0.1
 servers:
   - url: https://anypoint.mulesoft.com/runtimefabric/api
     description: Anypoint Cloudhub
@@ -266,7 +266,6 @@ components:
         empty:
           type: boolean
 
-
     PrivateSpace:
       title: PrivateSpace
       type: object
@@ -277,6 +276,9 @@ components:
         name:
           type: string
           description: The name of the private space.
+        version:
+          type: string
+          description: The version of the private space.
         organizationId:
           type: string
           description: The ID of the organization in GUID format.
@@ -315,8 +317,23 @@ components:
         enableIAMRole:
           type: boolean
           description: If true, application deployed to this space will have the Private Space IAM role attached to the service account.
+        enableEgress:
+          type: boolean
+          description: If true, egress is enabled for the private space.
+        enableNetworkIsolation:
+          type: boolean
+          description: If true, network isolation is enabled for the private space.
         globalSpaceStatus:
           $ref: '#/components/schemas/GlobalSpaceStatus'
+        muleAppDeploymentCount:
+          type: integer
+          description: The number of MuleSoft applications deployed to the private space.
+        daysLeftForRelaxedQuota:
+          type: integer
+          description: The number of days left for the relaxed quota.
+        vpcMigrationInProgress:
+          type: boolean
+          description: If true, a VPC migration is in progress for the private space.
 
     PrivateSpacePostBody:
       title: PrivateSpacePostBody
@@ -359,6 +376,12 @@ components:
         enableIAMRole:
           type: boolean
           description: If true, application deployed to this space will have the Private Space IAM role attached to the service account.
+        enableEgress:
+          type: boolean
+          description: If true, egress is enabled for the private space.
+        enableNetworkIsolation:
+          type: boolean
+          description: If true, network isolation is enabled for the private space.
 
     PrivateSpaceAssociatedEnvironments:
       type: object
