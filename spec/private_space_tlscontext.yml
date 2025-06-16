@@ -227,11 +227,14 @@ components:
                       type: string
                     certificateFileName:
                       type: string
+                    capath:
+                      type: string
+                    capathFileName:
+                      type: string
                   required:
                     - source
                     - certificate
                     - key
-                    - keyPassphrase
                     - keyFileName
                     - certificateFileName
                 - type: object
@@ -254,7 +257,6 @@ components:
                   required:
                     - source
                     - keystoreBase64
-                    - keyPassphrase
                     - storePassphrase
                     - alias
                     - keystoreFileName
@@ -361,8 +363,6 @@ components:
     KeyStore:
       type: object
       properties:
-        fileName:
-          type: string
         type:
           type: string
         cn:
@@ -371,6 +371,12 @@ components:
           type: array
           items:
             type: string
+        fileName:
+          type: string
+        keyFileName:
+          type: string
+        capathFileName:
+          type: string
         expirationDate:
           type: string
 
