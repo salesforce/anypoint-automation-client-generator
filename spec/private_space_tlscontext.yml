@@ -269,8 +269,6 @@ components:
         - alias
         - keystoreFileName
 
-
-
     TlsContext:
       type: object
       properties:
