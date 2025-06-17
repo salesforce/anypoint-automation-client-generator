@@ -210,58 +210,65 @@ components:
           properties:
             keyStore:
               oneOf:
-                - type: object
-                  title: TlsContextPostBodyKeyStorePEM
-                  properties:
-                    source:
-                      type: string
-                      enum: [PEM]
-                      default: PEM
-                    certificate:
-                      type: string
-                    key:
-                      type: string
-                    keyPassphrase:
-                      type: string
-                    keyFileName:
-                      type: string
-                    certificateFileName:
-                      type: string
-                    capath:
-                      type: string
-                    capathFileName:
-                      type: string
-                  required:
-                    - source
-                    - certificate
-                    - key
-                    - keyFileName
-                    - certificateFileName
-                - type: object
-                  title: TlsContextPostBodyKeyStoreJKS
-                  properties:
-                    source:
-                      type: string
-                      enum: [JKS]
-                      default: JKS
-                    keystoreBase64:
-                      type: string
-                    keyPassphrase:
-                      type: string
-                    storePassphrase:
-                      type: string
-                    alias:
-                      type: string
-                    keystoreFileName:
-                      type: string
-                  required:
-                    - source
-                    - keystoreBase64
-                    - storePassphrase
-                    - alias
-                    - keystoreFileName
+                - $ref: '#/components/schemas/TlsContextPostBodyKeyStorePEM'
+                - $ref: '#/components/schemas/TlsContextPostBodyKeyStoreJKS'
         ciphers:
           $ref: '#/components/schemas/Ciphers'
+
+    TlsContextPostBodyKeyStorePEM:
+      type: object
+      title: TlsContextPostBodyKeyStorePEM
+      properties:
+        source:
+          type: string
+          enum: [PEM]
+          default: PEM
+        certificate:
+          type: string
+        key:
+          type: string
+        keyPassphrase:
+          type: string
+        keyFileName:
+          type: string
+        certificateFileName:
+          type: string
+        capath:
+          type: string
+        capathFileName:
+          type: string
+      required:
+        - source
+        - certificate
+        - key
+        - keyFileName
+        - certificateFileName
+
+    TlsContextPostBodyKeyStoreJKS:
+      type: object
+      title: TlsContextPostBodyKeyStoreJKS
+      properties:
+        source:
+          type: string
+          enum: [JKS]
+          default: JKS
+        keystoreBase64:
+          type: string
+        keyPassphrase:
+          type: string
+        storePassphrase:
+          type: string
+        alias:
+          type: string
+        keystoreFileName:
+          type: string
+      required:
+        - source
+        - keystoreBase64
+        - storePassphrase
+        - alias
+        - keystoreFileName
+
 
 
     TlsContext:
