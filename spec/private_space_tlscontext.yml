@@ -212,6 +212,18 @@ components:
               oneOf:
                 - $ref: '#/components/schemas/TlsContextPostBodyKeyStorePEM'
                 - $ref: '#/components/schemas/TlsContextPostBodyKeyStoreJKS'
+            trustStore:
+              type: array
+              items:
+                type: object
+                title: TlsContextPostBodyTrustStorePEM
+                properties:
+                  source:
+                    type: string
+                    enum: [PEM]
+                  trustStorePEM:
+                    type: string
+
         ciphers:
           $ref: '#/components/schemas/Ciphers'
 
@@ -266,8 +278,6 @@ components:
         - source
         - keystoreBase64
         - storePassphrase
-        - alias
-        - keystoreFileName
 
     TlsContext:
       type: object
@@ -275,14 +285,6 @@ components:
         id:
           type: string
         name:
-          type: string
-        description:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-        updatedAt:
           type: string
         trustStore:
           $ref: '#/components/schemas/TrustStore'
@@ -292,7 +294,6 @@ components:
           $ref: '#/components/schemas/Ciphers'
         type:
           type: string
-
 
     TrustStore:
       type: object
