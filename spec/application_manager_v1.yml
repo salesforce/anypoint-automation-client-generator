@@ -1,7 +1,7 @@
 
 openapi: 3.0.0
 info:
-  title: Deployment v1
+  title: Application Manager v1
   description: >
     The Application Manager API exists to provide Mule Application management operations from Anypoint Control Planes to any Runtime Plane, with capabilities that include:
       - Deploying a Mule Application or API to a Mule Runtime
@@ -12,7 +12,7 @@ info:
       - Starting, Stopping or Restarting applications
       - etc.
     This API currently supports deployments to Cloudhub 1.0 targets only.
-  version: 1.2.0
+  version: 2.0.0
 
 servers:
   - url: https://anypoint.mulesoft.com
@@ -115,7 +115,10 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/DeployAppBody"
+              $ref: "#/components/schemas/DeployAppBodyFormData"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeployAppBodyJSON"
       responses:
         "200":
           $ref: "#/components/responses/PostDeploymentResponse"
@@ -194,7 +197,10 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/UpdateDeploymentBody"
+              $ref: "#/components/schemas/UpdateDeploymentBodyFormData"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeploymentBodyJSON"
       responses:
         "200":
           $ref: "#/components/responses/PutDeploymentResponse"
@@ -296,8 +302,9 @@ components:
       items:
         $ref: "#/components/schemas/DeploymentCH1Summary"
 
-    DeployAppBody:
+    DeployAppBodyFormData:
       type: object
+      description: Application deployment body to deploy from file.
       properties:
         appInfoJson:
           type: string
@@ -311,8 +318,23 @@ components:
           type: boolean
           description: Indicates whether the application should be automatically started after deployment.
 
-    UpdateDeploymentBody:
+    DeployAppBodyJSON:
       type: object
+      description: Application deployment body to deploy from exchange.
+      properties:
+        applicationInfo:
+          $ref: "#/components/schemas/NewDeploymentStruct"
+          description: Application deployment body containing configuration and artifact file.
+        applicationSource:
+          $ref: "#/components/schemas/ExchangeApplicationSource"
+          description: Application source in Exchange.
+        autoStart:
+          type: boolean
+          description: Indicates whether the application should be automatically started after deployment.
+
+    UpdateDeploymentBodyFormData:
+      type: object
+      description: Application deployment body to update a deployment from file.
       properties:
         appInfoJson:
           type: string
@@ -322,6 +344,17 @@ components:
           type: string
           format: binary
           description: The Mule application artifact to be deployed.
+
+    UpdateDeploymentBodyJSON:
+      type: object
+      description: Application deployment body to update a deployment from exchange.
+      properties:
+        applicationInfo:
+          $ref: "#/components/schemas/NewDeploymentStruct"
+          description: Application deployment body containing configuration and artifact file.
+        applicationSource:
+          $ref: "#/components/schemas/ExchangeApplicationSource"
+          description: Application source in Exchange.
 
     NewDeploymentStruct:
       type: object
@@ -1047,3 +1080,26 @@ components:
         state:
           type: string
           description: "The state of the IP address (ex. available, in use)."
+
+
+    ExchangeApplicationSource:
+      type: object
+      description: "The source of the application in Exchange."
+      properties:
+        source:
+          type: string
+          enum:
+            - EXCHANGE
+          description: "The source of the application in Exchange."
+        groupId:
+          type: string
+          description: "The group ID of the application in Exchange."
+        artifactId:
+          type: string
+          description: "The artifact ID of the application in Exchange."
+        version:
+          type: string
+          description: "The version of the application in Exchange."
+        organizationId:
+          type: string
+          description: "The organization ID of the application in Exchange."

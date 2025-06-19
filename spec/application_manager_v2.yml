@@ -2,7 +2,7 @@
 
 openapi: 3.0.0
 info:
-  title: Deployment
+  title: Application Manager v2
   description: >
     The Application Manager API exists to provide Mule Application management operations from Anypoint Control Planes to any Runtime Plane, with capabilities that include:
       - Deploying a Mule Application or API to a Mule Runtime
