@@ -15,7 +15,7 @@ security:
   - bearerAuth: []
 
 paths:
-  /organizations/:orgId/privatespaces/:privateSpaceId/tlsContexts:
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/tlsContexts:
     parameters:
       - name: orgId
         in: path
@@ -66,7 +66,7 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessGetTlsContexts'
 
-  /organizations/:orgId/privatespaces/:privateSpaceId/tlsContexts/{tlsContextId}:
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/tlsContexts/{tlsContextId}:
     parameters:
       - name: orgId
         in: path
@@ -145,6 +145,12 @@ paths:
 
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -203,47 +209,75 @@ components:
           type: object
           properties:
             keyStore:
-              type: object
-              properties:
-                source:
-                  type: string
-                  enum: [PEM, JKS]
-                certificate:
-                  type: string
-                key:
-                  type: string
-                keyPassphrase:
-                  type: string
-                keyFileName:
-                  type: string
-                certificateFileName:
-                  type: string
-                keystoreBase64:
-                  type: string
-                storePassphrase:
-                  type: string
-                alias:
-                  type: string
-                keystoreFileName:
-                  type: string
               oneOf:
-                - required:
-                  - source
-                  - certificate
-                  - key
-                  - keyPassphrase
-                  - keyFileName
-                  - certificateFileName
-                - required:
-                  - source
-                  - keystoreBase64
-                  - keyPassphrase
-                  - storePassphrase
-                  - alias
-                  - keystoreFileName
+                - $ref: '#/components/schemas/TlsContextPostBodyKeyStorePEM'
+                - $ref: '#/components/schemas/TlsContextPostBodyKeyStoreJKS'
+            trustStore:
+              type: array
+              items:
+                type: object
+                title: TlsContextPostBodyTrustStorePEM
+                properties:
+                  source:
+                    type: string
+                    enum: [PEM]
+                  trustStorePEM:
+                    type: string
+
         ciphers:
           $ref: '#/components/schemas/Ciphers'
 
+    TlsContextPostBodyKeyStorePEM:
+      type: object
+      title: TlsContextPostBodyKeyStorePEM
+      properties:
+        source:
+          type: string
+          enum: [PEM]
+          default: PEM
+        certificate:
+          type: string
+        key:
+          type: string
+        keyPassphrase:
+          type: string
+        keyFileName:
+          type: string
+        certificateFileName:
+          type: string
+        capath:
+          type: string
+        capathFileName:
+          type: string
+      required:
+        - source
+        - certificate
+        - key
+        - keyFileName
+        - certificateFileName
+
+    TlsContextPostBodyKeyStoreJKS:
+      type: object
+      title: TlsContextPostBodyKeyStoreJKS
+      properties:
+        source:
+          type: string
+          enum: [JKS]
+          default: JKS
+        keystoreBase64:
+          type: string
+        keyPassphrase:
+          type: string
+        storePassphrase:
+          type: string
+        alias:
+          type: string
+        keystoreFileName:
+          type: string
+      required:
+        - source
+        - keystoreBase64
+        - storePassphrase
 
     TlsContext:
       type: object
@@ -251,14 +285,6 @@ components:
         id:
           type: string
         name:
-          type: string
-        description:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-        updatedAt:
           type: string
         trustStore:
           $ref: '#/components/schemas/TrustStore'
@@ -268,7 +294,6 @@ components:
           $ref: '#/components/schemas/Ciphers'
         type:
           type: string
-
 
     TrustStore:
       type: object
@@ -344,8 +369,6 @@ components:
     KeyStore:
       type: object
       properties:
-        fileName:
-          type: string
         type:
           type: string
         cn:
@@ -354,6 +377,12 @@ components:
           type: array
           items:
             type: string
+        fileName:
+          type: string
+        keyFileName:
+          type: string
+        capathFileName:
+          type: string
         expirationDate:
           type: string
 
