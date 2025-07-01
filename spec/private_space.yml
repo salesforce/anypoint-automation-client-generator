@@ -144,6 +144,33 @@ paths:
         '204':    # status code
           $ref: '#/components/responses/SuccessDeletePrivateSpace'
 
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/iamroles:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        description: The ID of the private space in GUID format
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getPrivateSpaceIamRoles
+      description: gets the IAM roles for the given private space
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetPrivateSpaceIamRoles'
+
 components:
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
@@ -192,6 +219,12 @@ components:
             $ref: '#/components/schemas/PrivateSpace'
     SuccessDeletePrivateSpace:
       description: Private space deleted
+    SuccessGetPrivateSpaceIamRoles:
+      description: IAM roles for the given private space
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PrivateSpaceIamRoles'
 
   schemas:
     PrivateSpaceSummary:
@@ -335,6 +368,21 @@ components:
           type: boolean
           description: If true, a VPC migration is in progress for the private space.
 
+    PrivateSpaceIamRoles:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            type: string
+            description: The IAM role.
+        organizationId:
+          type: string
+          description: The ID of the organization in GUID format.
+        spaceId:
+          type: string
+          description: The ID of the private space in GUID format.
+
     PrivateSpacePostBody:
       title: PrivateSpacePostBody
       type: object
@@ -345,7 +393,7 @@ components:
         environments:
           $ref: '#/components/schemas/PrivateSpaceAssociatedEnvironments'
         network:
-          $ref: '#/components/schemas/PrivateSpaceNetworkEditable'
+          $ref: '#/components/schemas/PrivateSpaceNetworkCreate'
         firewallRules:
           type: array
           description: The list of firewall rules for the Private Space network.
@@ -396,7 +444,7 @@ components:
             type: string
             description: The business group of the environment.
 
-    PrivateSpaceNetworkEditable:
+    PrivateSpaceNetworkCreate:
       type: object
       properties:
         region:
@@ -405,6 +453,34 @@ components:
         cidrBlock:
           type: string
           description: The CIDR block of the VPC where the Private Space will be created. Required when create a Private Space in a new VPC. Default is 10.0.0.0/16.
+        internalDns:
+          type: object
+          description: The internal DNS config of the VPC that the Private Space uses.
+          properties:
+            dnsServers:
+              type: array
+              items:
+                type: string
+                description: The DNS server of the VPC.
+            specialDomains:
+              type: array
+              items:
+                type: string
+                description: The special domain of the VPC.
+        reservedCidrs:
+          type: array
+          description: >
+            The list of reserved CIDR blocks for your private space to prevent IP address overlap.
+            Required when you want to connect your private space to your corporate network (either on-premises or in the cloud).
+            Use CIDR notation and commas.
+          example: ["192.168.0.0/16", "172.16.0.0/12"]
+          items:
+            type: string
+            description: The reserved CIDR of the Private Space network.
+
+    PrivateSpaceNetworkEditable:
+      type: object
+      properties:
         internalDns:
           type: object
           description: The internal DNS config of the VPC that the Private Space uses.
