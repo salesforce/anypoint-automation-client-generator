@@ -52,7 +52,7 @@ paths:
             type: string
         - name: team_type
           in: query
-          description: return only teams that are of this type
+          description: return only teams that are of the given type. Enum are internal, shared, private, external
           required: false
           schema:
             type: string
@@ -80,10 +80,6 @@ paths:
           required: false
           schema:
             type: string
-            enum:
-              - team_name
-              - created_at
-              - team_id
         - name: ascending
           in: query
           description: Whether to sort ascending or descending. Default true
