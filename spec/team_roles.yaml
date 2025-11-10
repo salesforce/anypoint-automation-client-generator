@@ -1,37 +1,38 @@
 openapi: 3.0.0
 info:
   title: Team Roles API
-  description: Description of the Team Roles API 
-  version: 1.0.0
+  description: Description of the Team Roles API
+  version: 1.1.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
-
-paths: 
+paths:
   /organizations/{orgId}/teams/{teamId}/roles:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: teamId
+        in: path
+        description: The ID of the team in GUID format
+        required: true
+        schema:
+          type: string
     get:
+      operationId: getTeamRoles
       description: retrieves team assigned roles
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
         - name: role_id
           in: query
           description: return only role assignments containing one of the supplied role_ids
@@ -66,31 +67,20 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessListTeamRoles'
     post:
+      operationId: assignTeamRoles
       description: assignes a set of roles to the given team
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: teamId
-          in: path
-          description: The ID of the team in GUID format
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamRolesPostBody"
+              $ref: "#/components/schemas/TeamRolesPostBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '201':    # status code
           $ref: '#/components/responses/SuccessPostTeamRoles'
     delete:
+      operationId: deleteTeamRoles
       description: deletes a set of roles from the given team
       parameters:
         - name: orgId
@@ -109,7 +99,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/teamRolesDeleteBody"
+              $ref: "#/components/schemas/TeamRolesDeleteBody"
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -123,7 +113,6 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
-
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -132,7 +121,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorsResponse"
+            $ref: "#/components/schemas/ErrorsResponse"
     NotFoundError:
       description: resource not found
     SuccessListTeamRoles:
@@ -140,7 +129,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/teamRoleCollection"
+            $ref: "#/components/schemas/TeamRoleCollection"
     SuccessPostTeamRoles:
       description: Success response
     SuccessDeleteTeamRoles:
@@ -148,9 +137,9 @@ components:
 
 
   schemas:
-    errorsResponse:
+    ErrorsResponse:
       type: object
-      title: errorsResponse
+      title: ErrorsResponse
       properties:
         errors:
           type: array
@@ -176,12 +165,12 @@ components:
                 type: string
                 title: message
 
-    teamRolesPostBody:
+    TeamRolesPostBody:
       type: array
-      title: teamRolesPostBody
+      title: TeamRolesPostBody
       items:
         type: object
-        title: teamRolePostBody
+        title: TeamRolePostBody
         properties:
           role_id:
             type: string
@@ -197,12 +186,12 @@ components:
                 type: string
                 title: envId
 
-    teamRolesDeleteBody:
+    TeamRolesDeleteBody:
       type: array
-      title: teamRolesDeleteBody
+      title: TeamRolesDeleteBody
       items:
         type: object
-        title: teamRoleDeleteBody
+        title: TeamRoleDeleteBody
         properties:
           role_id:
             type: string
@@ -218,9 +207,9 @@ components:
                 type: string
                 title: envId
 
-    teamRole:
+    TeamRole:
       type: object
-      title: teamRole
+      title: TeamRole
       properties:
         name:
           type: string
@@ -239,15 +228,15 @@ components:
               type: string
               title: envId
 
-    teamRoleCollection:
+    TeamRoleCollection:
       type: object
-      title: teamRoleCollection
+      title: TeamRoleCollection
       properties:
         data:
           type: array
           title: data
           items:
-            $ref: "#/components/schemas/teamRole"
+            $ref: "#/components/schemas/TeamRole"
         total:
           type: integer
           title: total

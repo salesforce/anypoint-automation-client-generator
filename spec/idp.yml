@@ -1,18 +1,18 @@
 openapi: 3.0.0
 info:
   title: Identity Provider Management API
-  description: Description of Identity Provider API 
+  description: Description of Identity Provider API
   version: 1.0.0
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 paths:
   /organizations/{orgId}/identityProviders:
@@ -49,7 +49,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code 200
           $ref: '#/components/responses/SuccessPostIDP'
-    
+
   /organizations/{orgId}/identityProviders/{idpId}:
     get:
       description: Returns all identity providers for the given organization
@@ -71,7 +71,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '201':    # status code 200
+        '200':    # status code 200
           $ref: '#/components/responses/SuccessGetIDP'
     patch:
       description: Updates the given identity provider for the given organization
@@ -156,7 +156,7 @@ components:
                     message:
                       type: string
                       title: the error message
-                      example: A sample message here 
+                      example: A sample message here
     NotFoundError:
       description: Not Found response
       content:
@@ -200,431 +200,969 @@ components:
                 title: Total number of results
 
   schemas:
-    idpSummary:
-      title: idpSummary
+    idp:
+      title: idp
+      oneOf:
+        - $ref: '#/components/schemas/samlProviderGet'
+        - $ref: '#/components/schemas/ldapProviderGet'
+        - $ref: '#/components/schemas/openIDProviderGet'
+
+    idpPostBody:
+      oneOf:
+        - $ref: '#/components/schemas/samlProviderPostBody'
+        - $ref: '#/components/schemas/ldapProviderPostBody'
+        - $ref: '#/components/schemas/openIDProviderManualPostBody'
+        - $ref: '#/components/schemas/openIDProviderDynamicPostBody'
+
+    idpPatchBody:
+      oneOf:
+        - $ref: '#/components/schemas/samlProviderPatch'
+        - $ref: '#/components/schemas/ldapProviderPatch'
+        - $ref: '#/components/schemas/openIDProviderPatch'
+
+    samlProviderPostBody:
       type: object
+      additionalProperties: false
+      required:
+        - name
+        - type
+        - service_provider
+        - saml
       properties:
-        provider_id:
+        arc_namespace:
           type: string
-          title: provider_id
-        org_id:
-          type: string
-          title: org_id
         name:
           type: string
-          title: name
         type:
           type: object
-          title: type
+          additionalProperties: false
+          required:
+            - name
           properties:
             description:
               type: string
-              title: description
             name:
               type: string
-              title: name
               enum:
                 - saml
-                - openid
-
-    idpSAML:
-      type: object
-      title: idpSAML
-      properties:
-        saml:
+        service_provider:
           type: object
-          title: saml 
-          properties:
-            issuer:
-              type: string
-              title: issuer
-            audience:
-              type: string
-              title: audience
-            public_key:
-              type: array
-              title: public_key
-              items:
-                type: string
-            claims_mapping:
-              type: object
-              title: claims_mapping
-              properties:
-                email_attribute:
-                  type: string
-                  title: email_attribute
-                group_attribute:
-                  type: string
-                  title: group_attribute
-                lastname_attribute:
-                  type: string
-                  title: lastname_attribute
-                username_attribute:
-                  type: string
-                  title: username_attribute
-                firstname_attribute:
-                  type: string
-                  title: firstname_attribute
-            sp_initiated_sso_enabled:
-              type: boolean
-              title: sp_initiated_sso_enabled
-            idp_initiated_sso_enabled:
-              type: boolean
-              title: idp_initiated_sso_enabled
-            require_encrypted_saml_assertions:
-              type: boolean
-              title: require_encrypted_saml_assertions
-
-    idpOIDC:
-      title: idpOIDC
-      type: object
-      properties:
-        allow_untrusted_certificates:
-          type: boolean
-          title: allow_untrusted_certificates
-        oidc_provider:
-          type: object
-          title: oidc_provider
+          additionalProperties: false
+          required:
+            - urls
           properties:
             urls:
               type: object
-              title: urls
+              additionalProperties: false
+              required:
+                - sign_on
+                - sign_out
               properties:
-                token:
+                sign_on:
                   type: string
-                  title: token
-                redirect:
+                sign_out:
                   type: string
-                  title: redirect
-                userinfo:
+        saml:
+          type: object
+          additionalProperties: false
+          required:
+            - audience
+            - issuer
+            - public_key
+          properties:
+            audience:
+              type: string
+            issuer:
+              type: string
+            public_key:
+              type: array
+              items:
+                type: string
+              minItems: 1
+              maxItems: 2
+            claims_mapping:
+              type: object
+              additionalProperties: false
+              properties:
+                username_attribute:
                   type: string
-                  title: userinfo
-                authorize:
+                firstname_attribute:
                   type: string
-                  title: authorize
+                lastname_attribute:
+                  type: string
+                email_attribute:
+                  type: string
+                group_attribute:
+                  type: string
+            idp_initiated_sso_enabled:
+              type: boolean
+            sp_initiated_sso_enabled:
+              type: boolean
+            use_composer_acs_url:
+              type: boolean
+            require_encrypted_saml_assertions:
+              type: boolean
+        login_disabled:
+          type: boolean
+    ldapProviderPostBody:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - type
+        - connection
+        - search_bases
+        - dns
+        - filters
+        - user_mapping
+        - group_mapping
+      properties:
+        name:
+          type: string
+        arc_namespace:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          required:
+            - name
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+              enum:
+                - ldap
+        connection:
+          type: object
+          additionalProperties: false
+          required:
+            - binddn
+            - connectTimeoutSeconds
+            - host
+            - operationTimeoutMs
+            - password
+            - port
+          properties:
+            binddn:
+              type: string
+            connectTimeoutSeconds:
+              type: number
+            host:
+              type: string
+            operationTimeoutMs:
+              type: number
+            password:
+              type: string
+            port:
+              type: number
+            validatecert:
+              type: boolean
+        search_bases:
+          type: object
+          additionalProperties: false
+          required:
+            - group
+            - user
+          properties:
+            group:
+              type: string
+            user:
+              type: string
+        dns:
+          type: object
+          additionalProperties: false
+          required:
+            - group
+            - user
+          properties:
+            group:
+              type: string
+            user:
+              type: string
+        filters:
+          type: object
+          additionalProperties: false
+          required:
+            - groupsByUsername
+            - userByUsername
+          properties:
+            groupsByUsername:
+              type: string
+            userByUsername:
+              type: string
+        user_mapping:
+          type: object
+          additionalProperties: false
+          required:
+            - email
+            - firstName
+            - id
+            - lastName
+            - username
+          properties:
+            email:
+              type: string
+            firstName:
+              type: string
+            id:
+              type: string
+            lastName:
+              type: string
+            username:
+              type: string
+        group_mapping:
+          type: object
+          additionalProperties: false
+          required:
+            - groupName
+            - id
+          properties:
+            groupName:
+              type: string
+            id:
+              type: string
+    openIDProviderManualPostBody:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - type
+        - oidc_provider
+      properties:
+        name:
+          type: string
+        arc_namespace:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          required:
+            - name
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+              enum:
+                - openid
+        oidc_provider:
+          type: object
+          additionalProperties: false
+          required:
+            - client
+            - urls
+          properties:
             client:
               type: object
-              title: client
+              additionalProperties: false
+              required:
+                - credentials
               properties:
-                urls:
-                  type: object
-                  title: urls
-                  properties:
-                    register:
-                      type: string
-                      title: register
                 credentials:
                   type: object
-                  title: credentials
+                  additionalProperties: false
+                  required:
+                    - id
+                    - secret
                   properties:
                     id:
                       type: string
-                      title: id
+                    secret:
+                      type: string
+            issuer:
+              type: string
+            urls:
+              type: object
+              additionalProperties: false
+              required:
+                - authorize
+                - token
+                - userinfo
+              properties:
+                authorize:
+                  type: string
+                token:
+                  type: string
+                userinfo:
+                  type: string
+            group_scope:
+              type: string
+            claims_mapping:
+              type: object
+              additionalProperties: false
+              properties:
+                group_expression:
+                  type: string
+        allow_untrusted_certificates:
+          type: boolean
+        login_disabled:
+          type: boolean
+    openIDProviderDynamicPostBody:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - type
+        - oidc_provider
+      properties:
+        name:
+          type: string
+        arc_namespace:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          required:
+            - name
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+              enum:
+                - openid
+        oidc_provider:
+          type: object
+          additionalProperties: false
+          required:
+            - client
+            - urls
+          properties:
+            client:
+              type: object
+              additionalProperties: false
+              required:
+                - urls
+              properties:
+                urls:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - register
+                  properties:
+                    register:
+                      type: string
+                registration:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - authorization
+                  properties:
+                    authorization:
+                      type: string
+                metadata:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    name:
+                      type: string
+            issuer:
+              type: string
+            urls:
+              type: object
+              additionalProperties: false
+              required:
+                - authorize
+                - token
+                - userinfo
+              properties:
+                authorize:
+                  type: string
+                token:
+                  type: string
+                userinfo:
+                  type: string
+            group_scope:
+              type: string
+            claims_mapping:
+              type: object
+              additionalProperties: false
+              properties:
+                group_expression:
+                  type: string
+        allow_untrusted_certificates:
+          type: boolean
+        login_disabled:
+          type: boolean
+
+    samlProviderPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          properties:
+            description:
+              type: string
+        service_provider:
+          type: object
+          additionalProperties: false
+          properties:
+            urls:
+              type: object
+              additionalProperties: false
+              properties:
+                sign_on:
+                  type: string
+                sign_out:
+                  type: string
+        saml:
+          type: object
+          additionalProperties: false
+          properties:
+            audience:
+              type: string
+            issuer:
+              type: string
+            public_key:
+              type: array
+              items:
+                type: string
+              minItems: 1
+              maxItems: 2
+            claims_mapping:
+              type: object
+              additionalProperties: false
+              properties:
+                username_attribute:
+                  type: string
+                firstname_attribute:
+                  type: string
+                lastname_attribute:
+                  type: string
+                email_attribute:
+                  type: string
+                group_attribute:
+                  type: string
+            idp_initiated_sso_enabled:
+              type: boolean
+            sp_initiated_sso_enabled:
+              type: boolean
+            use_composer_acs_url:
+              type: boolean
+            require_encrypted_saml_assertions:
+              type: boolean
+        login_disabled:
+          type: boolean
+    ldapProviderPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          properties:
+            description:
+              type: string
+        connection:
+          type: object
+          additionalProperties: false
+          properties:
+            binddn:
+              type: string
+            connectTimeoutSeconds:
+              type: number
+            host:
+              type: string
+            operationTimeoutMs:
+              type: number
+            password:
+              type: string
+            port:
+              type: number
+            validatecert:
+              type: boolean
+        search_bases:
+          type: object
+          additionalProperties: false
+          properties:
+            group:
+              type: string
+            user:
+              type: string
+        dns:
+          type: object
+          additionalProperties: false
+          properties:
+            group:
+              type: string
+            user:
+              type: string
+        filters:
+          type: object
+          additionalProperties: false
+          properties:
+            groupsByUsername:
+              type: string
+            userByUsername:
+              type: string
+        user_mapping:
+          type: object
+          additionalProperties: false
+          properties:
+            email:
+              type: string
+            firstName:
+              type: string
+            id:
+              type: string
+            lastName:
+              type: string
+            username:
+              type: string
+        group_mapping:
+          type: object
+          additionalProperties: false
+          properties:
+            groupName:
+              type: string
+            id:
+              type: string
+    openIDProviderPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          properties:
+            description:
+              type: string
+        oidc_provider:
+          type: object
+          additionalProperties: false
+          properties:
+            client:
+              type: object
+              additionalProperties: false
+              properties:
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    id:
+                      type: string
+                    secret:
+                      type: string
+                urls:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    register:
+                      type: string
+                registration:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    authorization:
+                      type: string
+                metadata:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    name:
+                      type: string
+            issuer:
+              type: string
+            urls:
+              type: object
+              additionalProperties: false
+              properties:
+                authorize:
+                  type: string
+                token:
+                  type: string
+                userinfo:
+                  type: string
+            group_scope:
+              type: string
+            claims_mapping:
+              type: object
+              additionalProperties: false
+              properties:
+                group_expression:
+                  type: string
+        allow_untrusted_certificates:
+          type: boolean
+        login_disabled:
+          type: boolean
+
+    samlProviderGet:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - org_id
+        - saml
+        - service_provider
+        - provider_id
+        - type
+      properties:
+        name:
+          type: string
+        org_id:
+          type: string
+        saml:
+          type: object
+          additionalProperties: false
+          required:
+            - audience
+            - issuer
+            - public_key
+          properties:
+            audience:
+              type: string
+            issuer:
+              type: string
+            public_key:
+              type: array
+              items:
+                type: string
+              minItems: 1
+              maxItems: 2
+            claims_mapping:
+              type: object
+              additionalProperties: false
+              properties:
+                username_attribute:
+                  type: string
+                firstname_attribute:
+                  type: string
+                lastname_attribute:
+                  type: string
+                email_attribute:
+                  type: string
+                group_attribute:
+                  type: string
+            idp_initiated_sso_enabled:
+              type: boolean
+            sp_initiated_sso_enabled:
+              type: boolean
+            use_composer_acs_url:
+              type: boolean
+            require_encrypted_saml_assertions:
+              type: boolean
+        service_provider:
+          type: object
+          additionalProperties: false
+          required:
+            - urls
+          properties:
+            urls:
+              type: object
+              additionalProperties: false
+              required:
+                - sign_on
+                - sign_out
+              properties:
+                sign_on:
+                  type: string
+                sign_out:
+                  type: string
+        login_disabled:
+          type: boolean
+        arc_namespace:
+          type: string
+        provider_id:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          required:
+            - name
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+              enum:
+                - saml
+    ldapProviderGet:
+      type: object
+      additionalProperties: false
+      required:
+        - user_mapping
+        - filters
+        - name
+        - org_id
+        - dns
+        - group_mapping
+        - connection
+        - provider_id
+        - type
+        - search_bases
+      properties:
+        user_mapping:
+          type: object
+          additionalProperties: false
+          required:
+            - email
+            - firstName
+            - id
+            - lastName
+            - username
+          properties:
+            email:
+              type: string
+            firstName:
+              type: string
+            id:
+              type: string
+            lastName:
+              type: string
+            username:
+              type: string
+        filters:
+          type: object
+          additionalProperties: false
+          required:
+            - groupsByUsername
+            - userByUsername
+          properties:
+            groupsByUsername:
+              type: string
+            userByUsername:
+              type: string
+        name:
+          type: string
+        org_id:
+          type: string
+        dns:
+          type: object
+          additionalProperties: false
+          required:
+            - group
+            - user
+          properties:
+            group:
+              type: string
+            user:
+              type: string
+        group_mapping:
+          type: object
+          additionalProperties: false
+          required:
+            - groupName
+            - id
+          properties:
+            groupName:
+              type: string
+            id:
+              type: string
+        connection:
+          type: object
+          additionalProperties: false
+          required:
+            - binddn
+            - connectTimeoutSeconds
+            - host
+            - operationTimeoutMs
+            - password
+            - port
+          properties:
+            binddn:
+              type: string
+            connectTimeoutSeconds:
+              type: number
+            host:
+              type: string
+            operationTimeoutMs:
+              type: number
+            password:
+              type: string
+            port:
+              type: number
+            validatecert:
+              type: boolean
+        arc_namespace:
+          type: string
+        provider_id:
+          type: string
+        type:
+          type: object
+          additionalProperties: false
+          required:
+            - name
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+              enum:
+                - ldap
+        search_bases:
+          type: object
+          additionalProperties: false
+          required:
+            - group
+            - user
+          properties:
+            group:
+              type: string
+            user:
+              type: string
+    openIDProviderGet:
+      type: object
+      additionalProperties: false
+      required:
+        - oidc_provider
+        - name
+        - org_id
+        - service_provider
+        - allow_untrusted_certificates
+        - type
+        - provider_id
+      properties:
+        oidc_provider:
+          type: object
+          additionalProperties: false
+          required:
+            - client
+            - issuer
+            - urls
+          properties:
+            client:
+              type: object
+              additionalProperties: false
+              required:
+                - credentials
+              properties:
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - id
+                  properties:
+                    id:
+                      type: string
+                    secret:
+                      type: string
+                urls:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - register
+                  properties:
+                    register:
+                      type: string
+                registration:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    authorization:
+                      type: string
+                metadata:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    name:
+                      type: string
                 token_endpoint_auth_methods_supported:
                   type: array
-                  title: token_endpoint_auth_methods_supported
                   items:
                     type: string
             issuer:
               type: string
-              title: issuer
+            urls:
+              type: object
+              additionalProperties: false
+              required:
+                - authorize
+                - redirect
+                - token
+                - userinfo
+              properties:
+                authorize:
+                  type: string
+                redirect:
+                  type: string
+                token:
+                  type: string
+                userinfo:
+                  type: string
             group_scope:
               type: string
-              title: group_scope
-
-    idp:
-      title: idp
-      allOf:
-        - $ref: "#/components/schemas/idpSummary"
-        - $ref: "#/components/schemas/idpSAML"
-        - $ref: "#/components/schemas/idpOIDC"
-        - type: object
-          title: idpCommonProps
-          properties:
-            service_provider:
+            claims_mapping:
               type: object
-              title: service_provider
+              additionalProperties: false
               properties:
-                urls:
-                  type: object
-                  title: urls
-                  properties:
-                    sign_on:
-                      type: string
-                      title: sign_on
-                    sign_out:
-                      type: string
-                      title: sign_out
-                      description: only available for SAML
-
-    idpPostBody:
-      title: idpPostBody
-      type: object
-      properties:
+                group_expression:
+                  type: string
         name:
           type: string
-          title: name
+        org_id:
+          type: string
+        service_provider:
+          type: object
+          additionalProperties: false
+          required:
+            - urls
+          properties:
+            urls:
+              type: object
+              additionalProperties: false
+              required:
+                - sign_on
+              properties:
+                sign_on:
+                  type: string
+        login_disabled:
+          type: boolean
+        allow_untrusted_certificates:
+          type: boolean
         type:
           type: object
+          additionalProperties: false
+          required:
+            - name
           properties:
             description:
               type: string
-              title: description
             name:
               type: string
-              title: name
               enum:
-                - saml
                 - openid
-        oidc_provider:
-          type: object
-          title: oidc_provider
-          properties:
-            client:
-              title: client
-              type: object
-              description: either contains urls or credentials (mutually exclusive)
-              properties:
-                urls:
-                  type: object
-                  title: urls
-                  properties:
-                    register:
-                      type: string
-                      title: register
-                credentials:
-                  type: object
-                  title: credentials
-                  properties:
-                    id:
-                      type: string
-                      title: id
-                    secret:
-                      type: string
-                      title: secret
-            issuer:
-              type: string
-              title: issuer
-            urls:
-              type: object
-              title: urls
-              properties:
-                authorize:
-                  type: string
-                  title: authorize
-                token:
-                  type: string
-                  title: token
-                userinfo:
-                  type: string
-                  title: userinfo
-            group_scope:
-              type: string
-              title: group_scope
-            claims_mapping:
-              type: object
-              title: claims_mapping
-              properties:
-                group_expression:
-                  type: string
-                  title: group_expression
-        allow_untrusted_certificates:
-          type: boolean
-          title: allow_untrusted_certificates
-        saml:
-          type: object
-          title: saml
-          properties:
-            issuer:
-              type: string
-              title: issuer
-            public_key:
-              type: array
-              title: public_key
-              items:
-                type: string
-            audience:
-              type: string
-              title: audience
-            claims_mapping:
-              type: object
-              title: claims_mapping
-              properties:
-                username_attribute:
-                  type: string
-                  title: username_attribute
-                  description: Field name in the SAML AttributeStatements that maps to username. By default, the NameID attribute in the SAML assertion is used.
-                firstname_attribute:
-                  type: string
-                  title: firstname_attribute
-                  description: Field name in the SAML AttributeStatements that maps to First Name. By default, the firstname attribute in the SAML assertion is used.
-                lastname_attribute:
-                  type: string
-                  title: lastname_attribute
-                  description: Field name in the SAML AttributeStatements that maps to Last Name. By default, the lastname attribute in the SAML assertion is used.
-                email_attribute:
-                  type: string
-                  title: email_attribute
-                  description: Field name in the SAML AttributeStatements that maps to Email. By default, the email attribute in the SAML assertion is used.
-                group_attribute:
-                  type: string
-                  title: group_attribute
-                  description: Field name in the SAML AttributeStatements that maps to Group.
-            require_encrypted_saml_assertions:
-              type: boolean
-              title: require_encrypted_saml_assertions
-            idp_initiated_sso_enabled:
-              type: boolean
-              title: idp_initiated_sso_enabled
-            sp_initiated_sso_enabled:
-              type: boolean
-              title: sp_initiated_sso_enabled
-        service_provider:
-          type: object
-          title: service_provider
-          properties:
-            urls:
-              type: object
-              title: urls
-              properties:
-                sign_on:
-                  type: string
-                  title: sign_on
-                  description: The Anypoint Platform URL where users must sign in.
-                sign_out:
-                  type: string
-                  title: sign_out
-                  description: URL to redirect sign out requests, so users both sign out of the Anypoint Platform and have their SAML user's status set to signed out.
+        provider_id:
+          type: string
+        arc_namespace:
+          type: string
 
-    idpPatchBody:
-      title: idpPatchBody
+
+    idpSummary:
       type: object
+      additionalProperties: false
+      required:
+        - provider_id
+        - org_id
+        - name
+        - type
       properties:
+        provider_id:
+          type: string
+        org_id:
+          type: string
         name:
           type: string
-          title: name
         type:
           type: object
+          additionalProperties: false
+          required:
+            - name
           properties:
             description:
               type: string
-              title: description
-        oidc_provider:
-          type: object
-          title: oidc_provider
-          properties:
-            client:
-              title: client
-              type: object
-              description: either contains urls or credentials (mutually exclusive)
-              properties:
-                urls:
-                  type: object
-                  title: urls
-                  properties:
-                    register:
-                      type: string
-                      title: register
-                credentials:
-                  type: object
-                  title: credentials
-                  properties:
-                    id:
-                      type: string
-                      title: id
-                    secret:
-                      type: string
-                      title: secret
-            issuer:
+            name:
               type: string
-              title: issuer
-            urls:
-              type: object
-              title: urls
-              properties:
-                authorize:
-                  type: string
-                  title: authorize
-                token:
-                  type: string
-                  title: token
-                userinfo:
-                  type: string
-                  title: userinfo
-            group_scope:
-              type: string
-              title: group_scope
-            claims_mapping:
-              type: object
-              title: claims_mapping
-              properties:
-                group_expression:
-                  type: string
-                  title: group_expression
-        allow_untrusted_certificates:
-          type: boolean
-          title: allow_untrusted_certificates
-        saml:
-          type: object
-          title: saml
-          properties:
-            issuer:
-              type: string
-              title: issuer
-            public_key:
-              type: array
-              title: public_key
-              items:
-                type: string
-            audience:
-              type: string
-              title: audience
-            claims_mapping:
-              type: object
-              title: claims_mapping
-              properties:
-                username_attribute:
-                  type: string
-                  title: username_attribute
-                  description: Field name in the SAML AttributeStatements that maps to username. By default, the NameID attribute in the SAML assertion is used.
-                firstname_attribute:
-                  type: string
-                  title: firstname_attribute
-                  description: Field name in the SAML AttributeStatements that maps to First Name. By default, the firstname attribute in the SAML assertion is used.
-                lastname_attribute:
-                  type: string
-                  title: lastname_attribute
-                  description: Field name in the SAML AttributeStatements that maps to Last Name. By default, the lastname attribute in the SAML assertion is used.
-                email_attribute:
-                  type: string
-                  title: email_attribute
-                  description: Field name in the SAML AttributeStatements that maps to Email. By default, the email attribute in the SAML assertion is used.
-                group_attribute:
-                  type: string
-                  title: group_attribute
-                  description: Field name in the SAML AttributeStatements that maps to Group.
-            require_encrypted_saml_assertions:
-              type: boolean
-              title: require_encrypted_saml_assertions
-            idp_initiated_sso_enabled:
-              type: boolean
-              title: idp_initiated_sso_enabled
-            sp_initiated_sso_enabled:
-              type: boolean
-              title: sp_initiated_sso_enabled
-        service_provider:
-          type: object
-          title: service_provider
-          properties:
-            urls:
-              type: object
-              title: urls
-              properties:
-                sign_on:
-                  type: string
-                  title: sign_on
-                  description: The Anypoint Platform URL where users must sign in.
-                sign_out:
-                  type: string
-                  title: sign_out
-                  description: URL to redirect sign out requests, so users both sign out of the Anypoint Platform and have their SAML user's status set to signed out.
+              enum:
+                - ldap
+                - openid
+                - saml
+
