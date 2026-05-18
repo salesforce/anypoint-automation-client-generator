@@ -64,7 +64,7 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '201':    # status code
+        '200':
           $ref: '#/components/responses/SuccessListTeamRoles'
     post:
       operationId: assignTeamRoles
@@ -77,7 +77,7 @@ paths:
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '201':    # status code
+        '201':
           $ref: '#/components/responses/SuccessPostTeamRoles'
     delete:
       operationId: deleteTeamRoles
