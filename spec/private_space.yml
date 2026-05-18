@@ -171,6 +171,224 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessGetPrivateSpaceIamRoles'
 
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/transitgateways:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        description: The ID of the private space in GUID format
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getPrivateSpaceTransitGateways
+      description: lists transit gateway attachments for the given private space
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessListTransitGateways'
+    post:
+      operationId: createPrivateSpaceTransitGateway
+      description: creates a transit gateway attachment on the given private space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitGatewayPostBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':
+          $ref: '#/components/responses/SuccessCreateTransitGateway'
+
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/transitgateways/{transitGatewayId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        description: The ID of the private space in GUID format
+        required: true
+        schema:
+          type: string
+      - name: transitGatewayId
+        in: path
+        description: The transit gateway id (AWS tgw-...).
+        required: true
+        schema:
+          type: string
+    patch:
+      operationId: updatePrivateSpaceTransitGatewayRoutes
+      description: updates the static routes of a transit gateway attachment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitGatewayPatchRoutesBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessUpdateTransitGatewayRoutes'
+    delete:
+      operationId: deletePrivateSpaceTransitGateway
+      description: deletes a transit gateway attachment from the given private space
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':
+          description: Transit gateway attachment deleted
+
+  /organizations/{orgId}/transitgateways:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getOrgTransitGateways
+      description: lists transit gateways across the organization, optionally filtered by region and private space id
+      parameters:
+        - name: region
+          in: query
+          description: AWS region filter.
+          required: false
+          schema:
+            type: string
+        - name: privateSpaceId
+          in: query
+          description: Private space id filter (GUID).
+          required: false
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '200':
+          $ref: '#/components/responses/SuccessListTransitGateways'
+
+  /organizations/{orgId}/transitgateways/{transitGatewayId}:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: transitGatewayId
+        in: path
+        description: The transit gateway id (AWS tgw-...).
+        required: true
+        schema:
+          type: string
+    patch:
+      operationId: updateOrgTransitGatewayName
+      description: updates the name of a transit gateway
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitGatewayPatchNameBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessUpdateTransitGatewayName'
+
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/accounts:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        description: The ID of the private space in GUID format
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getPrivateSpaceMulesoftAccount
+      description: returns the MuleSoft AWS account id (region-bound to the private space) to whitelist as RAM share principal
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessGetPrivateSpaceMulesoftAccount'
+
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/routes:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        description: The ID of the private space in GUID format
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getPrivateSpaceRoutes
+      description: lists static routes for the private space network
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessListPrivateSpaceRoutes'
+
 components:
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
@@ -225,6 +443,50 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/PrivateSpaceIamRoles'
+    SuccessListTransitGateways:
+      description: List of transit gateways
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TransitGateway'
+    SuccessCreateTransitGateway:
+      description: Transit gateway attachment created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransitGateway'
+    SuccessUpdateTransitGatewayRoutes:
+      description: Transit gateway routes updated (truncated array wrap)
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TransitGatewayPatchRoutesResult'
+    SuccessUpdateTransitGatewayName:
+      description: Transit gateway name updated (full array wrap)
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TransitGateway'
+    SuccessGetPrivateSpaceMulesoftAccount:
+      description: MuleSoft AWS account id, region-bound (raw string body)
+      content:
+        application/json:
+          schema:
+            type: string
+    SuccessListPrivateSpaceRoutes:
+      description: Private space route table
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/PrivateSpaceRoute'
 
   schemas:
     PrivateSpaceSummary:
@@ -662,3 +924,130 @@ components:
           type: integer
           format: int64
           description: Last known timestamp of the status in EPOCH.
+
+    TransitGateway:
+      title: TransitGateway
+      type: object
+      properties:
+        id:
+          type: string
+          description: AWS transit gateway id (e.g. tgw-017e20b9ce00c865c).
+        name:
+          type: string
+          description: User-chosen display name for the attachment.
+        accountId:
+          type: string
+          description: MuleSoft AWS account id (region-bound to the private space).
+        spec:
+          type: object
+          properties:
+            resourceShare:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: RAM resource share UUID (trailing GUID of the ARN).
+                account:
+                  type: string
+                  description: AWS account id that owns the RAM share.
+            region:
+              type: string
+              description: AWS region (inherits the private space region).
+            spaceName:
+              type: string
+              description: Private space display name.
+        status:
+          type: object
+          properties:
+            gateway:
+              type: string
+              description: Gateway status (e.g. refreshing, available).
+            attachment:
+              type: string
+              description: Attachment status (e.g. refreshing, available).
+            tgwResource:
+              type: string
+              description: AWS console URL pointing at the transit gateway resource.
+            routes:
+              type: array
+              description: Static routes pushed into the private space route table.
+              items:
+                type: string
+
+    TransitGatewayPostBody:
+      title: TransitGatewayPostBody
+      type: object
+      required:
+        - name
+        - resourceShareId
+        - resourceShareAccount
+        - routes
+      properties:
+        name:
+          type: string
+          description: Display name for the transit gateway attachment.
+        resourceShareId:
+          type: string
+          description: RAM resource share UUID (trailing GUID of the ARN, NOT the full ARN).
+        resourceShareAccount:
+          type: string
+          description: AWS account id that owns the RAM share (your AWS account, NOT MuleSoft's account).
+        routes:
+          type: array
+          description: Static routes (CIDR strings) to push into the private space route table. Must not equal or be more specific than the private space CIDR.
+          items:
+            type: string
+
+    TransitGatewayPatchRoutesBody:
+      title: TransitGatewayPatchRoutesBody
+      type: object
+      required:
+        - routes
+      properties:
+        routes:
+          type: array
+          description: Replacement set of static routes (CIDR strings).
+          items:
+            type: string
+
+    TransitGatewayPatchNameBody:
+      title: TransitGatewayPatchNameBody
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: New display name.
+
+    TransitGatewayPatchRoutesResult:
+      title: TransitGatewayPatchRoutesResult
+      description: Truncated transit gateway shape returned by the routes PATCH endpoint.
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        deploymentId:
+          type: string
+        resourceShareId:
+          type: string
+        routes:
+          type: array
+          items:
+            type: string
+
+    PrivateSpaceRoute:
+      title: PrivateSpaceRoute
+      type: object
+      properties:
+        destination:
+          type: string
+          description: Destination CIDR.
+        status:
+          type: string
+          description: Route status.
+        target:
+          type: string
+          description: Route target (transit gateway id, VPN id, etc.).
