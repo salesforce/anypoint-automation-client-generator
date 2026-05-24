@@ -685,7 +685,6 @@ components:
         - name
         - classifier
         - groupId
-        - asset
       type: object
       title: postAssetObject
       properties:
