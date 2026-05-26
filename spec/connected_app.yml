@@ -407,6 +407,11 @@ components:
               type: boolean
               title: enabled
               example: true
+            owner_user_id:
+              type: string
+              title: ownerUserId
+              description: User id of the connected app owner. Set to transfer ownership.
+              example: "9exb9686-4e35-81e0-45ac-8c83662480c0"
 
     scopeCore:
       title: scopeCore
