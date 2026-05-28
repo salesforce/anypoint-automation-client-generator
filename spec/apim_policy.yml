@@ -141,6 +141,15 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: injectionPoint
+          in: query
+          description: Filter by policy injection point.
+          required: false
+          schema:
+            type: string
+            enum:
+              - inbound
+              - outbound
       summary: Retrieve all or part of exchange policy templates of a given organization
       description: Retrieves all or part of exchange policy templates of a given organization.
       responses:
@@ -192,6 +201,12 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: apiInstanceId
+          in: query
+          description: Filter applicability against a specific api instance id.
+          required: false
+          schema:
+            type: string
       summary: Retrieve details of exchange policy template of a given organization
       description: Retrieve details of exchange policy template of a given organization.
       responses:
@@ -633,9 +648,48 @@ components:
         applicable:
           type: boolean
         configuration:
+          description: |
+            Policy configuration. Legacy policies (mule3/older mule4) return an array
+            of PolicyConfiguration items describing each configurable property. Modern
+            policies (AI/MCP/A2A and newer mule4) return a JSON Schema object
+            (draft-2019-09) describing the same structure with richer validation
+            (if/then/else, oneOf, etc.). Consumer code must check the runtime type
+            and parse accordingly.
+        schemaId:
+          type: string
+          description: Identifier of the underlying JSON schema for modern policies.
+        splitAssetModel:
+          type: boolean
+          description: Whether the policy uses the split asset model.
+        ootbUpgradeableImpl:
+          type: boolean
+          description: Whether the OOTB implementation supports in-place upgrades.
+        supportedJavaVersions:
           type: array
+          description: Java runtime versions this policy implementation is compatible with.
           items:
-            $ref: "#/components/schemas/PolicyConfiguration"
+            type: string
+            nullable: true
+        interfaceScope:
+          type: array
+          description: Scopes at which the policy can be applied (e.g. "api", "resource").
+          items:
+            type: string
+        interfaceTransformation:
+          type: array
+          description: |
+            Modern replacement for the flat ramlSnippet/oasV2Snippet/oasV3Snippet
+            fields. Each entry pairs a language identifier with a transformation
+            snippet to apply to the API definition.
+          items:
+            type: object
+            properties:
+              language:
+                type: string
+                description: Snippet language (e.g. ramlSnippet, ramlV1Snippet, oasV2Snippet, oasV3Snippet).
+              transformation:
+                type: string
+                description: The snippet body to merge into the API definition.
         allVersions:
           type: array
           items:
@@ -647,6 +701,9 @@ components:
                 type: string
               version:
                 type: string
+              status:
+                type: string
+                description: Lifecycle status of the version (e.g. published, deprecated, development).
 
     ApimPolicyCollection:
       oneOf:
