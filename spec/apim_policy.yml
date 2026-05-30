@@ -415,6 +415,204 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessEnableApimPolicy'
 
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/outbound-policies:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimOutboundPolicies
+      summary: Retrieve all of api manager instance outbound policies.
+      description: Retrieve all of api manager instance outbound policies in a given organization and environment.
+      parameters:
+        - in: query
+          name: fullInfo
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimOutboundPolicies'
+    post:
+      operationId: PostApimOutboundPolicy
+      summary: Create an api manager instance outbound policy.
+      description: Create an api manager instance outbound policy in a given organization and environment.
+      requestBody:
+        description: outbound policy content
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApimPolicyBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostApimOutboundPolicy'
+
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/outbound-policies/{apiPolicyId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiPolicyId
+        description: The api manager instance outbound policy Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApimOutboundPolicy
+      summary: Retrieve a specific api manager instance outbound policy.
+      description: Retrieve a specific api manager instance outbound policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetApimOutboundPolicy'
+    patch:
+      operationId: PatchApimOutboundPolicy
+      summary: Update a specific api manager instance outbound policy.
+      description: Update a specific api manager instance outbound policy in a given organization and environment.
+      requestBody:
+        description: outbound policy content
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApimPolicyPatchBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessPatchApimOutboundPolicy'
+    delete:
+      operationId: DeleteApimOutboundPolicy
+      summary: Delete a specific api manager instance outbound policy.
+      description: Delete a specific api manager instance outbound policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':    # status code
+          $ref: '#/components/responses/SuccessDeleteApimOutboundPolicy'
+
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/outbound-policies/{apiPolicyId}/disable:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiPolicyId
+        description: The api manager instance outbound policy Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: DisableApimOutboundPolicy
+      summary: Disable a specific api manager instance outbound policy.
+      description: Disable a specific api manager instance outbound policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessDisableApimOutboundPolicy'
+
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/outbound-policies/{apiPolicyId}/enable:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiPolicyId
+        description: The api manager instance outbound policy Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: EnableApimOutboundPolicy
+      summary: Enable a specific api manager instance outbound policy.
+      description: Enable a specific api manager instance outbound policy in a given organization and environment.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessEnableApimOutboundPolicy'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -497,6 +695,44 @@ components:
             $ref: "#/components/schemas/ApimPolicy"
     SuccessEnableApimPolicy:
       description: enable specific api manager policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessGetApimOutboundPolicies:
+      description: list api manager outbound policies
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicyCollection"
+    SuccessPostApimOutboundPolicy:
+      description: create api manager outbound policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessGetApimOutboundPolicy:
+      description: get specific api manager outbound policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessPatchApimOutboundPolicy:
+      description: patch specific api manager outbound policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessDeleteApimOutboundPolicy:
+      description: delete specific api manager outbound policy
+    SuccessDisableApimOutboundPolicy:
+      description: disable specific api manager outbound policy
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimPolicy"
+    SuccessEnableApimOutboundPolicy:
+      description: enable specific api manager outbound policy
       content:
         application/json:
           schema:
