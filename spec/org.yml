@@ -1,24 +1,25 @@
 openapi: 3.0.0
 info:
   title: Organization API
-  description: Description of the Organization API 
-  version: 1.0.0
+  description: Description of the Organization API
+  version: 1.1.1
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 paths:
   /organizations:
     post:
-      summary: Creates a new Business Group within an organization.
-      description: Creates a new Business Group within an organization. This action can only be performed with an access token generated from user/pwd.
+      operationId: createBG
+      summary: Creates a new Business Group.
+      description: Creates a new Business Group. This action can only be performed with an access token generated from user/pwd.
       requestBody:
         description: Business Group Request Body Object
         required: true
@@ -33,7 +34,7 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '201':
           $ref: '#/components/responses/SuccessPostBG'
-  
+
   /organizations/{orgId}:
     parameters:
       - in: path
@@ -43,37 +44,80 @@ paths:
         schema:
           type: string
     get:
-      summary: Returns the business Group instance with the given id.
-      description: Returns the Business Group with the given id 
+      operationId: getBG
+      summary: Returns the Business Group instance with the given id.
+      description: Returns the Business Group with the given id
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           $ref: '#/components/responses/SuccessGetBG'
     put:
-      summary: Put a Business Group by its id.
-      description: Put a Business Group by its given id. 
+      operationId: updateBG
+      summary: Update a Business Group by its id.
+      description: Update a Business Group by its given id.
       requestBody:
         description: Business Group Request Body Object
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BGPutReqBody'
+              $ref: '#/components/schemas/BGUpdateReqBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '204':    # status code
-          $ref: '#/components/responses/SuccessPutBG'
+          $ref: '#/components/responses/SuccessUpdateBG'
     delete:
+      operationId: deleteBG
       summary: Delete a Business Group by its id.
-      description: Delete a Business Group by its given id. 
+      description: Delete a Business Group by its given id.
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '204':    # status code
           $ref: '#/components/responses/SuccessDeleteBG'
 
+  /organizations/{orgId}/clients/{clientId}:
+    get:
+      operationId: getClientCredentials
+      description: Get client ID and client secret
+      parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
+      - name: clientId
+        in: path
+        description: The client ID of the client
+        required: true
+        schema:
+          type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetClient'
+
+  /cs/organizations/{orgId}/usage:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getBGUsage
+      summary: Returns the usage for a given Business Group.
+      description: Returns the usage for a given Business Group
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetUsage'
 
 components:
   securitySchemes:
@@ -98,7 +142,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/masterBGDetail'
+            $ref: '#/components/schemas/MasterBGDetail'
     SuccessPostBG:
       description: Success response
       content:
@@ -111,33 +155,44 @@ components:
         application/json:
           schema:
             type: object
-            default: {}
-    SuccessPutBG:
+    SuccessUpdateBG:
       description: Success response
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/BGCore'
-    
+    SuccessGetClient:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Client'
+    SuccessGetUsage:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Usage'
+
 
   schemas:
     BGPostReqBody:
       properties:
         entitlements:
-          $ref: "#/components/schemas/entitlementsCore"
+          $ref: "#/components/schemas/EntitlementsCore"
         name:
           default: ''
-          description: An explanation about the purpose of this instance.
+          description: The name of the organization
           title: name
           type: string
         ownerId:
           default: ''
-          description: An explanation about the purpose of this instance.
+          description: The id of the owner of the organization.
           title: ownerId
           type: string
         parentOrganizationId:
           default: ''
-          description: An explanation about the purpose of this instance.
+          description: a reference to the parent organization
           title: parentOrganizationId
           type: string
       required:
@@ -148,1092 +203,1170 @@ components:
       title: BGPostReqBody
       type: object
 
-    BGPutReqBody:
-      title: BGPutReqBody
+    BGUpdateReqBody:
+      title: BGUpdateReqBody
       type: object
       properties:
         entitlements:
-          $ref: "#/components/schemas/entitlementsCore"
+          $ref: "#/components/schemas/EntitlementsCore"
         name:
           default: ''
-          description: An explanation about the purpose of this instance.
+          description: The name of the organization
           title: name
           type: string
         ownerId:
           default: ''
-          description: An explanation about the purpose of this instance.
+          description: The id of the owner of the organization.
           title: ownerId
           type: string
         sessionTimeout:
             default: 0
-            description: An explanation about the purpose of this instance.
+            description: The session timeout in minutes
             title: sessionTimeout
             type: integer
 
     BGCore:
-      properties:
-        clientId:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            example:
-            - 1ab4bb7db66448be902379d1fcfb1a43
-            title: clientId
-            type: string
-        createdAt:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            example:
-            - '2021-03-05T14:06:52.976Z'
-            title: createdAt
-            type: string
-        domain:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            example:
-            - ms-04
-            title: domain
-            type: string
-        entitlements:
-          $ref: "#/components/schemas/entitlements"
-        environments:
-            default: []
-            description: An explanation about the purpose of this instance.
-            items:
-                default: {}
-                description: An explanation about the purpose of this instance.
-                properties:
-                    clientId:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: clientId
-                        type: string
-                    id:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: id
-                        type: string
-                    isProduction:
-                        default: false
-                        description: An explanation about the purpose of this instance.
-                        title: isProduction
-                        type: boolean
-                    name:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: name
-                        type: string
-                    organizationId:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: organizationId
-                        type: string
-                    type:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: type
-                        type: string
-                required:
-                - id
-                - name
-                - organizationId
-                - isProduction
-                - type
-                - clientId
-                title: environment
-                type: object
-            title: environments
-            type: array
-        id:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            title: id
-            type: string
-        idprovider_id:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            title: idprovider_id
-            type: string
-        isAutomaticAdminPromotionExempt:
-            default: false
-            description: An explanation about the purpose of this instance.
-            title: isAutomaticAdminPromotionExempt
-            type: boolean
-        isFederated:
-            default: false
-            description: An explanation about the purpose of this instance.
-            title: isFederated
-            type: boolean
-        isMaster:
-            default: false
-            description: An explanation about the purpose of this instance.
-            title: isMaster
-            type: boolean
-        mfaRequired:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            title: mfaRequired
-            type: string
-        name:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            title: name
-            type: string
-        ownerId:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            title: ownerId
-            type: string
-        parentOrganizationIds:
-            default: []
-            description: An explanation about the purpose of this instance.
-            items:
-              title: parentOrganizationId
-              type: string
-            title: parentOrganizationIds
-            type: array
-        properties:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            title: properties
-            type: object
-        subOrganizationIds:
-            default: []
-            description: An explanation about the purpose of this instance.
-            items:
-                default: ''
-                description: An explanation about the purpose of this instance.
-                title: subOrganizationId
-                type: string
-            title: subOrganizationIds
-            type: array
-        tenantOrganizationIds:
-            default: []
-            description: An explanation about the purpose of this instance.
-            items:
-              title: tenantOrganizationId
-              type: string
-            title: tenantOrganizationIds
-            type: array
-        updatedAt:
-            default: ''
-            description: An explanation about the purpose of this instance.
-            title: updatedAt
-            type: string
-        owner:
-            properties:
-                createdAt:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: createdAt
-                    type: string
-                deleted:
-                    default: false
-                    description: An explanation about the purpose of this instance.
-                    title: deleted
-                    type: boolean
-                email:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: The email schema
-                    type: string
-                enabled:
-                    default: false
-                    description: An explanation about the purpose of this instance.
-                    title: enabled
-                    type: boolean
-                firstName:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: firstName
-                    type: string
-                id:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: id
-                    type: string
-                idprovider_id:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: idprovider_id
-                    type: string
-                lastLogin:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: lastLogin
-                    type: string
-                lastName:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: lastName
-                    type: string
-                mfaVerificationExcluded:
-                    default: false
-                    description: An explanation about the purpose of this instance.
-                    title: mfaVerificationExcluded
-                    type: boolean
-                mfaVerifiersConfigured:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: mfaVerifiersConfigured
-                    type: string
-                organizationId:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: organizationId
-                    type: string
-                phoneNumber:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: phoneNumber
-                    type: string
-                type:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: type
-                    type: string
-                updatedAt:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: updatedAt
-                    type: string
-                username:
-                    default: ''
-                    description: An explanation about the purpose of this instance.
-                    title: username
-                    type: string
-            title: owner
-            type: object
       title: BGCore
       type: object
+      properties:
+        clientId:
+          default: ''
+          description: The client id of the organization
+          example:
+          - 1ab4bb7db66448be902379d1fcfb1a43
+          title: clientId
+          type: string
+        createdAt:
+          default: ''
+          description: The creation date of the organization
+          example:
+          - '2021-03-05T14:06:52.976Z'
+          title: createdAt
+          type: string
+        domain:
+          default: ''
+          description: The domain of the organization
+          example:
+          - ms-04
+          title: domain
+          type: string
+        entitlements:
+          $ref: "#/components/schemas/Entitlements"
+        environments:
+          title: environments
+          type: array
+          description: List of environments.
+          items:
+            $ref: "#/components/schemas/Environment"
+        id:
+          default: ''
+          description: The id of the organization
+          title: id
+          type: string
+        idprovider_id:
+          default: ''
+          description: The id of the idprovider of the organization.
+          title: idprovider_id
+          type: string
+        isAutomaticAdminPromotionExempt:
+          default: false
+          description: Whether the organization is exempt from automatic admin promotion.
+          title: isAutomaticAdminPromotionExempt
+          type: boolean
+        isFederated:
+          default: false
+          description: Whether the organization is federated.
+          title: isFederated
+          type: boolean
+        isRoot:
+          default: false
+          description: Whether the organization is a root organization.
+          title: isRoot
+          type: boolean
+        isMaster:
+          default: false
+          description: Whether the organization is a master organization.
+          title: isMaster
+          type: boolean
+        mfaRequired:
+          default: ''
+          description: Whether multi-factor authentication is required for the organization.
+          title: mfaRequired
+          type: string
+        name:
+          default: ''
+          description: The name of the organization.
+          title: name
+          type: string
+        ownerId:
+          default: ''
+          description: The id of the owner of the organization.
+          title: ownerId
+          type: string
+        parentOrganizationIds:
+          description: The ids of the parent organizations.
+          items:
+            title: parentOrganizationId
+            type: string
+          title: parentOrganizationIds
+          type: array
+        properties:
+          description: The properties of the organization.
+          title: properties
+          type: object
+        subOrganizationIds:
+          description: The ids of the sub organizations.
+          items:
+            default: ''
+            description: The id of a sub organization.
+            title: subOrganizationId
+            type: string
+          title: subOrganizationIds
+          type: array
+        tenantOrganizationIds:
+          description: The ids of the tenant organizations.
+          items:
+            title: tenantOrganizationId
+            type: string
+          title: tenantOrganizationIds
+          type: array
+        updatedAt:
+          default: ''
+          description: The last update date of the organization.
+          title: updatedAt
+          type: string
+        owner:
+          title: owner
+          $ref: "#/components/schemas/User"
 
-    masterBGDetail:
+    MasterBGDetail:
       title: masterBGDetail
       allOf:
         - $ref: "#/components/schemas/BGCore"
-        - properties:
-            sessionTimeout:
-                default: 0
-                description: An explanation about the purpose of this instance.
-                title: sessionTimeout
-                type: integer
-            subscription:
-                default: {}
-                description: An explanation about the purpose of this instance.
-                properties:
-                    category:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: category
-                        type: string
-                    expiration:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: expiration
-                        type: string
-                    type:
-                        default: ''
-                        description: An explanation about the purpose of this instance.
-                        title: type
-                        type: string
-                title: subscription
-                type: object
-          title: masterBGSpecificDetails
+        - title: masterBGSpecificDetails
           type: object
+          properties:
+            sessionTimeout:
+              default: 0
+              description: The session timeout in minutes.
+              title: sessionTimeout
+              type: integer
+            subscription:
+              title: subscription
+              type: object
+              description: The subscription details of the organization.
+              properties:
+                category:
+                  default: ''
+                  description: The category of the subscription.
+                  title: category
+                  type: string
+                expiration:
+                  default: ''
+                  description: The expiration date of the subscription.
+                  title: expiration
+                  type: string
+                type:
+                  default: ''
+                  description: The type of the subscription.
+                  title: type
+                  type: string
+            gdotId:
+              default: ''
+              description: The gdot id of the organization
+              title: gdotId
+              type: string
+            deletedAt:
+              default: null
+              description: The deleted date of the organization
+              title: deletedAt
+              type: string
+              nullable: true
+            orgType:
+              default: ''
+              description: The type of the organization
+              title: orgType
+              type: string
 
-    entitlements:
-      description: An explanation about the purpose of this instance.
+    Environment:
+      title: environment
+      type: object
+      description: an instance of an environment.
       properties:
-          angGovernance:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  level:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      example:
-                      - -1
-                      title: level
-                      type: integer
-              required:
-              - level
-              title: angGovernance
-              type: object
-          anypointSecurityEdgePolicies:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: anypointSecurityEdgePolicies
-              type: object
-          anypointSecurityTokenization:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: anypointSecurityTokenization
-              type: object
-          apiCommunityManager:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: apiCommunityManager
-              type: object
-          apiMonitoring:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  schedules:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: schedules
-                      type: integer
-              required:
-              - schedules
-              title: apiMonitoring
-              type: object
-          apiQuery:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-                  productSKU:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: productSKU
-                      type: integer
-              required:
-              - enabled
-              title: apiQuery
-              type: object
-          apiQueryC360:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: apiQueryC360
-              type: object
-          apis:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: apis
-              type: object
-          appViz:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: appViz
-              type: boolean
-          armAlerts:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: armAlerts
-              type: boolean
-          autoscaling:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: autoscaling
-              type: boolean
-          cam:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: cam
-              type: object
-          createEnvironments:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: createEnvironments
-              type: boolean
-          createSubOrgs:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: createSubOrgs
-              type: boolean
-          crowd:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  environments:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: environments
-                      type: boolean
-                  hideApiManagerDesigner:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: hideApiManagerDesigner
-                      type: boolean
-                  hideFormerApiPlatform:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: hideFormerApiPlatform
-                      type: boolean
-              required:
-              - hideApiManagerDesigner
-              - hideFormerApiPlatform
-              - environments
-              title: crowd
-              type: object
-          crowdSelfServiceMigration:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: crowdSelfServiceMigration
-              type: object
-          designCenter:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  api:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: api
-                      type: boolean
-                  mozart:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: mozart
-                      type: boolean
-              title: The designCenter schema
-              type: object
-          exchange2:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: exchange2
-              type: object
-          externalIdentity:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: externalIdentity
-              type: boolean
-          gateways:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-              required:
-              - assigned
-              title: gateways
-              type: object
-          globalDeployment:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: globalDeployment
-              type: boolean
-          hybrid:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: The hybrid schema
-              type: object
-          hybridAutoDiscoverProperties:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: hybridAutoDiscoverProperties
-              type: boolean
-          hybridInsight:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: hybridInsight
-              type: boolean
-          kpiDashboard:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: kpiDashboard
-              type: object
-          loadBalancer:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-                  reassigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: integer
-              required:
-              - assigned
-              title: loadBalancer
-              type: object
-          messaging:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-              required:
-              - assigned
-              title: messaging
-              type: object
-          monitoringCenter:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  productSKU:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: productSKU
-                      type: integer
-              required:
-              - productSKU
-              title: monitoringCenter
-              type: object
-          mqAdvancedFeatures:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: mqAdvancedFeatures
-              type: object
-          mqMessages:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  addOn:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: addOn
-                      type: integer
-                  base:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: base
-                      type: integer
-              title: mqMessages
-              type: object
-          mqRequests:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  addOn:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: addOn
-                      type: integer
-                  base:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: base
-                      type: integer
-              title: mqRequests
-              type: object
-          objectStoreKeys:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  addOn:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: addOn
-                      type: integer
-                  base:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: base
-                      type: integer
-              title: objectStoreKeys
-              type: object
-          objectStoreRequestUnits:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  addOn:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: addOn
-                      type: integer
-                  base:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: base
-                      type: integer
-              title: objectStoreRequestUnits
-              type: object
-          partnersProduction:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-              required:
-              - assigned
-              title: partnersProduction
-              type: object
-          partnersSandbox:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-              required:
-              - assigned
-              title: partnersSandbox
-              type: object
-          pcf:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: pcf
-              type: boolean
-          runtimeFabric:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: runtimeFabric
-              type: boolean
-          runtimeFabricCloud:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: runtimeFabricCloud
-              type: object
-          serviceMesh:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: serviceMesh
-              type: object
-          staticIps:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-                  reassigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: integer
-              required:
-              - assigned
-              title: staticIps
-              type: object
-          tradingPartnersProduction:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-              required:
-              - assigned
-              title: tradingPartnersProduction
-              type: object
-          tradingPartnersSandbox:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-              required:
-              - assigned
-              title: tradingPartnersSandbox
-              type: object
-          vCoresDesign:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: number
-                  reassigned:
-                      default: 0.0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: number
-              required:
-              - assigned
-              title: vCoresDesign
-              type: object
-          vCoresProduction:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: number
-                  reassigned:
-                      default: 0.0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: number
-              required:
-              - assigned
-              title: vCoresProduction
-              type: object
-          vCoresSandbox:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: number
-                  reassigned:
-                      default: 0.0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: number
-              required:
-              - assigned
-              title: vCoresSandbox
-              type: object
-          vpcs:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-                  reassigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: integer
-              required:
-              - assigned
-              title: vpcs
-              type: object
-          vpns:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-                  reassigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: integer
-              required:
-              - assigned
-              title: vpns
-              type: object
-          workerClouds:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  assigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: assigned
-                      type: integer
-                  reassigned:
-                      default: 0
-                      description: An explanation about the purpose of this instance.
-                      title: reassigned
-                      type: integer
-              required:
-              - assigned
-              title: workerClouds
-              type: object
-          workerLoggingOverride:
-              default: {}
-              description: An explanation about the purpose of this instance.
-              properties:
-                  enabled:
-                      default: false
-                      description: An explanation about the purpose of this instance.
-                      title: enabled
-                      type: boolean
-              required:
-              - enabled
-              title: workerLoggingOverride
-              type: object
-      required:
-      - createEnvironments
-      - globalDeployment
-      - createSubOrgs
-      - vCoresProduction
-      - vCoresSandbox
-      - vCoresDesign
-      - staticIps
-      - vpcs
-      - vpns
-      - loadBalancer
+        clientId:
+          default: ''
+          description: The client id of the environment.
+          title: clientId
+          type: string
+        id:
+          default: ''
+          description: The id of the environment.
+          title: id
+          type: string
+        isProduction:
+          default: false
+          description: Whether the environment is a production environment.
+          title: isProduction
+          type: boolean
+        name:
+          default: ''
+          description: The name of the environment.
+          title: name
+          type: string
+        organizationId:
+          default: ''
+          description: The id of the organization.
+          title: organizationId
+          type: string
+        type:
+          default: ''
+          description: The type of the environment.
+          title: type
+          type: string
+
+    User:
+      type: object
+      properties:
+        createdAt:
+          default: ''
+          description: The creation date of the user.
+          title: createdAt
+          type: string
+        deleted:
+          default: false
+          description: Whether the user is deleted.
+          title: deleted
+          type: boolean
+        email:
+          default: ''
+          description: The email of the user.
+          title: email
+          type: string
+        enabled:
+          default: false
+          description: Whether the user is enabled.
+          title: enabled
+          type: boolean
+        firstName:
+          default: ''
+          description: The first name of the user.
+          title: firstName
+          type: string
+        id:
+          default: ''
+          description: The id of the user.
+          title: id
+          type: string
+        idprovider_id:
+          default: ''
+          description: The idprovider id of the user.
+          title: idprovider_id
+          type: string
+        lastLogin:
+          default: ''
+          description: The last login date of the user.
+          title: lastLogin
+          type: string
+        lastName:
+          default: ''
+          description: The last name of the user.
+          title: lastName
+          type: string
+        mfaVerificationExcluded:
+          default: false
+          description: Whether the user is excluded from MFA verification.
+          title: mfaVerificationExcluded
+          type: boolean
+        mfaVerifiersConfigured:
+          default: ''
+          description: Whether the user has configured MFA verifiers.
+          title: mfaVerifiersConfigured
+          type: string
+        organizationId:
+          default: ''
+          description: The id of the organization.
+          title: organizationId
+          type: string
+        phoneNumber:
+          default: ''
+          description: The phone number of the user.
+          title: phoneNumber
+          type: string
+        type:
+          default: ''
+          description: The type of the user.
+          title: type
+          type: string
+        updatedAt:
+          default: ''
+          description: The last update date of the user.
+          title: updatedAt
+          type: string
+        username:
+          default: ''
+          description: The username of the user.
+          title: username
+          type: string
+
+
+    Entitlements:
       title: entitlements
       type: object
+      description: Business Group entitlements
+      properties:
+        angGovernance:
+          $ref: '#/components/schemas/AngGovernanceEntitlement'
+          description: Ang Governance entitlements
+          title: angGovernance
+        anypointSecurityEdgePolicies:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: anypointSecurityEdgePolicies
+        anypointSecurityTokenization:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: anypointSecurityTokenization
+        apiCommunityManager:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: apiCommunityManager
+        apiMonitoring:
+          $ref: '#/components/schemas/ApiMonitoringEntitlement'
+          description: API Monitoring entitlements
+          title: apiMonitoring
+        apiQuery:
+          title: apiQuery
+          $ref: '#/components/schemas/ApiQueryEntitlement'
+        apiQueryC360:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: apiQueryC360
+        apis:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: apis
+        appViz:
+          description: AppViz entitlements
+          title: appViz
+          type: boolean
+        armAlerts:
+          description: ARM Alerts entitlements
+          title: armAlerts
+          type: boolean
+        autoscaling:
+          description: Autoscaling entitlements
+          title: autoscaling
+          type: boolean
+        cam:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: cam
+        createEnvironments:
+          description: Create Environments entitlements
+          title: createEnvironments
+          type: boolean
+        createSubOrgs:
+          description: Create Sub Orgs entitlements
+          title: createSubOrgs
+          type: boolean
+        crowd:
+          title: crowd
+          $ref: '#/components/schemas/CrowdEntitlement'
+        crowdSelfServiceMigration:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: crowdSelfServiceMigration
+        designCenter:
+          title: designCenter
+          $ref: '#/components/schemas/DesignCenterEntitlement'
+        exchange2:
+          $ref: '#/components/schemas/Exchange2Entitlement'
+          title: exchange2
+        externalIdentity:
+          description: External Identity entitlements
+          title: externalIdentity
+          type: boolean
+        gateways:
+          $ref: '#/components/schemas/GatewaysEntitlement'
+        globalDeployment:
+          description: Global Deployment entitlements
+          title: globalDeployment
+          type: boolean
+        hybrid:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: hybrid
+        hybridAutoDiscoverProperties:
+          description: Hybrid auto-discover properties
+          title: hybridAutoDiscoverProperties
+          type: boolean
+        hybridInsight:
+          description: Hybrid Insight entitlements
+          title: hybridInsight
+          type: boolean
+        kpiDashboard:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: kpiDashboard
+        loadBalancer:
+          $ref: '#/components/schemas/LoadBalancerEntitlement'
+        messaging:
+          $ref: '#/components/schemas/MessagingEntitlement'
+        monitoringCenter:
+          $ref: '#/components/schemas/MonitoringCenterEntitlement'
+        mqAdvancedFeatures:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: mqAdvancedFeatures
+        mqMessages:
+          $ref: '#/components/schemas/AddOnEntitlement'
+          title: mqMessages
+        mqRequests:
+          $ref: '#/components/schemas/AddOnEntitlement'
+          title: mqRequests
+        objectStoreKeys:
+          $ref: '#/components/schemas/AddOnEntitlement'
+          title: objectStoreKeys
+        objectStoreRequestUnits:
+          $ref: '#/components/schemas/AddOnEntitlement'
+          title: objectStoreRequestUnits
+        partnersProduction:
+          $ref: '#/components/schemas/PartnersProductionEntitlement'
+          title: partnersProduction
+        partnersSandbox:
+          $ref: '#/components/schemas/PartnersSandboxEntitlement'
+          title: partnersSandbox
+        pcf:
+          description: PCF entitlements
+          title: pcf
+          type: boolean
+        runtimeFabric:
+          description: Runtime Fabric entitlements
+          title: runtimeFabric
+          type: boolean
+        runtimeFabricCloud:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: runtimeFabricCloud
+        serviceMesh:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: serviceMesh
+        staticIps:
+          $ref: '#/components/schemas/StaticIpsEntitlement'
+          title: staticIps
+        tradingPartnersProduction:
+          $ref: '#/components/schemas/TradingPartnersProductionEntitlement'
+          title: tradingPartnersProduction
+        tradingPartnersSandbox:
+          $ref: '#/components/schemas/TradingPartnersSandboxEntitlement'
+          title: tradingPartnersSandbox
+        vCoresDesign:
+          $ref: '#/components/schemas/vCoresDesignEntitlement'
+          title: vCoresDesign
+        vCoresProduction:
+          $ref: '#/components/schemas/vCoresProductionEntitlement'
+          title: vCoresProduction
+        vCoresSandbox:
+          $ref: '#/components/schemas/vCoresSandboxEntitlement'
+          title: vCoresSandbox
+        vpcs:
+          $ref: '#/components/schemas/VpcsEntitlement'
+          title: vpcs
+        vpns:
+          $ref: '#/components/schemas/VpnsEntitlement'
+          title: vpns
+        workerClouds:
+          $ref: '#/components/schemas/WorkerCloudsEntitlement'
+          title: workerClouds
+        workerLoggingOverride:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: workerLoggingOverride
+        muleDxWebIde:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: muleDxWebIde
+        muleDxGenAI:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: muleDxGenAI
+        muleDxEDA:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: muleDxEDA
+        highAvailability:
+          $ref: '#/components/schemas/HighAvailabilityEntitlement'
+          title: highAvailability
+        cloudhub1:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: cloudhub1
+        apiGovernance:
+          $ref: '#/components/schemas/ApiGovernanceEntitlement'
+          title: apiGovernance
+        apiGovernanceDomain:
+          $ref: '#/components/schemas/ApiGovernanceDomainEntitlement'
+          title: apiGovernanceDomain
+        apiCatalog:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: apiCatalog
+        apiManager:
+          $ref: '#/components/schemas/ApiManagerEntitlement'
+          title: apiManager
+        composer:
+          $ref: '#/components/schemas/ComposerEntitlement'
+          title: composer
+        rpa:
+          $ref: '#/components/schemas/RpaEntitlement'
+          title: rpa
+        idp:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: idp
+        usageBasedPricing:
+          $ref: '#/components/schemas/UsageBasedPricingEntitlement'
+          title: usageBasedPricing
+        usageBasedPricingLimits:
+          $ref: '#/components/schemas/UsageBasedPricingLimitsEntitlement'
+          title: usageBasedPricingLimits
+        telemetryExporter:
+          $ref: '#/components/schemas/EnablementResourceEntitlement'
+          title: telemetryExporter
+        managedGatewaySmall:
+          $ref: '#/components/schemas/ManagedGatewaySmallEntitlement'
+          title: managedGatewaySmall
+        managedGatewayLarge:
+          $ref: '#/components/schemas/ManagedGatewayLargeEntitlement'
+          title: managedGatewayLarge
+        networkConnections:
+          $ref: '#/components/schemas/NetworkConnectionsEntitlement'
+          title: networkConnections
 
-    entitlementsCore:
-      description: An explanation about the purpose of this instance.
+    EntitlementsCore:
+      description: Entitlements core
       properties:
         globalDeployment:
-              default: false
-              description: An explanation about the purpose of this instance.
-              title: globalDeployment
-              type: boolean
+          default: false
+          description: Global Deployment
+          title: globalDeployment
+          type: boolean
         createEnvironments:
-            default: false
-            description: An explanation about the purpose of this instance.
-            title: createEnvironments
-            type: boolean
+          default: false
+          description: Create Environments
+          title: createEnvironments
+          type: boolean
         createSubOrgs:
-            default: false
-            description: An explanation about the purpose of this instance.
-            title: createSubOrgs
-            type: boolean
+          default: false
+          description: Create Sub Orgs
+          title: createSubOrgs
+          type: boolean
         loadBalancer:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: integer
-                reassigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: integer
-            required:
-            - assigned
-            title: loadBalancer
-            type: object
+          $ref: '#/components/schemas/LoadBalancerEntitlement'
         staticIps:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: integer
-                reassigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: integer
-            required:
-            - assigned
-            title: staticIps
-            type: object
+          $ref: '#/components/schemas/StaticIpsEntitlement'
         vCoresDesign:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: number
-                reassigned:
-                    default: 0.0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: number
-            required:
-            - assigned
-            title: vCoresDesign
-            type: object
+          $ref: '#/components/schemas/vCoresDesignEntitlement'
         vCoresProduction:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: number
-                reassigned:
-                    default: 0.0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: number
-            required:
-            - assigned
-            title: vCoresProduction
-            type: object
+          $ref: '#/components/schemas/vCoresProductionEntitlement'
         vCoresSandbox:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: number
-                reassigned:
-                    default: 0.0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: number
-            required:
-            - assigned
-            title: vCoresSandbox
-            type: object
+          $ref: '#/components/schemas/vCoresSandboxEntitlement'
         vpcs:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: integer
-                reassigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: integer
-            required:
-            - assigned
-            title: vpcs
-            type: object
+          $ref: '#/components/schemas/VpcsEntitlement'
         vpns:
-            default: {}
-            description: An explanation about the purpose of this instance.
-            properties:
-                assigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: assigned
-                    type: integer
-                reassigned:
-                    default: 0
-                    description: An explanation about the purpose of this instance.
-                    title: reassigned
-                    type: integer
-            required:
-            - assigned
-            title: vpns
-            type: object
-      required:
-      - createEnvironments
-      - globalDeployment
-      - createSubOrgs
-      - vCoresProduction
-      - vCoresSandbox
-      - vCoresDesign
-      - staticIps
-      - vpcs
-      - vpns
-      - loadBalancer
+          $ref: '#/components/schemas/VpnsEntitlement'
       title: entitlementsCore
       type: object
+
+    AngGovernanceEntitlement:
+      type: object
+      properties:
+        level:
+          description: Ang Governance level
+          example: -1
+          title: level
+          type: integer
+
+    ApiMonitoringEntitlement:
+      type: object
+      properties:
+        schedules:
+          description: Schedules
+          title: schedules
+          type: integer
+
+    TradingPartnersProductionEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: Trading Partners Production assigned
+          title: assigned
+          default: 0
+      title: tradingPartnersProduction
+
+    TradingPartnersSandboxEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: Trading Partners Sandbox assigned
+          title: assigned
+          default: 0
+      title: tradingPartnersSandbox
+
+    LoadBalancerEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: Load Balancers assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: integer
+          description: Load Balancers reassigned
+          title: reassigned
+          default: 0
+      title: loadBalancer
+
+    StaticIpsEntitlement:
+      type: object
+      description: Static IPs entitlements
+      properties:
+        assigned:
+          type: integer
+          description: Static IPs assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: integer
+          description: Static IPs reassigned
+          title: reassigned
+          default: 0
+
+    VpnsEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: VPNs assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: integer
+          description: VPNs reassigned
+          title: reassigned
+          default: 0
+      title: vpn
+
+    VpcsEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: VPCs assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: integer
+          description: VPCs reassigned
+          title: reassigned
+          default: 0
+      title: vpc
+
+    vCoresProductionEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: number
+          description: VCores Production assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: number
+          description: VCores Production reassigned
+          title: reassigned
+          default: 0
+      title: vCoresProduction
+
+    vCoresDesignEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: number
+          description: VCores Design assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: number
+          description: VCores Design reassigned
+          title: reassigned
+          default: 0
+      title: vCoresDesign
+
+    vCoresSandboxEntitlement:
+      type: object
+      properties:
+        assigned:
+          type: number
+          description: VCores Sandbox assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: number
+          description: VCores Sandbox reassigned
+          title: reassigned
+          default: 0
+      title: vCoresSandbox
+
+    WorkerCloudsEntitlement:
+      title: workerClouds
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: Worker Clouds assigned
+          title: assigned
+          default: 0
+        reassigned:
+          type: integer
+          description: Worker Clouds reassigned
+          title: reassigned
+          default: 0
+
+    MessagingEntitlement:
+      description: Messaging entitlements
+      properties:
+        assigned:
+          default: 0
+          description: Messaging assigned
+          title: assigned
+          type: integer
+      title: messaging
+      type: object
+
+    MonitoringCenterEntitlement:
+      description: Monitoring Center entitlements
+      properties:
+        productSKU:
+          description: Product SKU
+          title: productSKU
+          type: integer
+        dataRegion:
+          description: Data region
+          title: dataRegion
+          type: string
+        storageBase:
+          description: Storage base
+          title: storageBase
+          type: number
+        storageAddOn:
+          description: Storage add-on
+          title: storageAddOn
+          type: number
+        productionUnits:
+          description: Production units
+          title: productionUnits
+          type: number
+        preProductionUnits:
+          description: Pre-production units
+          title: preProductionUnits
+          type: number
+      title: monitoringCenter
+      type: object
+
+    PartnersSandboxEntitlement:
+      description: Partners Sandbox entitlements
+      properties:
+        assigned:
+          description: Partners Sandbox assigned
+          title: assigned
+          type: integer
+      title: partnersSandbox
+      type: object
+
+    GatewaysEntitlement:
+      description: Gateway entitlements
+      properties:
+        assigned:
+          default: 0
+          description: Gateway assigned
+          title: assigned
+          type: integer
+      title: gateways
+      type: object
+
+    PartnersProductionEntitlement:
+      description: Partners Production entitlements
+      properties:
+        assigned:
+          default: 0
+          description: Partners Production assigned
+          title: assigned
+          type: integer
+      title: partnersProduction
+      type: object
+
+    EnablementResourceEntitlement:
+      type: object
+      title: enablementResource
+      properties:
+        enabled:
+          default: false
+          description: Whether entitlement resource is enabled
+          title: enabled
+          type: boolean
+
+    AddOnEntitlement:
+      type: object
+      properties:
+        addOn:
+          default: 0
+          description: Add-on
+          title: addOn
+          type: integer
+        base:
+          default: 0
+          description: Base
+          title: base
+          type: integer
+
+    ApiManagerEntitlement:
+      type: object
+      properties:
+        governance:
+          type: object
+          title: governance
+          properties:
+            enabled:
+              type: boolean
+              description: API Manager governance enabled
+              title: enabled
+              default: false
+        usageBasedPricing:
+          type: object
+          title: usageBasedPricing
+          properties:
+            api:
+              type: object
+              title: api
+              properties:
+                production:
+                  type: object
+                  title: production
+                  properties:
+                    amount:
+                      type: integer
+                      description: Amount
+                      title: amount
+                      default: 0
+                sandbox:
+                  type: object
+                  title: sandbox
+                  properties:
+                    amount:
+                      type: integer
+                      description: Amount
+                      title: amount
+                      default: 0
+
+    ComposerEntitlement:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Composer enabled
+          title: enabled
+        tasksPerMonth:
+          type: integer
+          description: Tasks per month
+          title: tasksPerMonth
+        maxConnectors:
+          type: integer
+          description: Max connectors
+          title: maxConnectors
+        unlimitedConnectors:
+          type: boolean
+          description: Unlimited connectors
+          title: unlimitedConnectors
+        isHyperAutomation:
+          type: boolean
+          description: Hyper Automation
+          title: hyperAutomation
+
+    RpaEntitlement:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: RPA enabled
+          title: enabled
+        active:
+          type: boolean
+          description: RPA active
+          title: active
+        composerVersion:
+          type: string
+          description: Composer version
+          title: composerVersion
+
+    UsageBasedPricingEntitlement:
+      type: object
+      properties:
+        muleRuntimeIntegration:
+          type: object
+          title: muleRuntimeIntegration
+          properties:
+            enabled:
+              type: boolean
+              description: Mule Runtime Integration enabled
+              title: enabled
+              default: false
+            flows:
+              type: integer
+              description: Flows
+              title: flows
+              default: 0
+            messages:
+              type: integer
+              description: Messages
+              title: messages
+              default: 0
+            throughput:
+              type: integer
+              description: Throughput
+              title: throughput
+              default: 0
+
+    UsageBasedPricingLimitsEntitlement:
+      type: object
+      properties:
+        cpu:
+          type: object
+          properties:
+            base:
+              type: integer
+              description: Base
+              title: base
+              default: 0
+            extra:
+              type: integer
+              description: Extra
+              title: extra
+              default: 0
+        memory:
+          type: object
+          properties:
+            base:
+              type: integer
+              description: Base
+              title: base
+              default: 0
+            extra:
+              type: integer
+              description: Extra
+              title: extra
+              default: 0
+
+    ApiQueryEntitlement:
+      type: object
+      description: API Query entitlements
+      properties:
+        enabled:
+          default: false
+          description: API Query enabled
+          title: enabled
+          type: boolean
+        productSKU:
+          default: 0
+          description: Product SKU
+          title: productSKU
+          type: integer
+        sandbox:
+          description: Product SKU
+          title: productSKU
+          type: integer
+        production:
+          description: Product SKU
+          title: productSKU
+          type: integer
+
+    CrowdEntitlement:
+      type: object
+      description: Crowd entitlements
+      properties:
+        environments:
+          default: false
+          description: Crowd environments
+          title: environments
+          type: boolean
+        hideApiManagerDesigner:
+          default: false
+          description: Crowd Hide API Manager Designer
+          title: hideApiManagerDesigner
+          type: boolean
+        hideFormerApiPlatform:
+          default: false
+          description: Crowd Hide Former API Platform
+          title: hideFormerApiPlatform
+          type: boolean
+
+    Exchange2Entitlement:
+      type: object
+      description: Exchange 2 entitlements
+      properties:
+        enabled:
+          description: Exchange 2 enabled
+          title: enabled
+          type: boolean
+        assetUsageAndEngagement:
+          type: object
+          properties:
+            enabled:
+              description: Asset usage and engagement enabled
+              title: enabled
+              type: boolean
+
+    DesignCenterEntitlement:
+      type: object
+      description: Design Center entitlements
+      properties:
+        api:
+          description: API entitlements
+          title: api
+          type: boolean
+        mozart:
+          description: Mozart entitlements
+          title: mozart
+          type: boolean
+        apiVisual:
+          description: API Visual entitlements
+          title: apiVisual
+          type: boolean
+        apiExample:
+          description: API Example entitlements
+          title: apiExample
+          type: boolean
+
+    ManagedGatewaySmallEntitlement:
+      type: object
+      description: Managed Gateway Small entitlements
+      properties:
+        assigned:
+          description: Managed Gateway Small assigned
+          title: assigned
+          type: integer
+        reassigned:
+          description: Managed Gateway Small reassigned
+          title: reassigned
+          type: integer
+
+    ManagedGatewayLargeEntitlement:
+      type: object
+      description: Managed Gateway Large entitlements
+      properties:
+        assigned:
+          description: Managed Gateway Large assigned
+          title: assigned
+          type: integer
+        reassigned:
+          description: Managed Gateway Large reassigned
+          title: reassigned
+          type: integer
+
+    NetworkConnectionsEntitlement:
+      type: object
+      description: Network connections entitlements
+      properties:
+        assigned:
+          description: Network connections assigned
+          title: assigned
+          type: integer
+        reassigned:
+          description: Network connections reassigned
+          title: reassigned
+          type: integer
+
+    ApiGovernanceEntitlement:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: API Governance enabled
+          title: enabled
+        apisPerMonth:
+          type: integer
+          description: APIs per month
+          title: apisPerMonth
+
+    ApiGovernanceDomainEntitlement:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: API Governance domain
+          title: domain
+
+    HighAvailabilityEntitlement:
+      type: object
+      properties:
+        clustering:
+          type: boolean
+          description: Clustering
+          title: clustering
+
+    Usage:
+      type: object
+      properties:
+        productionVCoresConsumed:
+          type: number
+          description: Production VCores consumed
+          title: productionVCoresConsumed
+          default: 0
+        sandboxVCoresConsumed:
+          type: number
+          description: Sandbox VCores consumed
+          title: sandboxVCoresConsumed
+          default: 0
+        designVCoresConsumed:
+          type: number
+          description: Design VCores consumed
+          title: designVCoresConsumed
+          default: 0
+        staticIpsConsumed:
+          type: number
+          description: Static IPs consumed
+          title: staticIpsConsumed
+          default: 0
+        vpcsConsumed:
+          type: integer
+          description: VPCs consumed
+          title: vpcsConsumed
+          default: 0
+        vpnsConsumed:
+          type: integer
+          description: VPNs consumed
+          title: vpnsConsumed
+          default: 0
+        networkConnectionsConsumed:
+          type: integer
+          description: Network connections consumed
+          title: networkConnectionsConsumed
+          default: 0
+        loadBalancersConsumed:
+          type: integer
+          description: Load balancers consumed
+          title: loadBalancersConsumed
+          default: 0
+        loadbalancerWorkersConsumed:
+          type: integer
+          description: Load balancer workers consumed
+          title: loadbalancerWorkersConsumed
+          default: 0
+
+    Client:
+      type: object
+      properties:
+        client_id:
+          type: string
+          title: Client ID
+        client_secret:
+          type: string
+          title: Client Secret
+        name:
+          type: string
+          title: Credentials name
+        org_id:
+          type: string
+          title: Organization ID
+        user_id:
+          type: string
+          title:
+        grant_types:
+          type: array
+          title: Grants for the client credentials
+          items:
+            type: string
