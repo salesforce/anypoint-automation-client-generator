@@ -151,6 +151,37 @@ paths:
         '200':
           $ref: '#/components/responses/SuccessGetAsset'
 
+  /assets/{orgId}/{assetId}/{version}/asset:
+    get:
+      summary: Get Asset by Version
+      description: Get one specific Asset by version
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: assetId
+          in: path
+          description: The ID of the asset
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The version of the asset
+          required: true
+          schema:
+            type: string
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '200':
+          $ref: '#/components/responses/SuccessGetAsset'
+
   /assets/{orgId}/{assetId}:
     patch:
       summary: update Asset name and description
@@ -180,6 +211,61 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '204':
           $ref: '#/components/responses/SuccessPatchAsset'
+
+  /organizations/{orgId}/assets/{groupId}/{assetId}/{version}:
+    post:
+      summary: Publish an LLM-typed Exchange asset
+      description: |-
+        Publish an Exchange asset of type "llm". This is the metadata-only variant
+        used by the Anypoint AI Gateway: no spec file is uploaded — Anypoint
+        generates the LLM metadata artifacts server-side. Returns 202 with the
+        publication status link; the resource is queryable immediately
+        (Exchange publish is synchronous from the caller's perspective).
+      operationId: PostLLMAsset
+      parameters:
+        - name: orgId
+          in: path
+          description: The ID of the organization in GUID format
+          required: true
+          schema:
+            type: string
+        - name: groupId
+          in: path
+          description: The business group id (often equals orgId for root-level assets)
+          required: true
+          schema:
+            type: string
+        - name: assetId
+          in: path
+          description: The asset slug
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The asset version (must follow Semver, e.g. 1.0.0)
+          required: true
+          schema:
+            type: string
+        - name: x-strict-package
+          in: header
+          description: Indicates if the asset package is immutable.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/postLLMAssetObject'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '202':
+          $ref: '#/components/responses/SuccessPostLLMAsset'
 
   /assets/{orgId}/{assetId}/{version}:
     delete:
@@ -267,6 +353,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/postAssetResponse'
+    SuccessPostLLMAsset:
+      description: LLM asset publication accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/postLLMAssetResponse'
     SuccessGetAsset:
       description: Success response
       content:
@@ -653,10 +745,7 @@ components:
         - version
         - name
         - classifier
-        - apiVersion
-        - main
         - groupId
-        - asset
       type: object
       title: postAssetObject
       properties:
@@ -679,6 +768,7 @@ components:
         classifier:
           type: string
           enum:
+            - mule-application
             - raml-fragment
             - raml
             - oas
@@ -758,7 +848,14 @@ components:
               type: array
               title: tags
               items:
-                type: string
+                type: object
+                properties:
+                  key:
+                    type: string
+                    title: key
+                  value:
+                    type: string
+                    title: value
             name:
               type: string
               title: name
@@ -771,3 +868,68 @@ components:
         type:
           type: string
           title: type
+
+    postLLMAssetObject:
+      required:
+        - name
+        - type
+        - status
+      type: object
+      title: postLLMAssetObject
+      description: |-
+        Multipart body for publishing an LLM-typed Exchange asset.
+
+        Field naming note: Anypoint requires the literal dotted multipart key
+        `properties.platform`. The underscored variant `properties_platform`
+        is silently accepted by the POST endpoint (returns 202) but produces
+        a ghost asset that is not retrievable. The schema property name uses
+        the dotted form to ensure the openapi-generator multipart serializer
+        emits the correct field name on the wire. The generated Go identifier
+        is renamed to `PropertiesPlatform` by the generator.
+      properties:
+        name:
+          type: string
+          title: name
+          description: The visible name of the asset.
+        type:
+          type: string
+          enum:
+            - llm
+          title: type
+          description: Always "llm" for this resource.
+        status:
+          type: string
+          enum:
+            - published
+            - draft
+          default: published
+          title: status
+          description: Publication status. Defaults to "published".
+        properties.platform:
+          type: string
+          title: properties.platform
+          description: |-
+            The LLM vendor identifier. Free string — Anypoint does not enforce
+            an enum. Known values include "openai", "bedrock", "anthropic",
+            "azure-openai", "gemini", "other". Defaults server-side to "other"
+            if omitted.
+        tags:
+          type: string
+          title: tags
+          description: |-
+            Stringified JSON array of asset tags. Optional. The field must be
+            sent as a String; pass the stringified value.
+
+    postLLMAssetResponse:
+      type: object
+      title: postLLMAssetResponse
+      description: Acknowledgement of the LLM asset publication.
+      properties:
+        publicationStatusLink:
+          type: string
+          title: publicationStatusLink
+          description: |-
+            URL pointing to the publication status of the newly created asset.
+            Exchange publish is synchronous from the caller's perspective; the
+            asset is queryable immediately. This link is the resource location,
+            not an async completion handle.

@@ -1,0 +1,425 @@
+openapi: 3.0.0
+info:
+  title: Private Space TLS Context API
+  description: Description of the Private Space TLS Context API
+  version: 1.0.0
+servers:
+  - url: https://anypoint.mulesoft.com/runtimefabric/api
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/runtimefabric/api
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/runtimefabric/api
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/tlsContexts:
+    parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        required: true
+        description: Private Space ID
+        schema:
+          type: string
+    post:
+      operationId: createTlsContext
+      summary: Create a TLS Context
+      description: Create a TLS Context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TlsContextPostBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaTypeError'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsError'
+        '201':
+          $ref: '#/components/responses/SuccessCreateTlsContext'
+    get:
+      operationId: getTlsContexts
+      summary: Get TLS Contexts
+      description: Get TLS Contexts
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaTypeError'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsError'
+        '200':
+          $ref: '#/components/responses/SuccessGetTlsContexts'
+
+  /organizations/{orgId}/privatespaces/{privateSpaceId}/tlsContexts/{tlsContextId}:
+    parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID
+        schema:
+          type: string
+      - name: privateSpaceId
+        in: path
+        required: true
+        description: Private Space ID
+        schema:
+          type: string
+      - name: tlsContextId
+        in: path
+        required: true
+        description: TLS Context ID
+        schema:
+          type: string
+    get:
+      operationId: getTlsContext
+      summary: Get TLS Context
+      description: Get TLS Context
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaTypeError'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessGetTlsContext'
+    patch:
+      operationId: updateTlsContext
+      summary: Update TLS Context
+      description: Update TLS Context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TlsContextPutBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaTypeError'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '200':
+          $ref: '#/components/responses/SuccessUpdateTlsContext'
+    delete:
+      operationId: deleteTlsContext
+      summary: Delete TLS Context
+      description: Delete TLS Context
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteTlsContext'
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ForbiddenError:
+      description: Forbidden
+    BadRequestError:
+      description: Bad request
+    NotFoundError:
+      description: Not found
+    ConflictError:
+      description: Conflict
+    UnsupportedMediaTypeError:
+      description: Unsupported media type
+    TooManyRequestsError:
+      description: Too many requests
+    SuccessCreateTlsContext:
+      description: TLS Context created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TlsContext'
+    SuccessGetTlsContexts:
+      description: TLS Contexts retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TlsContext'
+    SuccessGetTlsContext:
+      description: TLS Context retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TlsContext'
+    SuccessUpdateTlsContext:
+      description: TLS Context updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TlsContext'
+    SuccessDeleteTlsContext:
+      description: TLS Context deleted successfully
+
+
+  schemas:
+    TlsContextPutBody:
+      $ref: '#/components/schemas/TlsContextPostBody'
+
+    TlsContextPostBody:
+      type: object
+      properties:
+        name:
+          type: string
+        tlsConfig:
+          type: object
+          properties:
+            keyStore:
+              oneOf:
+                - $ref: '#/components/schemas/TlsContextPostBodyKeyStorePEM'
+                - $ref: '#/components/schemas/TlsContextPostBodyKeyStoreJKS'
+            trustStore:
+              type: array
+              items:
+                type: object
+                title: TlsContextPostBodyTrustStorePEM
+                properties:
+                  source:
+                    type: string
+                    enum: [PEM]
+                  trustStorePEM:
+                    type: string
+
+        ciphers:
+          $ref: '#/components/schemas/Ciphers'
+
+    TlsContextPostBodyKeyStorePEM:
+      type: object
+      title: TlsContextPostBodyKeyStorePEM
+      properties:
+        source:
+          type: string
+          enum: [PEM]
+          default: PEM
+        certificate:
+          type: string
+        key:
+          type: string
+        keyPassphrase:
+          type: string
+        keyFileName:
+          type: string
+        certificateFileName:
+          type: string
+        capath:
+          type: string
+        capathFileName:
+          type: string
+      required:
+        - source
+        - certificate
+        - key
+        - keyFileName
+        - certificateFileName
+
+    TlsContextPostBodyKeyStoreJKS:
+      type: object
+      title: TlsContextPostBodyKeyStoreJKS
+      properties:
+        source:
+          type: string
+          enum: [JKS]
+          default: JKS
+        keystoreBase64:
+          type: string
+        keyPassphrase:
+          type: string
+        storePassphrase:
+          type: string
+        alias:
+          type: string
+        keystoreFileName:
+          type: string
+      required:
+        - source
+        - keystoreBase64
+        - storePassphrase
+
+    TlsContext:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        trustStore:
+          $ref: '#/components/schemas/TrustStore'
+        keyStore:
+          $ref: '#/components/schemas/KeyStore'
+        ciphers:
+          $ref: '#/components/schemas/Ciphers'
+        type:
+          type: string
+
+    TrustStore:
+      type: object
+      properties:
+        fileName:
+          type: string
+        expirationDate:
+          type: string
+        dnList:
+          type: array
+          items:
+            type: object
+            properties:
+              issuer:
+                type: object
+                properties:
+                  commonName:
+                    type: string
+                  countryName:
+                    type: string
+                  localityName:
+                    type: string
+                  organizationName:
+                    type: string
+                  organizationUnit:
+                    type: string
+                  state:
+                    type: string
+              subject:
+                type: object
+                properties:
+                  commonName:
+                    type: string
+                  countryName:
+                    type: string
+                  localityName:
+                    type: string
+                  organizationName:
+                    type: string
+                  organizationUnit:
+                    type: string
+                  state:
+                    type: string
+              version:
+                type: string
+              serialNumber:
+                type: string
+              signatureAlgorithm:
+                type: string
+              publicKeyAlgorithm:
+                type: string
+              basicConstraints:
+                type: object
+                properties:
+                  certificateAuthority:
+                    type: boolean
+              validity:
+                type: object
+                properties:
+                  notBefore:
+                    type: string
+                  notAfter:
+                    type: string
+              keyUsage:
+                type: array
+                items:
+                  type: string
+              certificateType:
+                type: string
+        type:
+          type: string
+
+    KeyStore:
+      type: object
+      properties:
+        type:
+          type: string
+        cn:
+          type: string
+        san:
+          type: array
+          items:
+            type: string
+        fileName:
+          type: string
+        keyFileName:
+          type: string
+        capathFileName:
+          type: string
+        expirationDate:
+          type: string
+
+    Ciphers:
+      type: object
+      properties:
+        aes128GcmSha256:
+          type: boolean
+        aes128Sha256:
+          type: boolean
+        aes256GcmSha384:
+          type: boolean
+        aes256Sha256:
+          type: boolean
+        dheRsaAes128Sha256:
+          type: boolean
+        dheRsaAes256GcmSha384:
+          type: boolean
+        dheRsaAes256Sha256:
+          type: boolean
+        ecdheEcdsaAes128GcmSha256:
+          type: boolean
+        ecdheEcdsaAes256GcmSha384:
+          type: boolean
+        ecdheRsaAes128GcmSha256:
+          type: boolean
+        ecdheRsaAes256GcmSha384:
+          type: boolean
+        ecdheEcdsaChacha20Poly1305:
+          type: boolean
+        ecdheRsaChacha20Poly1305:
+          type: boolean
+        dheRsaChacha20Poly1305:
+          type: boolean
+        tlsAes256GcmSha384:
+          type: boolean
+        tlsChacha20Poly1305Sha256:
+          type: boolean
+        tlsAes128GcmSha256:
+          type: boolean

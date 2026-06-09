@@ -1,0 +1,417 @@
+openapi: 3.0.3
+info:
+  title: API Manager SLA Tier API
+  description: API Manager SLA Tier API
+  version: 1.0.0
+
+servers:
+  - url: https://anypoint.mulesoft.com/apimanager/
+    description: Anypoint Cloudhub
+  - url: https://eu1.anypoint.mulesoft.com/apimanager/
+    description: Anypoint Cloudhub EU
+  - url: https://gov.anypoint.mulesoft.com/apimanager/
+    description: Anypoint Cloudhub GOV
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/tiers:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The API Manager instance id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetApiInstanceTiers
+      summary: Retrieves all SLA tiers for a given API instance
+      description: >
+        Retrieves all SLA tiers for a given API instance in the given organization and environment.
+        Connected Apps require the following scopes:
+        - View SLA Tiers
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of tiers to return
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: The offset of the first tier to return
+          required: false
+          schema:
+            type: integer
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          $ref: '#/components/responses/SuccessGetApiInstanceTiers'
+    post:
+      operationId: CreateApiInstanceTier
+      summary: Creates a new SLA tier for a given API instance
+      description: >
+        Creates a new SLA tier for a given API instance in the given organization and environment.
+        Connected Apps require the following scopes:
+        - Manage SLA Tiers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlaTierPostBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessCreateApiInstanceTier'
+
+  /api/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/tiers/{tierId}:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The API Manager instance id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: tierId
+        description: The SLA tier id
+        required: true
+        schema:
+          type: integer
+    put:
+      operationId: UpdateApiInstanceTier
+      summary: Updates an SLA tier for a given API instance
+      description: >
+        Updates an SLA tier for a given API instance in the given organization and environment.
+        Connected Apps require the following scopes:
+        - Manage SLA Tiers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlaTierPutBody'
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '201':
+          $ref: '#/components/responses/SuccessUpdateApiInstanceTier'
+    delete:
+      operationId: DeleteApiInstanceTier
+      summary: Deletes an SLA tier for a given API instance
+      description: >
+        Deletes an SLA tier for a given API instance in the given organization and environment.
+        Connected Apps require the following scopes:
+        - Manage SLA Tiers
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '204':
+          $ref: '#/components/responses/SuccessDeleteApiInstanceTier'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsResponse'
+    NotFoundError:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              message:
+                type: string
+    SuccessGetApiInstanceTiers:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetSlaTiersResponse'
+    SuccessCreateApiInstanceTier:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SlaTier'
+    SuccessUpdateApiInstanceTier:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SlaTier'
+    SuccessDeleteApiInstanceTier:
+      description: Successful response
+
+  schemas:
+
+    ErrorsResponse:
+      type: object
+      title: errorsResponse
+      properties:
+        errors:
+          title: errors
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                title: type
+              dataPath:
+                type: string
+                title: dataPath
+              keyword:
+                type: string
+                title: keyword
+              schema:
+                type: string
+                title: schema
+              data:
+                type: string
+                title: data
+              message:
+                type: string
+                title: message
+
+    GetSlaTiersResponse:
+      type: object
+      title: getSlaTiersResponse
+      properties:
+        total:
+          type: integer
+          title: total
+          example: 4
+        tiers:
+          title: tiers
+          type: array
+          items:
+            $ref: '#/components/schemas/SlaTier'
+
+    SlaTierPostBody:
+      type: object
+      title: slaTierPostBody
+      properties:
+        name:
+          type: string
+          title: name
+          example: Gold Tier
+        description:
+          type: string
+          title: description
+          nullable: true
+          example: Gold SLA tier with high throughput
+        autoApprove:
+          type: boolean
+          title: autoApprove
+          example: false
+        status:
+          type: string
+          title: status
+          enum:
+            - ACTIVE
+            - DEPRECATED
+          example: ACTIVE
+        limits:
+          title: limits
+          type: array
+          items:
+            $ref: '#/components/schemas/SlaLimit'
+        apiVersionId:
+          type: string
+          title: apiVersionId
+          example: "20586313"
+
+    SlaTierPutBody:
+      type: object
+      title: slaTierPutBody
+      properties:
+        id:
+          type: integer
+          title: id
+          example: 2428630
+        name:
+          type: string
+          title: name
+          example: Gold Tier
+        description:
+          type: string
+          title: description
+          nullable: true
+          example: Gold SLA tier with high throughput
+        autoApprove:
+          type: boolean
+          title: autoApprove
+          example: false
+        status:
+          type: string
+          title: status
+          enum:
+            - ACTIVE
+            - DEPRECATED
+          example: ACTIVE
+        limits:
+          title: limits
+          type: array
+          items:
+            $ref: '#/components/schemas/SlaLimit'
+        apiVersionId:
+          type: string
+          title: apiVersionId
+          example: "20586313"
+        apiId:
+          type: integer
+          title: apiId
+          example: 20586313
+        applicationCount:
+          type: integer
+          title: applicationCount
+          example: 0
+        masterOrganizationId:
+          type: string
+          title: masterOrganizationId
+          example: "9a5c9842-3e68-452a-aa88-d100c3bdefba"
+        organizationId:
+          type: string
+          title: organizationId
+          example: "f02a5569-24ac-491a-964a-0950ab318728"
+        audit:
+          $ref: '#/components/schemas/SlaTierAudit'
+
+    SlaTier:
+      type: object
+      title: slaTier
+      properties:
+        audit:
+          $ref: '#/components/schemas/SlaTierAudit'
+        masterOrganizationId:
+          type: string
+          title: masterOrganizationId
+          example: "9a5c9842-3e68-452a-aa88-d100c3bdefba"
+        organizationId:
+          type: string
+          title: organizationId
+          example: "f02a5569-24ac-491a-964a-0950ab318728"
+        id:
+          type: integer
+          title: id
+          example: 2428630
+        name:
+          type: string
+          title: name
+          example: Gold Tier
+        description:
+          type: string
+          title: description
+          nullable: true
+          example: Gold SLA tier with high throughput
+        autoApprove:
+          type: boolean
+          title: autoApprove
+          example: false
+        status:
+          type: string
+          title: status
+          example: ACTIVE
+        limits:
+          title: limits
+          type: array
+          items:
+            $ref: '#/components/schemas/SlaLimit'
+        applicationCount:
+          type: integer
+          title: applicationCount
+          example: 0
+        apiId:
+          type: integer
+          title: apiId
+          example: 20586313
+        apiVersionId:
+          type: string
+          title: apiVersionId
+          nullable: true
+          example: "20586313"
+
+    SlaLimit:
+      type: object
+      title: slaLimit
+      properties:
+        visible:
+          type: boolean
+          title: visible
+          example: true
+        timePeriodInMilliseconds:
+          type: integer
+          format: int64
+          title: timePeriodInMilliseconds
+          example: 60000
+        maximumRequests:
+          type: integer
+          format: int64
+          title: maximumRequests
+          example: 100
+
+    SlaTierAudit:
+      type: object
+      title: slaTierAudit
+      properties:
+        created:
+          $ref: '#/components/schemas/SlaTierAuditDate'
+        updated:
+          $ref: '#/components/schemas/SlaTierAuditDate'
+
+    SlaTierAuditDate:
+      type: object
+      title: slaTierAuditDate
+      properties:
+        date:
+          type: string
+          title: date
+          example: "2026-05-21T07:38:16.914Z"

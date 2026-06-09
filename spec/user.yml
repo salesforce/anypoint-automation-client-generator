@@ -1,30 +1,32 @@
 openapi: 3.0.0
 info:
   title: User API
-  description: Description of the User API 
-  version: 1.0.0
+  description: Description of the User API
+  version: 1.1.1
 servers:
   - url: https://anypoint.mulesoft.com/accounts/api/
-    description: Anypoint Cloudhub 
+    description: Anypoint Cloudhub
   - url: https://eu1.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub EU
   - url: https://gov.anypoint.mulesoft.com/accounts/api/
     description: Anypoint Cloudhub GOV
 
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
 
 paths:
   /organizations/{orgId}/users:
+    parameters:
+      - name: orgId
+        in: path
+        description: The ID of the organization in GUID format
+        required: true
+        schema:
+          type: string
     get:
+      operationId: listUsers
       description: Returns the group of users that belong to the specified organization.
       parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
         - name: type
           in: query
           description: A search string to specify the type of user you want to retrieve.
@@ -50,19 +52,13 @@ paths:
         '200':    # status code
           $ref: '#/components/responses/SuccessListUsers'
     post:
+      operationId: createUser
       description: Creates a User
-      parameters:
-      - name: orgId
-        in: path
-        description: The ID of the organization in GUID format
-        required: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userPostBody'
+              $ref: '#/components/schemas/UserPostBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -72,29 +68,7 @@ paths:
           $ref: '#/components/responses/SuccessPostUser'
 
   /organizations/{orgId}/users/{userId}:
-    get:
-      description: Returns a specific user that belong to the specified organization.
-      parameters:
-        - name: orgId
-          in: path
-          description: The ID of the organization in GUID format
-          required: true
-          schema:
-            type: string
-        - name: userId
-          in: path
-          description: the ID of the user
-          required: true
-          schema:
-            type: string
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '200':    # status code
-          $ref: '#/components/responses/SuccessGetUser'
-    put:
-      description: Update a user
-      parameters:
+    parameters:
       - name: orgId
         in: path
         description: The ID of the organization in GUID format
@@ -103,15 +77,26 @@ paths:
           type: string
       - name: userId
         in: path
-        description: The ID of the user
+        description: the ID of the user
         required: true
         schema:
           type: string
+    get:
+      operationId: getUser
+      description: Returns a specific user that belong to the specified organization.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':    # status code
+          $ref: '#/components/responses/SuccessGetUser'
+    put:
+      operationId: updateUser
+      description: Update a user
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userPutBody'
+              $ref: '#/components/schemas/UserPutBody'
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -120,20 +105,8 @@ paths:
         '204':
           $ref: '#/components/responses/SuccessPutUser'
     delete:
+      operationId: deleteUser
       description: Delete the user
-      parameters:
-      - name: orgId
-        in: path
-        description: The ID of the organization in GUID format
-        required: true
-        schema:
-          type: string
-      - name: userId
-        in: path
-        description: The ID of the user
-        required: true
-        schema:
-          type: string
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -142,7 +115,7 @@ paths:
 
 components:
   securitySchemes:
-    bearerAuth:            # arbitrary name for the security scheme
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -159,24 +132,24 @@ components:
             properties:
               status:
                 type: integer
-                title: the response status code 
+                title: the response status code
                 default: 400
               message:
                 type: string
                 title: the error message
-                example: A sample message here 
+                example: A sample message here
     SuccessPostUser:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/user'
+            $ref: '#/components/schemas/User'
     SuccessPutUser:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/user"
+            $ref: "#/components/schemas/User"
     SuccessDeleteUser:
       description: Success response
     SuccessListUsers:
@@ -184,27 +157,34 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              data:
-                type: array
-                title: List of users
-                items:
-                  $ref: '#/components/schemas/user'
-              total:
-                type: integer
-                title: Total number of results
+            $ref: '#/components/schemas/ListUsersResponse'
     SuccessGetUser:
       description: Success response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/user'
+            $ref: '#/components/schemas/User'
 
   schemas:
-    userPostBody:
+    ListUsersResponse:
+      title: ListUsersResponse
       type: object
-      title: userPostBody
+      properties:
+        data:
+          $ref: '#/components/schemas/UserList'
+        total:
+          type: integer
+          title: Total number of results
+
+    UserList:
+      type: array
+      title: UserList
+      items:
+        $ref: '#/components/schemas/User'
+
+    UserPostBody:
+      type: object
+      title: UserPostBody
       properties:
         username:
           type: string
@@ -224,9 +204,10 @@ components:
         password:
           type: string
           title: password
-    userPutBody:
+
+    UserPutBody:
       type: object
-      title: userPutBody
+      title: UserPutBody
       properties:
         username:
           type: string
@@ -249,7 +230,8 @@ components:
         properties:
           type: object
           title: properties
-    user:
+
+    User:
       title: user
       allOf:
         - type: object
@@ -262,9 +244,10 @@ components:
               title: id
               type: string
               example: '4b353f44-6486-42ae-ae77-18b4032f9643'
-        - $ref: "#/components/schemas/userCore"
-    userCore:
-      title: userCore
+        - $ref: "#/components/schemas/UserCore"
+
+    UserCore:
+      title: UserCore
       type: object
       properties:
         username:
@@ -331,11 +314,11 @@ components:
           type: string
           title: type
         organization:
-          $ref: "#/components/schemas/organization"
+          $ref: "#/components/schemas/Organization"
         memberOfOrganizations:
-          $ref: "#/components/schemas/memberOfOrganizations"
+          $ref: "#/components/schemas/MemberOfOrganizations"
         contributorOfOrganizations:
-          $ref: "#/components/schemas/contributorOfOrganizations"
+          $ref: "#/components/schemas/ContributorOfOrganizations"
         properties:
           type: object
           title: properties
@@ -350,15 +333,15 @@ components:
           type: object
           title: primaryOrganization
           properties:
-            id: 
+            id:
               type: string
               title: id
             name:
               type: string
               title: name
 
-    organization:
-      title: organization
+    Organization:
+      title: Organization
       type: object
       properties:
         name:
@@ -432,92 +415,16 @@ components:
           type: object
           title: entitlements
 
-    memberOfOrganizations:
+    MemberOfOrganizations:
       type: array
-      title: memberOfOrganizations
+      title: MemberOfOrganizations
       items:
-        $ref: "#/components/schemas/org"
-    
-    contributorOfOrganizations:
-      type: array
-      title: contributorOfOrganizations
-      items:
-        $ref: "#/components/schemas/org"
+        $ref: "#/components/schemas/Organization"
 
-    org:
-      type: object
-      title: org
-      properties:
-        parentName:
-          type: string
-          nullable: true
-          title: parentName
-        parentId:
-          type: string
-          nullable: true
-          title: parentId
-        domain:
-          type: string
-          title: domain
-        name:
-          type: string
-          title: name
-        id: 
-          type: string
-          title: id
-        createdAt:
-          type: string
-          title: createdAt
-        updatedAt:
-          type: string
-          title: updatedAt
-        ownerId:
-          type: string
-          title: ownerId
-        clientId:
-          type: string
-          title: clientId
-        idprovider_id:
-          type: string
-          title: idprovider_id
-        isFederated:
-          type: boolean
-          title: isFederated
-        parentOrganizationIds:
-          type: array
-          title: parentOrganizationIds
-          items:
-            type: string
-        subOrganizationIds:
-          type: array
-          title: subOrganizationIds
-          items:
-            type: string
-        tenantOrganizationIds:
-          type: array
-          title: tenantOrganizationIds
-          items:
-            type: string
-        mfaRequired:
-          type: string
-          title: mfaRequired
-        isAutomaticAdminPromotionExempt:
-          type: boolean
-          title: isAutomaticAdminPromotionExempt
-        isMaster:
-          type: boolean
-          title: isMaster
-        subscription:
-          type: object
-          title: subscription
-          properties:
-            category:
-              type: string
-              title: category
-            type:
-              type: string
-              title: type
-            expiration:
-              type: string
-              title: expiration
+    ContributorOfOrganizations:
+      type: array
+      title: ContributorOfOrganizations
+      items:
+        $ref: "#/components/schemas/Organization"
+
 

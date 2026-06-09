@@ -221,12 +221,15 @@ components:
         exchangeId:
           type: string
           title: exchangeId
+        fifo:
+          type: boolean
+          title: fifo
 
     exchangeBindingWithRules:
       allOf:
         - $ref: "#/components/schemas/exchangeBinding"
         - properties:
-            rules:
+            routingRules:
               $ref: "#/components/schemas/routingRules"
 
     exchangeBindingRules:
@@ -248,160 +251,3 @@ components:
       items:
         type: object
         title: routingRule
-
-
-    # routingRulesStr2Str:
-    #   type: array
-    #   title: routingRulesStr2Str
-    #   items:
-    #     type: object
-    #     title: routingRuleStr2Str
-    #     properties:
-    #       propertyName:
-    #         type: string
-    #         title: propertyName
-    #       propertyType:
-    #         type: string
-    #         title: propertyType
-    #         enum:
-    #           - STRING
-    #       matcherType:
-    #         type: string
-    #         title: matcherType
-    #         enum:
-    #           - EQ
-    #           - PREFIX
-    #       value:
-    #         type: string
-    #         title: value
-
-    # routingRulesStr2Bool:
-    #   type: array
-    #   title: routingRulesStr2Bool
-    #   items:
-    #     type: object
-    #     title: routingRuleStr2Bool
-    #     properties:
-    #       propertyName:
-    #         type: string
-    #         title: propertyName
-    #       propertyType:
-    #         type: string
-    #         title: propertyType
-    #         enum:
-    #           - STRING
-    #       matcherType:
-    #         type: string
-    #         title: matcherType
-    #         enum:
-    #           - EXISTS
-    #       value:
-    #         type: boolean
-    #         title: value
-
-    # routingRulesStr2Arr:
-    #   type: array
-    #   title: routingRulesStr2Arr
-    #   items:
-    #     type: object
-    #     title: routingRuleStr2Arr
-    #     properties:
-    #       propertyName:
-    #         type: string
-    #         title: propertyName
-    #       propertyType:
-    #         type: string
-    #         title: propertyType
-    #         enum:
-    #           - STRING
-    #       matcherType:
-    #         type: string
-    #         title: matcherType
-    #         enum:
-    #           - ANY_OF
-    #           - NONE_OF
-    #       value:
-    #         type: array
-    #         title: value
-    #         items:
-    #           type: string
-
-    # routingRulesNum2Num:
-    #   type: array
-    #   title: routingRulesNum2Num
-    #   items:
-    #     type: object
-    #     title: routingRuleNum2Num
-    #     properties:
-    #       propertyName:
-    #         type: string
-    #         title: propertyName
-    #       propertyType:
-    #         type: string
-    #         title: propertyType
-    #         enum:
-    #           - NUMERIC
-    #       matcherType:
-    #         type: string
-    #         title: matcherType
-    #         enum:
-    #           - EQ
-    #           - LT
-    #           - LE
-    #           - GT
-    #           - GE
-    #       value:
-    #         type: number
-    #         title: value
-
-    # routingRulesNum2Bool:
-    #   type: array
-    #   title: routingRulesNum2Bool
-    #   items:
-    #     type: object
-    #     title: routingRuleNum2Bool
-    #     properties:
-    #       propertyName:
-    #         type: string
-    #         title: propertyName
-    #       propertyType:
-    #         type: string
-    #         title: propertyType
-    #         enum:
-    #           - NUMERIC
-    #       matcherType:
-    #         type: string
-    #         title: matcherType
-    #         enum:
-    #           - EXISTS
-    #       value:
-    #         type: boolean
-    #         title: value
-
-    # routingRulesNum2Arr:
-    #   type: array
-    #   title: routingRulesNum2Arr
-    #   items:
-    #     type: object
-    #     title: routingRuleNum2Arr
-    #     properties:
-    #       propertyName:
-    #         type: string
-    #         title: propertyName
-    #       propertyType:
-    #         type: string
-    #         title: propertyType
-    #         enum:
-    #           - NUMERIC
-    #       matcherType:
-    #         type: string
-    #         title: matcherType
-    #         enum:
-    #           - RANGE
-    #           - NONE_OF
-    #       value:
-    #         type: array
-    #         title: value
-    #         items:
-    #           type: number
-

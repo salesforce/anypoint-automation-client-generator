@@ -141,6 +141,15 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: injectionPoint
+          in: query
+          description: Filter by policy injection point.
+          required: false
+          schema:
+            type: string
+            enum:
+              - inbound
+              - outbound
       summary: Retrieve all or part of exchange policy templates of a given organization
       description: Retrieves all or part of exchange policy templates of a given organization.
       responses:
@@ -192,6 +201,12 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: apiInstanceId
+          in: query
+          description: Filter applicability against a specific api instance id.
+          required: false
+          schema:
+            type: string
       summary: Retrieve details of exchange policy template of a given organization
       description: Retrieve details of exchange policy template of a given organization.
       responses:
@@ -400,6 +415,50 @@ paths:
         '201':    # status code
           $ref: '#/components/responses/SuccessEnableApimPolicy'
 
+  /xapi/v1/organizations/{orgId}/environments/{envId}/apis/{apiId}/policies/outbound-policies:
+    parameters:
+      - in: path
+        name: orgId
+        description: The organization Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: envId
+        description: The environment Id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: apiId
+        description: The api manager instance Id
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: PostApimOutboundPolicy
+      summary: Create an api manager instance outbound policy.
+      description: >
+        Create an api manager instance outbound policy in a given organization and environment.
+        The request body must include `upstreamIds` (one or more existing upstream ids).
+        The API creates one policy record per upstream id and returns the array of created
+        policy records. Read/Update/Delete/Enable/Disable use the singular policy endpoints
+        (`PatchApimPolicy` / `DeleteApimPolicy` / `EnableApimPolicy` / `DisableApimPolicy`)
+        with the integer `id` returned here.
+      requestBody:
+        description: outbound policy content
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApimOutboundPolicyBody"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '201':    # status code
+          $ref: '#/components/responses/SuccessPostApimOutboundPolicy'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -486,6 +545,14 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ApimPolicy"
+    SuccessPostApimOutboundPolicy:
+      description: >
+        create api manager outbound policy — returns an array of policy records,
+        one per upstream id in the request body.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApimOutboundPolicyCollection"
 
   schemas:
     ErrorsResponse:
@@ -633,9 +700,48 @@ components:
         applicable:
           type: boolean
         configuration:
+          description: |
+            Policy configuration. Legacy policies (mule3/older mule4) return an array
+            of PolicyConfiguration items describing each configurable property. Modern
+            policies (AI/MCP/A2A and newer mule4) return a JSON Schema object
+            (draft-2019-09) describing the same structure with richer validation
+            (if/then/else, oneOf, etc.). Consumer code must check the runtime type
+            and parse accordingly.
+        schemaId:
+          type: string
+          description: Identifier of the underlying JSON schema for modern policies.
+        splitAssetModel:
+          type: boolean
+          description: Whether the policy uses the split asset model.
+        ootbUpgradeableImpl:
+          type: boolean
+          description: Whether the OOTB implementation supports in-place upgrades.
+        supportedJavaVersions:
           type: array
+          description: Java runtime versions this policy implementation is compatible with.
           items:
-            $ref: "#/components/schemas/PolicyConfiguration"
+            type: string
+            nullable: true
+        interfaceScope:
+          type: array
+          description: Scopes at which the policy can be applied (e.g. "api", "resource").
+          items:
+            type: string
+        interfaceTransformation:
+          type: array
+          description: |
+            Modern replacement for the flat ramlSnippet/oasV2Snippet/oasV3Snippet
+            fields. Each entry pairs a language identifier with a transformation
+            snippet to apply to the API definition.
+          items:
+            type: object
+            properties:
+              language:
+                type: string
+                description: Snippet language (e.g. ramlSnippet, ramlV1Snippet, oasV2Snippet, oasV3Snippet).
+              transformation:
+                type: string
+                description: The snippet body to merge into the API definition.
         allVersions:
           type: array
           items:
@@ -647,20 +753,51 @@ components:
                 type: string
               version:
                 type: string
+              status:
+                type: string
+                description: Lifecycle status of the version (e.g. published, deprecated, development).
 
     ApimPolicyCollection:
       oneOf:
         - type: array
-          title: "ApimPolicyCollecion"
+          title: "ApimPolicyCollection"
           items:
             $ref: "#/components/schemas/ApimPolicy"
-        - type: object
-          title: "ApimPolicyFullCollecion"
+        - $ref: "#/components/schemas/ApimPolicyFullData"
+
+    ApimPolicyFullData:
+      type: object
+      title: "ApimPolicyFullData"
+      properties:
+        policies:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApimPolicyFull"
+        tiers:
+          type: object
           properties:
-            policies:
+            values:
               type: array
               items:
-                $ref: "#/components/schemas/ApimPolicyFull"
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  limits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        maximumRequests:
+                          type: integer
+                        timePeriodInMilliseconds:
+                          type: integer
+                          format: int64
+                        visible:
+                          type: boolean
+            version:
+              type: integer
+              format: int64
 
     ApimPolicy:
       type: object
@@ -693,6 +830,17 @@ components:
           type: string
         apiId:
           type: integer
+        label:
+          type: string
+          nullable: true
+          description: Optional label applied to this policy instance.
+        upstreamId:
+          type: string
+          nullable: true
+          description: >
+            Identifier of the upstream this policy is bound to. Populated only when
+            the policy was created via the outbound endpoint (`PostApimOutboundPolicy`).
+            Absent for inbound policies.
 
     ApimPolicyFull:
       type: object
@@ -736,6 +884,50 @@ components:
           type: integer
         pointcutData:
           $ref: "#/components/schemas/PointcutData"
+
+    ApimOutboundPolicyBody:
+      type: object
+      description: >
+        Request body for creating an outbound policy. Differs from `ApimPolicyBody` in
+        two ways: it carries `apiVersionId` + `upstreamIds` (required, one or more
+        upstream identifiers), and it does NOT carry `pointcutData` — outbound policies
+        apply at the upstream binding level rather than via URL pointcuts.
+      required:
+        - configurationData
+        - apiVersionId
+        - groupId
+        - assetId
+        - assetVersion
+        - upstreamIds
+      properties:
+        configurationData:
+          type: object
+        apiVersionId:
+          type: integer
+          description: The numeric API instance id (same as `apiId` in `ApimPolicy`).
+        groupId:
+          type: string
+        assetId:
+          type: string
+        assetVersion:
+          type: string
+        label:
+          type: string
+          nullable: true
+        upstreamIds:
+          type: array
+          description: >
+            Upstream identifiers (UUID strings) the policy must bind to. The API
+            creates one policy record per id and returns them all in the response array.
+          items:
+            type: string
+
+    ApimOutboundPolicyCollection:
+      type: array
+      title: "ApimOutboundPolicyCollection"
+      description: One policy record per upstream id in the create request body.
+      items:
+        $ref: "#/components/schemas/ApimPolicy"
 
     ApimPolicyPatchBody:
       type: object
